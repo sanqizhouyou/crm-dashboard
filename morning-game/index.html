@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧠 早启动醒脑 - 晨会游戏</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { 
+  width: 100%; height: 100%; overflow: hidden;
+  font-family: 'Noto Sans SC', sans-serif;
+  background: #0a0a1a; color: #fff;
+}
+
+/* ============ PARTICLES ============ */
+#particles-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+
+/* ============ SCREENS ============ */
+.screen {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  display: none; z-index: 1;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.screen.active { display: flex; opacity: 1; }
+.screen.fade-in { animation: fadeIn 0.4s ease forwards; }
+.screen.fade-out { animation: fadeOut 0.3s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+@keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.97); } }
+
+/* ============ START SCREEN ============ */
+#start-screen {
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px; overflow-y: auto;
+}
+.main-title {
+  font-size: 4rem; font-weight: 900;
+  background: linear-gradient(135deg, #6C5CE7, #00CEC9, #FD79A8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 8px;
+  animation: titleGlow 3s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+.subtitle { font-size: 1.3rem; color: #aaa; margin-bottom: 30px; }
+.roster-box {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 30px; max-width: 800px; width: 100%;
+  backdrop-filter: blur(10px);
+}
+.roster-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; text-align: center; }
+.roster-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.roster-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 12px;
+  background: rgba(108, 92, 231, 0.1); border: 1px solid rgba(108, 92, 231, 0.2);
+  cursor: pointer; transition: all 0.2s;
+  font-size: 1.1rem;
+}
+.roster-item:hover { background: rgba(108, 92, 231, 0.2); }
+.roster-item.unchecked { opacity: 0.4; background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.05); }
+.roster-item input[type="checkbox"] {
+  width: 20px; height: 20px; accent-color: #6C5CE7; cursor: pointer;
+}
+.roster-actions { display: flex; gap: 12px; margin-top: 16px; justify-content: center; flex-wrap: wrap; }
+.roster-actions button {
+  padding: 6px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05); color: #ccc; cursor: pointer; font-size: 0.9rem;
+  font-family: inherit; transition: all 0.2s;
+}
+.roster-actions button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  padding: 16px 48px; font-size: 1.4rem; font-weight: 700;
+  border: none; border-radius: 16px; cursor: pointer;
+  background: linear-gradient(135deg, #6C5CE7, #a855f7);
+  color: #fff; font-family: inherit;
+  box-shadow: 0 8px 30px rgba(108, 92, 231, 0.4);
+  transition: all 0.3s; margin-top: 30px;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(108, 92, 231, 0.6); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  padding: 10px 24px; font-size: 1rem; font-weight: 500;
+  border: 2px solid rgba(255,255,255,0.2); border-radius: 12px;
+  background: transparent; color: #fff; cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: #6C5CE7; background: rgba(108, 92, 231, 0.1); }
+
+.btn-action {
+  padding: 14px 36px; font-size: 1.3rem; font-weight: 700;
+  border: none; border-radius: 14px; cursor: pointer;
+  background: linear-gradient(135deg, #00CEC9, #00b894);
+  color: #fff; font-family: inherit;
+  box-shadow: 0 6px 24px rgba(0, 206, 201, 0.4);
+  transition: all 0.3s;
+}
+.btn-action:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(0, 206, 201, 0.6); }
+
+.btn-danger {
+  padding: 10px 24px; font-size: 1rem; font-weight: 500;
+  border: 2px solid #e74c3c; border-radius: 12px;
+  background: transparent; color: #e74c3c; cursor: pointer;
+  font-family: inherit; transition: all 0.2s;
+}
+.btn-danger:hover { background: rgba(231, 76, 60, 0.15); }
+
+/* ============ GAME SELECT SCREEN ============ */
+#select-screen {
+  flex-direction: row; padding: 24px; gap: 24px; overflow: hidden;
+}
+.games-area {
+  flex: 1; display: flex; flex-direction: column; overflow-y: auto;
+  min-width: 0;
+}
+.select-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.select-title { font-size: 2rem; font-weight: 900; }
+.round-badge {
+  padding: 8px 20px; border-radius: 30px; font-size: 1.1rem; font-weight: 700;
+  background: linear-gradient(135deg, #FD79A8, #e84393);
+  box-shadow: 0 4px 16px rgba(253, 121, 168, 0.4);
+}
+.select-actions { display: flex; gap: 10px; }
+.games-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px; flex: 1;
+}
+.game-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 28px 20px; text-align: center;
+  cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 160px;
+}
+.game-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, var(--card-c1), var(--card-c2));
+  opacity: 0; transition: opacity 0.3s;
+}
+.game-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.2); }
+.game-card:hover::before { opacity: 0.15; }
+.game-card .icon { font-size: 3rem; margin-bottom: 12px; position: relative; z-index: 1; }
+.game-card .name { font-size: 1.4rem; font-weight: 700; position: relative; z-index: 1; }
+.game-card .desc { font-size: 0.85rem; color: #aaa; margin-top: 6px; position: relative; z-index: 1; }
+
+/* ============ LEADERBOARD SIDEBAR ============ */
+.leaderboard-sidebar {
+  width: 300px; min-width: 280px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 20px; display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.lb-title {
+  font-size: 1.4rem; font-weight: 900; text-align: center; margin-bottom: 16px;
+  background: linear-gradient(135deg, #f9ca24, #f0932b);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.lb-list { flex: 1; overflow-y: auto; }
+.lb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; margin-bottom: 4px;
+  transition: all 0.4s; font-size: 1.05rem;
+}
+.lb-item.top1 { background: rgba(255, 215, 0, 0.12); }
+.lb-item.top2 { background: rgba(192, 192, 192, 0.1); }
+.lb-item.top3 { background: rgba(205, 127, 50, 0.1); }
+.lb-rank { width: 32px; text-align: center; font-weight: 700; font-size: 1.1rem; }
+.lb-name { flex: 1; font-weight: 500; }
+.lb-score {
+  font-weight: 900; font-size: 1.2rem; min-width: 36px; text-align: right;
+  background: linear-gradient(135deg, #6C5CE7, #00CEC9);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.lb-item.score-bump { animation: scoreBump 0.6s ease; }
+@keyframes scoreBump {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.06); background: rgba(108, 92, 231, 0.15); }
+  100% { transform: scale(1); }
+}
+
+/* ============ GAME PLAY SCREEN ============ */
+#game-screen {
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px; text-align: center;
+}
+.game-top-bar {
+  position: absolute; top: 24px; left: 24px; right: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.game-label {
+  font-size: 1.3rem; font-weight: 700; padding: 8px 20px;
+  border-radius: 30px; background: rgba(255,255,255,0.08);
+}
+.game-content {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: 1; width: 100%; max-width: 1000px;
+}
+.game-prompt {
+  font-size: 6rem; font-weight: 900; line-height: 1.2;
+  margin-bottom: 30px; transition: all 0.3s;
+  max-width: 90vw; word-break: break-all;
+}
+.game-subtext {
+  font-size: 1.6rem; color: #aaa; margin-bottom: 30px;
+}
+.game-answer-reveal {
+  font-size: 3.5rem; font-weight: 900; padding: 20px 40px;
+  border-radius: 20px; background: rgba(0, 206, 201, 0.15);
+  border: 2px solid #00CEC9; display: none;
+  animation: revealPop 0.5s ease;
+}
+@keyframes revealPop {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.game-buttons { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+
+/* Reaction game specific */
+.reaction-zone {
+  width: 80vw; height: 50vh; border-radius: 30px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; font-weight: 900; transition: all 0.3s;
+  background: #1a1a2e; border: 3px solid rgba(255,255,255,0.1);
+}
+.reaction-zone.waiting { background: #c0392b; }
+.reaction-zone.ready { background: #27ae60; cursor: pointer; }
+.reaction-zone.clicked { background: #2980b9; }
+
+/* Memory game */
+.memory-grid {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
+  font-size: 4rem; margin-bottom: 20px;
+}
+.memory-item {
+  width: 100px; height: 100px; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05); border-radius: 16px;
+  transition: all 0.3s;
+}
+.memory-item.hidden-item { background: rgba(108, 92, 231, 0.2); }
+.memory-item.hidden-item::after { content: '❓'; font-size: 3rem; }
+.memory-item.hidden-item > span { display: none; }
+
+/* Find different */
+.find-grid {
+  display: grid; gap: 8px; justify-content: center;
+}
+.find-cell {
+  width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; background: rgba(255,255,255,0.03); border-radius: 12px;
+  transition: all 0.2s;
+}
+.find-cell.highlight { background: rgba(0, 206, 201, 0.3); border: 2px solid #00CEC9; animation: revealPop 0.4s ease; }
+
+/* ============ SCORE ENTRY SCREEN ============ */
+#score-screen {
+  flex-direction: column; align-items: center; padding: 30px;
+  overflow-y: auto;
+}
+.score-header { font-size: 2rem; font-weight: 900; margin-bottom: 6px; }
+.score-subheader { font-size: 1.1rem; color: #aaa; margin-bottom: 24px; }
+.score-list {
+  width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 8px;
+}
+.score-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: 14px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.2s;
+}
+.score-row.has-score { border-color: rgba(108, 92, 231, 0.4); background: rgba(108, 92, 231, 0.08); }
+.score-name { font-size: 1.2rem; font-weight: 600; width: 100px; }
+.score-value {
+  font-size: 1.6rem; font-weight: 900; min-width: 50px; text-align: center;
+  color: #00CEC9;
+}
+.score-btns { display: flex; gap: 6px; flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+.score-btn {
+  width: 52px; height: 44px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04); color: #fff; font-size: 1rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.score-btn:hover { border-color: #6C5CE7; background: rgba(108, 92, 231, 0.15); }
+.score-btn:active { transform: scale(0.92); }
+.score-btn.active-plus { background: rgba(0, 206, 201, 0.2); border-color: #00CEC9; }
+.score-btn.reset-btn { border-color: rgba(231, 76, 60, 0.4); color: #e74c3c; font-size: 0.85rem; }
+.score-btn.reset-btn:hover { background: rgba(231, 76, 60, 0.15); }
+.score-confirm { margin-top: 28px; }
+
+/* ============ FULLSCREEN REACTION OVERLAY ============ */
+.reaction-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 100; display: none; align-items: center; justify-content: center;
+  font-size: 4rem; font-weight: 900; cursor: pointer;
+  transition: background 0.15s;
+}
+.reaction-overlay.show { display: flex; }
+
+/* ============ COUNTDOWN ============ */
+.countdown-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 90; display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.85); font-size: 12rem; font-weight: 900;
+  color: #6C5CE7;
+}
+.countdown-overlay.show { display: flex; }
+.countdown-num { animation: countPop 0.8s ease; }
+@keyframes countPop {
+  0% { transform: scale(2); opacity: 0; }
+  40% { transform: scale(1); opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* ============ TOAST ============ */
+.toast {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px);
+  padding: 14px 28px; border-radius: 14px; font-size: 1.1rem; font-weight: 600;
+  background: rgba(108, 92, 231, 0.95); color: #fff; z-index: 200;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3); transition: transform 0.4s ease;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ============ CONFIRM DIALOG ============ */
+.dialog-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); z-index: 150; display: none;
+  align-items: center; justify-content: center;
+}
+.dialog-overlay.show { display: flex; }
+.dialog-box {
+  background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 36px; text-align: center;
+  max-width: 400px; width: 90%;
+}
+.dialog-box h3 { font-size: 1.4rem; margin-bottom: 12px; }
+.dialog-box p { color: #aaa; margin-bottom: 24px; }
+.dialog-btns { display: flex; gap: 12px; justify-content: center; }
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(108, 92, 231, 0.4); border-radius: 3px; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+  #select-screen { flex-direction: column; }
+  .leaderboard-sidebar { width: 100%; min-width: unset; max-height: 250px; }
+  .games-grid { grid-template-columns: repeat(2, 1fr); }
+  .game-prompt { font-size: 3.5rem; }
+}
+@media (max-width: 600px) {
+  .games-grid { grid-template-columns: 1fr; }
+  .main-title { font-size: 2.5rem; }
+  .game-prompt { font-size: 2.5rem; }
+}
+</style>
+</head>
+<body>
+<!-- Particles Canvas -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ============ START SCREEN ============ -->
+<div id="start-screen" class="screen active">
+  <div class="main-title">🧠 早启动醒脑</div>
+  <div class="subtitle">上海一区 · 晨会互动游戏</div>
+  <div class="roster-box">
+    <div class="roster-title">📋 今日参与人员（取消勾选缺席成员）</div>
+    <div class="roster-grid" id="roster-grid"></div>
+    <div class="roster-actions">
+      <button onclick="toggleAllRoster(true)">全选</button>
+      <button onclick="toggleAllRoster(false)">全不选</button>
+      <button onclick="loadPreviousSession()">恢复上次</button>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="startGame()">🚀 开始游戏</button>
+</div>
+
+<!-- ============ GAME SELECT SCREEN ============ -->
+<div id="select-screen" class="screen">
+  <div class="games-area">
+    <div class="select-header">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div class="select-title">🎮 选择游戏</div>
+        <div class="round-badge" id="round-badge">第 1 轮</div>
+      </div>
+      <div class="select-actions">
+        <button class="btn-secondary" onclick="goHome()">🏠 返回首页</button>
+        <button class="btn-danger" onclick="confirmResetScores()">🔄 重置积分</button>
+      </div>
+    </div>
+    <div class="games-grid" id="games-grid"></div>
+  </div>
+  <div class="leaderboard-sidebar">
+    <div class="lb-title">🏆 积分排行榜</div>
+    <div class="lb-list" id="lb-list"></div>
+  </div>
+</div>
+
+<!-- ============ GAME PLAY SCREEN ============ -->
+<div id="game-screen" class="screen">
+  <div class="game-top-bar">
+    <div class="game-label" id="game-label"></div>
+    <button class="btn-secondary" onclick="exitGame()">✕ 退出</button>
+  </div>
+  <div class="game-content" id="game-content"></div>
+</div>
+
+<!-- ============ SCORE ENTRY SCREEN ============ -->
+<div id="score-screen" class="screen">
+  <div class="score-header">📝 录入得分</div>
+  <div class="score-subheader" id="score-subheader"></div>
+  <div class="score-list" id="score-list"></div>
+  <div class="score-confirm">
+    <button class="btn-primary" onclick="confirmScores()" style="margin-top:12px;">✅ 确认录入</button>
+  </div>
+  <button class="btn-secondary" style="margin-top:16px;" onclick="skipScoring()">⏭ 跳过本轮</button>
+</div>
+
+<!-- Reaction overlay -->
+<div class="reaction-overlay" id="reaction-overlay"></div>
+
+<!-- Countdown overlay -->
+<div class="countdown-overlay" id="countdown-overlay"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Confirm dialog -->
+<div class="dialog-overlay" id="dialog-overlay">
+  <div class="dialog-box">
+    <h3 id="dialog-title">确认</h3>
+    <p id="dialog-msg">确定要重置所有积分吗？此操作不可撤销。</p>
+    <div class="dialog-btns">
+      <button class="btn-secondary" onclick="closeDialog()">取消</button>
+      <button class="btn-primary" style="padding:10px 28px;font-size:1rem;margin-top:0;" id="dialog-confirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+const ALL_MEMBERS = ['周巍','范子卿','高圣杰','姜骏毅','刘青','李毅','李卓艺','孙逸飞','王梦奇','王野','王种卿','习嘉辰'];
+
+const GAMES = [
+  { id:'reaction', icon:'⚡', name:'闪电反应', desc:'屏幕变绿，比谁反应快！', c1:'#e74c3c', c2:'#f39c12' },
+  { id:'math',     icon:'🔢', name:'速算风暴', desc:'心算比拼，先答先得分', c1:'#6C5CE7', c2:'#a855f7' },
+  { id:'stroop',   icon:'🎨', name:'色字矛盾', desc:'说颜色不说字，考验大脑', c1:'#00CEC9', c2:'#00b894' },
+  { id:'memory',   icon:'🧩', name:'记忆闪烁', desc:'短暂记忆，考验眼力', c1:'#FD79A8', c2:'#e84393' },
+  { id:'finddiff', icon:'👀', name:'找不同',   desc:'茫茫emoji中找出异类', c1:'#f9ca24', c2:'#f0932b' },
+  { id:'reverse',  icon:'💬', name:'倒序挑战', desc:'倒着说，越长越难', c1:'#2d3436', c2:'#636e72' },
+];
+
+let state = {
+  participants: [...ALL_MEMBERS],
+  scores: {},        // { name: totalScore }
+  round: 1,
+  currentGame: null,
+  roundScores: {},   // temp scores for current round
+};
+
+// ============ PERSISTENCE ============
+function saveState() {
+  try { localStorage.setItem('morningGame', JSON.stringify(state)); } catch(e){}
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem('morningGame');
+    if (s) return JSON.parse(s);
+  } catch(e){}
+  return null;
+}
+function loadPreviousSession() {
+  const s = loadState();
+  if (!s) { showToast('没有找到上次会话'); return; }
+  state = s;
+  renderRoster();
+  // check previously selected
+  document.querySelectorAll('.roster-item').forEach(el => {
+    const name = el.dataset.name;
+    const cb = el.querySelector('input');
+    cb.checked = state.participants.includes(name);
+    el.classList.toggle('unchecked', !cb.checked);
+  });
+  showToast('已恢复上次会话（第' + state.round + '轮，积分已恢复）');
+}
+
+// ============ PARTICLES ============
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  
+  const colors = ['rgba(108,92,231,0.4)','rgba(0,206,201,0.3)','rgba(253,121,168,0.3)'];
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random()*W, y: Math.random()*H,
+      r: Math.random()*3+1, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5,
+      c: colors[Math.floor(Math.random()*colors.length)]
+    });
+  }
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p => {
+      p.x += p.dx; p.y += p.dy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.c; ctx.fill();
+    });
+    // draw some connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i+1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 150) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(108,92,231,${0.1*(1-dist/150)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ============ SCREEN MANAGEMENT ============
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s.classList.contains('active')) {
+      s.classList.remove('active');
+      s.style.display = 'none';
+    }
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+  // Force reflow for animation
+  void el.offsetWidth;
+  el.classList.add('active', 'fade-in');
+  setTimeout(() => el.classList.remove('fade-in'), 400);
+}
+
+// ============ TOAST ============
+function showToast(msg, duration=2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ============ DIALOG ============
+function showDialog(title, msg, onConfirm) {
+  document.getElementById('dialog-title').textContent = title;
+  document.getElementById('dialog-msg').textContent = msg;
+  document.getElementById('dialog-overlay').classList.add('show');
+  document.getElementById('dialog-confirm').onclick = () => { closeDialog(); onConfirm(); };
+}
+function closeDialog() { document.getElementById('dialog-overlay').classList.remove('show'); }
+
+// ============ ROSTER (START SCREEN) ============
+function renderRoster() {
+  const grid = document.getElementById('roster-grid');
+  grid.innerHTML = ALL_MEMBERS.map(name => `
+    <label class="roster-item" data-name="${name}">
+      <input type="checkbox" checked onchange="toggleMember(this, '${name}')">
+      <span>${name}</span>
+    </label>
+  `).join('');
+}
+function toggleMember(cb, name) {
+  cb.closest('.roster-item').classList.toggle('unchecked', !cb.checked);
+}
+function toggleAllRoster(val) {
+  document.querySelectorAll('.roster-item').forEach(el => {
+    el.querySelector('input').checked = val;
+    el.classList.toggle('unchecked', !val);
+  });
+}
+
+// ============ START GAME ============
+function startGame() {
+  const checked = [];
+  document.querySelectorAll('.roster-item input:checked').forEach(cb => {
+    checked.push(cb.closest('.roster-item').dataset.name);
+  });
+  if (checked.length < 2) { showToast('至少需要2人参与！'); return; }
+  
+  state.participants = checked;
+  // Initialize scores for new participants, keep existing
+  checked.forEach(name => {
+    if (!(name in state.scores)) state.scores[name] = 0;
+  });
+  // Remove scores for unchecked
+  Object.keys(state.scores).forEach(name => {
+    if (!checked.includes(name)) delete state.scores[name];
+  });
+  
+  saveState();
+  renderSelectScreen();
+  showScreen('select-screen');
+}
+
+// ============ GAME SELECT SCREEN ============
+function renderSelectScreen() {
+  document.getElementById('round-badge').textContent = `第 ${state.round} 轮`;
+  
+  const grid = document.getElementById('games-grid');
+  grid.innerHTML = GAMES.map(g => `
+    <div class="game-card" style="--card-c1:${g.c1};--card-c2:${g.c2}" onclick="playGame('${g.id}')">
+      <div class="icon">${g.icon}</div>
+      <div class="name">${g.name}</div>
+      <div class="desc">${g.desc}</div>
+    </div>
+  `).join('');
+  
+  renderLeaderboard();
+}
+function renderLeaderboard() {
+  const list = document.getElementById('lb-list');
+  const sorted = state.participants.map(n => ({ name: n, score: state.scores[n]||0 }))
+    .sort((a,b) => b.score - a.score);
+  
+  const medals = ['🥇','🥈','🥉'];
+  list.innerHTML = sorted.map((p, i) => {
+    const topClass = i === 0 && p.score > 0 ? 'top1' : i === 1 && p.score > 0 ? 'top2' : i === 2 && p.score > 0 ? 'top3' : '';
+    const rank = p.score > 0 && i < 3 ? medals[i] : (i+1);
+    return `<div class="lb-item ${topClass}" data-name="${p.name}">
+      <div class="lb-rank">${rank}</div>
+      <div class="lb-name">${p.name}</div>
+      <div class="lb-score">${p.score}</div>
+    </div>`;
+  }).join('');
+}
+
+function goHome() {
+  showScreen('start-screen');
+  // Re-render roster with current participants checked
+  document.querySelectorAll('.roster-item').forEach(el => {
+    const name = el.dataset.name;
+    const cb = el.querySelector('input');
+    cb.checked = state.participants.includes(name);
+    el.classList.toggle('unchecked', !cb.checked);
+  });
+}
+function confirmResetScores() {
+  showDialog('重置积分', '确定要清零所有人的积分吗？此操作不可撤销。', () => {
+    state.participants.forEach(n => state.scores[n] = 0);
+    state.round = 1;
+    saveState();
+    renderSelectScreen();
+    showToast('积分已重置');
+  });
+}
+
+// ============ GAME PLAY ============
+function playGame(gameId) {
+  state.currentGame = gameId;
+  const game = GAMES.find(g => g.id === gameId);
+  document.getElementById('game-label').textContent = `${game.icon} ${game.name} · 第${state.round}轮`;
+  showScreen('game-screen');
+  
+  switch(gameId) {
+    case 'reaction': startReactionGame(); break;
+    case 'math':     startMathGame(); break;
+    case 'stroop':   startStroopGame(); break;
+    case 'memory':   startMemoryGame(); break;
+    case 'finddiff': startFindDiffGame(); break;
+    case 'reverse':  startReverseGame(); break;
+  }
+}
+function exitGame() {
+  // Clean up any timers
+  clearAllTimers();
+  const overlay = document.getElementById('reaction-overlay');
+  overlay.classList.remove('show'); overlay.onclick = null;
+  renderSelectScreen();
+  showScreen('select-screen');
+}
+function goToScoring() {
+  clearAllTimers();
+  const overlay = document.getElementById('reaction-overlay');
+  overlay.classList.remove('show'); overlay.onclick = null;
+  showScoreScreen();
+}
+
+let _timers = [];
+function addTimer(t) { _timers.push(t); }
+function clearAllTimers() { _timers.forEach(t => clearTimeout(t)); _timers = []; }
+
+// ---- REACTION GAME ----
+function startReactionGame() {
+  const content = document.getElementById('game-content');
+  content.innerHTML = `
+    <div class="game-subtext">等待屏幕变绿后，最先拍桌子的人得分！</div>
+    <div class="reaction-zone waiting" id="rzone">
+      <span>⏳ 等待中…</span>
+    </div>
+    <div class="game-buttons" id="reaction-buttons" style="margin-top:24px;">
+      <button class="btn-action" onclick="startReactionRound()">🟢 开始</button>
+    </div>
+  `;
+}
+function startReactionRound() {
+  const zone = document.getElementById('rzone');
+  const btns = document.getElementById('reaction-buttons');
+  zone.className = 'reaction-zone waiting';
+  zone.innerHTML = '<span>⏳ 准备…不要提前动！</span>';
+  btns.innerHTML = '';
+  
+  const delay = 2000 + Math.random() * 5000; // 2-7 seconds random
+  const t = setTimeout(() => {
+    zone.className = 'reaction-zone ready';
+    zone.innerHTML = '<span>🟢 拍！拍！拍！</span>';
+    zone.style.cursor = 'pointer';
+    
+    const startTime = Date.now();
+    zone.onclick = () => {
+      const elapsed = Date.now() - startTime;
+      zone.className = 'reaction-zone clicked';
+      zone.innerHTML = `<span>⏱ ${elapsed}ms<br>主持人记录最快反应者！</span>`;
+      zone.onclick = null;
+      btns.innerHTML = `
+        <button class="btn-action" onclick="startReactionRound()">🔄 再来一次</button>
+        <button class="btn-primary" style="margin-top:0" onclick="goToScoring()">📝 录入得分</button>
+      `;
+    };
+  }, delay);
+  addTimer(t);
+}
+
+// ---- MATH GAME ----
+function startMathGame() {
+  const ops = [
+    () => { // addition
+      const a = rand(10,99), b = rand(10,99);
+      return { q: `${a} + ${b} = ?`, a: a+b };
+    },
+    () => { // subtraction
+      const a = rand(30,99), b = rand(10, a);
+      return { q: `${a} − ${b} = ?`, a: a-b };
+    },
+    () => { // multiplication
+      const a = rand(2,19), b = rand(2,19);
+      return { q: `${a} × ${b} = ?`, a: a*b };
+    },
+    () => { // two-step
+      const a = rand(10,50), b = rand(10,50), c = rand(1,20);
+      return { q: `${a} + ${b} − ${c} = ?`, a: a+b-c };
+    },
+    () => { // bigger multiplication
+      const a = rand(11,25), b = rand(3,9);
+      return { q: `${a} × ${b} = ?`, a: a*b };
+    }
+  ];
+  
+  const problem = ops[rand(0, ops.length-1)]();
+  
+  const content = document.getElementById('game-content');
+  content.innerHTML = `
+    <div class="game-subtext">心算！最先喊出正确答案的人得分</div>
+    <div class="game-prompt" id="math-q">${problem.q}</div>
+    <div class="game-answer-reveal" id="math-a">${problem.a}</div>
+    <div class="game-buttons" id="math-btns">
+      <button class="btn-action" onclick="revealMathAnswer()">🔍 揭晓答案</button>
+    </div>
+  `;
+}
+function revealMathAnswer() {
+  document.getElementById('math-a').style.display = 'block';
+  document.getElementById('math-btns').innerHTML = `
+    <button class="btn-action" onclick="startMathGame()">🔄 下一题</button>
+    <button class="btn-primary" style="margin-top:0" onclick="goToScoring()">📝 录入得分</button>
+  `;
+}
+
+// ---- STROOP GAME ----
+function startStroopGame() {
+  const colorMap = [
+    { name: '红色', hex: '#e74c3c' },
+    { name: '蓝色', hex: '#3498db' },
+    { name: '绿色', hex: '#2ecc71' },
+    { name: '黄色', hex: '#f1c40f' },
+    { name: '紫色', hex: '#9b59b6' },
+    { name: '橙色', hex: '#e67e22' },
+    { name: '粉色', hex: '#FD79A8' },
+    { name: '白色', hex: '#ecf0f1' },
+  ];
+  
+  const wordIdx = rand(0, colorMap.length-1);
+  let colorIdx = rand(0, colorMap.length-1);
+  while (colorIdx === wordIdx) colorIdx = rand(0, colorMap.length-1);
+  
+  const word = colorMap[wordIdx].name;
+  const displayColor = colorMap[colorIdx].hex;
+  const correctAnswer = colorMap[colorIdx].name;
+  
+  const content = document.getElementById('game-content');
+  content.innerHTML = `
+    <div class="game-subtext">说出文字的【颜色】，不是文字内容！</div>
+    <div class="game-prompt" style="color:${displayColor}">${word}</div>
+    <div class="game-answer-reveal" id="stroop-a">正确答案：${correctAnswer}</div>
+    <div class="game-buttons" id="stroop-btns">
+      <button class="btn-action" onclick="revealStroopAnswer()">🔍 揭晓答案</button>
+    </div>
+  `;
+}
+function revealStroopAnswer() {
+  document.getElementById('stroop-a').style.display = 'block';
+  document.getElementById('stroop-btns').innerHTML = `
+    <button class="btn-action" onclick="startStroopGame()">🔄 下一题</button>
+    <button class="btn-primary" style="margin-top:0" onclick="goToScoring()">📝 录入得分</button>
+  `;
+}
+
+// ---- MEMORY GAME ----
+function startMemoryGame() {
+  const emojiPool = ['🍎','🍊','🍋','🍇','🍉','🍓','🍑','🥝','🍌','🫐','🥑','🍒','🌽','🥕','🍄','🌶️','🧅','🍍','🥭','🫑'];
+  const count = rand(5, 8);
+  const selected = shuffle([...emojiPool]).slice(0, count);
+  
+  const content = document.getElementById('game-content');
+  content.innerHTML = `
+    <div class="game-subtext">记住这些物品！3秒后隐藏</div>
+    <div class="memory-grid" id="mem-grid">
+      ${selected.map(e => `<div class="memory-item"><span>${e}</span></div>`).join('')}
+    </div>
+    <div class="game-prompt" style="font-size:2rem;color:#aaa;" id="mem-timer">3</div>
+    <div class="game-answer-reveal" id="mem-a">答案：${selected.join(' ')}</div>
+    <div class="game-buttons" id="mem-btns"></div>
+  `;
+  
+  let countdown = 3;
+  const timer = setInterval(() => {
+    countdown--;
+    document.getElementById('mem-timer').textContent = countdown > 0 ? countdown : '时间到！';
+    if (countdown <= 0) {
+      clearInterval(timer);
+      document.querySelectorAll('.memory-item').forEach(el => el.classList.add('hidden-item'));
+      document.getElementById('mem-timer').textContent = '已隐藏！谁能说出所有物品？';
+      document.getElementById('mem-btns').innerHTML = `
+        <button class="btn-action" onclick="revealMemoryAnswer()">🔍 揭晓答案</button>
+      `;
+    }
+  }, 1000);
+  addTimer(timer);
+}
+function revealMemoryAnswer() {
+  document.querySelectorAll('.memory-item').forEach(el => el.classList.remove('hidden-item'));
+  document.getElementById('mem-a').style.display = 'block';
+  document.getElementById('mem-btns').innerHTML = `
+    <button class="btn-action" onclick="startMemoryGame()">🔄 下一题</button>
+    <button class="btn-primary" style="margin-top:0" onclick="goToScoring()">📝 录入得分</button>
+  `;
+}
+
+// ---- FIND DIFFERENT ----
+function startFindDiffGame() {
+  const emojiSets = [
+    { normal: '🐱', diff: '🐶' }, { normal: '🍎', diff: '🍊' },
+    { normal: '😀', diff: '😃' }, { normal: '🔵', diff: '🟣' },
+    { normal: '🌸', diff: '🌺' }, { normal: '⭐', diff: '🌟' },
+    { normal: '🐸', diff: '🐢' }, { normal: '🍕', diff: '🍔' },
+    { normal: '🎈', diff: '🎀' }, { normal: '🦊', diff: '🐺' },
+    { normal: '🌙', diff: '☀️' }, { normal: '🎵', diff: '🎶' },
+    { normal: '📚', diff: '📖' }, { normal: '🏀', diff: '⚽' },
+    { normal: '🚗', diff: '🚙' }, { normal: '✈️', diff: '🚀' },
+  ];
+  
+  const set = emojiSets[rand(0, emojiSets.length-1)];
+  const gridSize = rand(4,6);
+  const total = gridSize * gridSize;
+  const diffPos = rand(0, total-1);
+  
+  const content = document.getElementById('game-content');
+  const cells = [];
+  for (let i = 0; i < total; i++) {
+    cells.push(i === diffPos ? set.diff : set.normal);
+  }
+  
+  content.innerHTML = `
+    <div class="game-subtext">找出不同的那个！第几行第几列？</div>
+    <div class="find-grid" id="find-grid" style="grid-template-columns:repeat(${gridSize},80px)">
+      ${cells.map((e,i) => `<div class="find-cell" data-idx="${i}">${e}</div>`).join('')}
+    </div>
+    <div class="game-buttons" id="find-btns">
+      <button class="btn-action" onclick="revealFindDiff(${diffPos})">🔍 揭晓答案</button>
+    </div>
+  `;
+}
+function revealFindDiff(pos) {
+  document.querySelector(`.find-cell[data-idx="${pos}"]`).classList.add('highlight');
+  const grid = document.getElementById('find-grid');
+  const cols = parseInt(grid.style.gridTemplateColumns.split('repeat(')[1]);
+  const row = Math.floor(pos / cols) + 1;
+  const col = pos % cols + 1;
+  document.getElementById('find-btns').innerHTML = `
+    <div style="font-size:1.5rem;font-weight:700;color:#00CEC9;">答案：第${row}行第${col}列</div>
+    <button class="btn-action" onclick="startFindDiffGame()">🔄 下一题</button>
+    <button class="btn-primary" style="margin-top:0" onclick="goToScoring()">📝 录入得分</button>
+  `;
+}
+
+// ---- REVERSE GAME ----
+function startReverseGame() {
+  const phrases = [
+    '你好世界','早上好','加油干','上海一区','开门红','好好学习','天天向上',
+    '恭喜发财','万事如意','心想事成','马到成功','大展宏图','步步高升',
+    '一帆风顺','前程似锦','左右逢源','龙马精神','蒸蒸日上',
+    '人工智能','客户至上','团队协作','销售冠军','勇往直前',
+    '披荆斩棘','乘风破浪','不忘初心','脚踏实地','志存高远',
+    '雷厉风行','精益求精','追求卓越','全力以赴',
+  ];
+  
+  const phrase = phrases[rand(0, phrases.length-1)];
+  const reversed = phrase.split('').reverse().join('');
+  
+  const content = document.getElementById('game-content');
+  content.innerHTML = `
+    <div class="game-subtext">把下面的词倒过来说！</div>
+    <div class="game-prompt">${phrase}</div>
+    <div class="game-answer-reveal" id="rev-a">倒序：${reversed}</div>
+    <div class="game-buttons" id="rev-btns">
+      <button class="btn-action" onclick="revealReverseAnswer()">🔍 揭晓答案</button>
+    </div>
+  `;
+}
+function revealReverseAnswer() {
+  document.getElementById('rev-a').style.display = 'block';
+  document.getElementById('rev-btns').innerHTML = `
+    <button class="btn-action" onclick="startReverseGame()">🔄 下一题</button>
+    <button class="btn-primary" style="margin-top:0" onclick="goToScoring()">📝 录入得分</button>
+  `;
+}
+
+// ============ SCORE ENTRY ============
+function showScoreScreen() {
+  const game = GAMES.find(g => g.id === state.currentGame);
+  document.getElementById('score-subheader').textContent = `${game.icon} ${game.name} · 第${state.round}轮`;
+  
+  // Reset round scores
+  state.roundScores = {};
+  state.participants.forEach(n => state.roundScores[n] = 0);
+  
+  renderScoreList();
+  showScreen('score-screen');
+}
+function renderScoreList() {
+  const list = document.getElementById('score-list');
+  list.innerHTML = state.participants.map(name => {
+    const val = state.roundScores[name] || 0;
+    return `<div class="score-row ${val > 0 ? 'has-score' : ''}" data-name="${name}">
+      <div class="score-name">${name}</div>
+      <div class="score-value" id="sv-${name}">${val > 0 ? '+'+val : val}</div>
+      <div class="score-btns">
+        <button class="score-btn" onclick="addScore('${name}', 1)">+1</button>
+        <button class="score-btn" onclick="addScore('${name}', 2)">+2</button>
+        <button class="score-btn" onclick="addScore('${name}', 3)">+3</button>
+        <button class="score-btn" onclick="addScore('${name}', 5)">+5</button>
+        <button class="score-btn reset-btn" onclick="resetScore('${name}')">归零</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function addScore(name, pts) {
+  state.roundScores[name] = (state.roundScores[name] || 0) + pts;
+  updateScoreDisplay(name);
+}
+function resetScore(name) {
+  state.roundScores[name] = 0;
+  updateScoreDisplay(name);
+}
+function updateScoreDisplay(name) {
+  const val = state.roundScores[name] || 0;
+  const el = document.getElementById('sv-' + name);
+  if (el) {
+    el.textContent = val > 0 ? '+'+val : val;
+    el.style.transform = 'scale(1.3)';
+    setTimeout(() => el.style.transform = 'scale(1)', 200);
+  }
+  const row = el?.closest('.score-row');
+  if (row) row.classList.toggle('has-score', val > 0);
+}
+function confirmScores() {
+  // Apply round scores to total
+  const scoredPeople = [];
+  state.participants.forEach(name => {
+    const pts = state.roundScores[name] || 0;
+    if (pts > 0) {
+      state.scores[name] = (state.scores[name] || 0) + pts;
+      scoredPeople.push(`${name}+${pts}`);
+    }
+  });
+  
+  state.round++;
+  saveState();
+  
+  if (scoredPeople.length > 0) {
+    showToast(`✅ 已录入：${scoredPeople.join('，')}`);
+  } else {
+    showToast('本轮无人得分');
+  }
+  
+  renderSelectScreen();
+  showScreen('select-screen');
+  
+  // Animate leaderboard updates
+  setTimeout(() => {
+    scoredPeople.forEach(sp => {
+      const name = sp.split('+')[0];
+      const item = document.querySelector(`.lb-item[data-name="${name}"]`);
+      if (item) item.classList.add('score-bump');
+    });
+  }, 300);
+}
+function skipScoring() {
+  state.round++;
+  saveState();
+  renderSelectScreen();
+  showScreen('select-screen');
+  showToast('⏭ 已跳过本轮计分');
+}
+
+// ============ UTILITIES ============
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+  initParticles();
+  renderRoster();
+  
+  // Try to restore state
+  const saved = loadState();
+  if (saved && saved.participants && saved.participants.length > 0) {
+    // Merge saved scores
+    if (saved.scores) {
+      Object.keys(saved.scores).forEach(k => {
+        state.scores[k] = saved.scores[k];
+      });
+    }
+    if (saved.round) state.round = saved.round;
+  }
+});
+</script>
+</body>
+</html>

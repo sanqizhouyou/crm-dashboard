@@ -1,0 +1,2767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM数据与任务看板 - 周巍</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f6f8;--card:#fff;--card-hover:#f9f9fb;--border:#e8e8e8;--text:#333;--text-dim:#888;--accent:#FF6B35;--accent-dim:rgba(255,107,53,.12);--green:#22c55e;--green-dim:rgba(34,197,94,.12);--blue:#3b82f6;--blue-dim:rgba(59,130,246,.12);--orange:#f97316;--orange-dim:rgba(249,115,22,.12);--red:#ef4444;--red-dim:rgba(239,68,68,.12);--purple:#a855f7;--purple-dim:rgba(168,85,247,.12);--cyan:#06b6d4;--cyan-dim:rgba(6,182,212,.12)}
+body{font-family:-apple-system,'SF Pro Display','PingFang SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:70px}
+
+/* Login screen */
+#loginScreen{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
+#loginScreen.hidden{display:none}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:360px;max-width:90vw;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.1)}
+.login-box h2{font-size:22px;margin-bottom:6px;color:var(--accent)}
+.login-box .sub{font-size:13px;color:var(--text-dim);margin-bottom:28px}
+.login-box input{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;margin-bottom:14px;outline:none;transition:border-color .2s}
+.login-box input:focus{border-color:var(--accent)}
+.login-box input::placeholder{color:var(--text-dim)}
+.login-box button{width:100%;padding:12px;background:var(--accent);color:#000;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:4px}
+.login-box button:hover{opacity:.85}
+.login-box .err{color:var(--red);font-size:13px;margin-top:10px;min-height:18px}
+#mainApp.hidden{display:none}
+.header{padding:20px 32px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.header h1{font-size:22px;font-weight:600}
+.header h1 span{color:var(--accent)}
+.header-right{display:flex;gap:10px;align-items:center}
+.search-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-size:14px;width:220px;outline:none;transition:border-color .2s}
+.search-box:focus{border-color:var(--accent)}
+.hdr-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text-dim);font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.hdr-btn:hover,.hdr-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+
+/* Quick entry */
+.quick-entry{padding:12px 32px;display:flex;gap:10px;align-items:center;background:linear-gradient(90deg,rgba(255,209,0,.06),transparent);border-bottom:1px solid var(--border)}
+.quick-entry .icon{font-size:20px}
+.quick-input{flex:1;background:var(--card);border:2px solid var(--border);border-radius:10px;padding:10px 16px;color:var(--text);font-size:15px;outline:none;transition:border-color .2s}
+.quick-input:focus{border-color:var(--accent)}
+.quick-input::placeholder{color:var(--text-dim)}
+.quick-hint{font-size:12px;color:var(--text-dim);white-space:nowrap}
+
+/* Match dropdown */
+.match-dropdown{position:absolute;left:0;right:0;top:100%;background:var(--card);border:1px solid var(--accent);border-radius:0 0 10px 10px;z-index:200;max-height:200px;overflow-y:auto;display:none}
+.match-dropdown.show{display:block}
+.match-item{padding:10px 16px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.match-item:hover,.match-item.sel{background:var(--accent-dim);color:var(--accent)}
+.match-item .stage-tag{font-size:11px;opacity:.7}
+.quick-wrap{position:relative;flex:1}
+
+/* Stats */
+.stats-bar{display:flex;gap:10px;padding:16px 32px;overflow-x:auto;flex-wrap:wrap}
+.stat-card{flex:1;min-width:120px;background:var(--card);border-radius:10px;padding:14px 16px;border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.stat-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.stat-card.active{border-color:var(--accent);background:var(--accent-dim)}
+.stat-label{font-size:11px;color:var(--text-dim);margin-bottom:4px}
+.stat-value{font-size:26px;font-weight:700}
+.stage-7天 .stat-value{color:var(--red)}
+.stage-30天 .stat-value{color:var(--orange)}
+.stage-长期 .stat-value{color:var(--blue)}
+.stage-线索 .stat-value{color:var(--purple)}
+.stage-回款 .stat-value{color:var(--green)}
+.stage-流失 .stat-value{color:var(--text-dim)}
+
+.amount-bar{padding:0 32px 12px;display:flex;gap:12px;flex-wrap:wrap}
+.amount-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:160px}
+.amount-card .a-label{font-size:11px;color:var(--text-dim)}
+.amount-card .a-value{font-size:20px;font-weight:700;color:var(--accent);margin-top:2px}
+
+/* Project tracking section */
+.project-section{padding:0 32px 16px}
+.project-title{font-size:13px;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.project-title .proj-icon{font-size:16px}
+.project-title span{font-size:11px;background:var(--purple-dim);color:var(--purple);padding:2px 8px;border-radius:4px}
+.project-grid{display:flex;gap:14px;flex-wrap:wrap}
+.project-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;flex:1;min-width:320px;transition:border-color .2s}
+.project-card:hover{border-color:var(--purple)}
+.project-card .pc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.project-card .pc-name{font-size:16px;font-weight:600;color:var(--text)}
+.project-card .pc-status{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:500}
+.project-card .pc-status.prep{background:var(--orange-dim);color:var(--orange)}
+.project-card .pc-status.active{background:var(--green-dim);color:var(--green)}
+.project-card .pc-status.review{background:var(--blue-dim);color:var(--blue)}
+.project-card .pc-desc{font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:12px}
+.project-card .pc-section{margin-bottom:10px}
+.project-card .pc-section-title{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.project-card .pc-item{font-size:12px;color:var(--text);line-height:1.7;padding-left:12px;position:relative}
+.project-card .pc-item::before{content:'•';position:absolute;left:0;color:var(--purple)}
+.project-card .pc-members{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.project-card .pc-member{font-size:11px;background:rgba(0,0,0,.04);border-radius:4px;padding:2px 8px;color:var(--text-dim)}
+.project-card .pc-member.me{background:var(--accent-dim);color:var(--accent)}
+.project-card .pc-deadline{font-size:11px;color:var(--red);margin-top:8px;display:flex;align-items:center;gap:4px}
+.project-card .pc-updated{font-size:11px;color:var(--text-dim);margin-top:8px;text-align:right}
+
+/* Sales target section */
+.target-section{padding:0 32px 12px}
+.target-title{font-size:13px;color:var(--text-dim);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.target-title span{font-size:11px;background:var(--accent-dim);color:var(--accent);padding:2px 8px;border-radius:4px}
+.target-bar{display:flex;gap:12px;flex-wrap:wrap}
+.target-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;flex:1;min-width:200px}
+.target-card .t-label{font-size:11px;color:var(--text-dim);margin-bottom:4px}
+.target-card .t-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.target-card .t-value{font-size:22px;font-weight:700}
+.target-card .t-target{font-size:12px;color:var(--text-dim)}
+.target-card .t-progress-bar{height:6px;background:rgba(0,0,0,.06);border-radius:3px;margin-top:8px;overflow:hidden}
+.target-card .t-progress-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.target-card .t-pct{font-size:13px;font-weight:600;margin-top:4px}
+
+/* Alerts */
+.alert-bar{padding:0 32px 12px;display:flex;gap:12px;flex-wrap:wrap}
+.alert-card{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.3);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--orange)}
+.alert-card .num{font-weight:700;font-size:18px}
+
+/* View bar */
+.view-bar{padding:0 32px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.view-toggle{display:flex;background:var(--card);border-radius:8px;border:1px solid var(--border);overflow:hidden}
+.view-toggle button{background:none;border:none;padding:7px 16px;color:var(--text-dim);font-size:13px;cursor:pointer;transition:all .2s}
+.view-toggle button.active{background:var(--accent);color:#000;font-weight:600}
+.sort-dropdown{margin-left:auto}
+.sort-dropdown select{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px}
+
+/* Kanban */
+.kanban{display:flex;gap:14px;padding:0 32px 32px;overflow-x:auto;min-height:50vh}
+.kanban-col{min-width:270px;max-width:310px;flex:1}
+.kanban-col-header{padding:10px 14px;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;margin-bottom:8px}
+.kanban-col-header .count{background:rgba(0,0,0,.08);border-radius:10px;padding:2px 8px;font-size:12px}
+.kanban-cards{display:flex;flex-direction:column;gap:8px}
+.kanban-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s}
+.kanban-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.kanban-card.dragging{opacity:.4;transform:scale(.95);border:2px dashed var(--accent)}
+.kanban-col.drag-over .kanban-col-header{box-shadow:0 0 12px rgba(255,209,0,.4);transform:scale(1.02)}
+.kanban-cards.drag-over{min-height:80px;background:rgba(255,209,0,.04);border-radius:8px;border:2px dashed rgba(255,209,0,.3);transition:all .2s}
+.drop-indicator{height:4px;background:var(--accent);border-radius:2px;margin:4px 0;transition:all .15s;animation:pulseGlow 1s infinite}
+.kanban-card.stale{border-left:3px solid var(--orange)}
+.kanban-card .brand{font-size:14px;font-weight:600;margin-bottom:5px}
+.kanban-card .meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.tag{font-size:10px;padding:2px 7px;border-radius:4px}
+.tag-cat{background:var(--cyan-dim);color:var(--cyan)}
+.tag-mod{background:var(--purple-dim);color:var(--purple)}
+.tag-amt{background:var(--green-dim);color:var(--green);font-weight:600}
+.kanban-card .progress{font-size:12px;color:var(--text-dim);line-height:1.4}
+.kanban-card .time{font-size:11px;color:var(--text-dim);margin-top:5px;opacity:.7}
+.kanban-card .stale-badge{font-size:10px;color:var(--orange);margin-top:4px}
+
+/* Table */
+.table-wrap{padding:0 32px 32px;overflow-x:auto}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{background:var(--card);padding:10px 12px;text-align:left;color:var(--text-dim);font-weight:500;border-bottom:1px solid var(--border);position:sticky;top:0;white-space:nowrap;cursor:pointer}
+.data-table th:hover{color:var(--accent)}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.data-table tr:hover td{background:var(--card-hover)}
+.data-table tr.stale-row td:first-child{border-left:3px solid var(--orange)}
+.stage-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:500}
+.s7{background:var(--red-dim);color:var(--red)}
+.s30{background:var(--orange-dim);color:var(--orange)}
+.s长期{background:var(--blue-dim);color:var(--blue)}
+.s线索{background:var(--purple-dim);color:var(--purple)}
+.s回款{background:var(--green-dim);color:var(--green)}
+.s流失{background:rgba(0,0,0,.05);color:var(--text-dim)}
+
+/* Detail panel */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300}
+.overlay.open{display:block}
+.detail-panel{position:fixed;right:0;top:0;bottom:0;width:520px;max-width:92vw;background:#fff;border-left:1px solid var(--border);z-index:301;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;padding:24px}
+.detail-panel.open{transform:translateX(0)}
+.detail-panel .close-btn{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text-dim);font-size:24px;cursor:pointer;z-index:2}
+.detail-panel h2{font-size:20px;margin-bottom:16px;padding-right:80px}
+.detail-panel .del-btn{position:absolute;top:14px;right:52px;background:var(--red-dim);border:1px solid transparent;color:var(--red);font-size:13px;cursor:pointer;padding:4px 10px;border-radius:6px;transition:all .2s;z-index:2}
+.detail-panel .del-btn:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.detail-section{margin-bottom:16px}
+.detail-section h3{font-size:12px;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;gap:8px}
+.detail-row .label{color:var(--text-dim);white-space:nowrap;min-width:80px}
+.detail-row .value{text-align:right;flex:1;cursor:pointer;padding:2px 6px;border-radius:4px;transition:background .15s;min-height:20px}
+.detail-row .value:hover{background:var(--card)}
+.detail-row .value input,.detail-row .value select{background:var(--card);border:1px solid var(--accent);border-radius:4px;color:var(--text);padding:4px 8px;font-size:13px;width:100%;text-align:right;outline:none}
+.detail-progress{background:var(--card);border-radius:8px;padding:12px;font-size:14px;line-height:1.6;margin-top:8px;white-space:pre-wrap}
+.add-record-area{margin-top:10px}
+.add-record-area textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px;font-size:13px;resize:vertical;min-height:60px;outline:none}
+.add-record-area textarea:focus{border-color:var(--accent)}
+.add-record-btn{margin-top:6px;background:var(--accent);color:#000;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.add-record-btn:hover{opacity:.9}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;justify-content:center;align-items:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:28px;width:480px;max-width:92vw;max-height:85vh;overflow-y:auto}
+.modal h2{font-size:18px;margin-bottom:16px}
+.modal-field{margin-bottom:12px}
+.modal-field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:14px;outline:none}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--accent)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.modal-actions button{padding:8px 20px;border-radius:8px;font-size:14px;cursor:pointer;border:none}
+.btn-primary{background:var(--accent);color:#000;font-weight:600}
+.btn-cancel{background:var(--card);color:var(--text);border:1px solid var(--border) !important}
+
+/* Toast */
+.toast-container{position:fixed;top:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--card);border:1px solid var(--green);border-radius:10px;padding:12px 20px;font-size:14px;color:var(--green);animation:slideIn .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.toast.warn{border-color:var(--orange);color:var(--orange)}
+@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* Footer */
+.footer{padding:12px 32px;text-align:center;font-size:11px;color:var(--text-dim);border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer button{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text-dim);font-size:11px;cursor:pointer}
+.footer button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Personal info bar */
+.person-bar{padding:8px 32px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;font-size:12px;color:var(--text-dim)}
+.person-bar .pb-name{color:var(--accent);font-weight:600;font-size:13px}
+
+/* News layout - sidebar nav */
+.news-layout{display:flex;gap:0;min-height:calc(100vh - 100px)}
+.news-sidebar{width:200px;min-width:200px;background:#fff;border-right:1px solid var(--border);padding:16px 0;overflow-y:auto;display:flex;flex-direction:column;position:sticky;top:60px;max-height:calc(100vh - 70px)}
+.news-sidebar-group{margin-bottom:8px}
+.news-sidebar-group-label{font-size:12px;font-weight:600;color:var(--text-dim);padding:8px 20px 4px;letter-spacing:.5px}
+.news-sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:13px;color:var(--text);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.news-sidebar-item:hover{background:var(--accent-dim)}
+.news-sidebar-item.active{background:var(--accent-dim);color:var(--accent);font-weight:600;border-left-color:var(--accent)}
+.news-sidebar-item .nsi-icon{font-size:14px;min-width:18px;text-align:center}
+.news-sidebar-item .nsi-count{margin-left:auto;font-size:11px;color:var(--text-dim);background:var(--bg);padding:1px 6px;border-radius:10px}
+.news-sidebar-item.active .nsi-count{background:var(--accent);color:#fff}
+.news-main{flex:1;overflow-y:auto;padding:0 24px}
+@media(max-width:768px){.news-layout{flex-direction:column}.news-sidebar{width:100%;min-width:100%;border-right:none;border-bottom:1px solid var(--border);padding:8px 0;display:flex;flex-wrap:wrap;gap:0}.news-sidebar-group{display:flex;flex-wrap:wrap;gap:0;margin:0}.news-sidebar-group-label{padding:4px 12px;width:100%}.news-sidebar-item{padding:6px 12px;border-left:none;border-bottom:2px solid transparent}.news-sidebar-item.active{border-bottom-color:var(--accent);border-left:none}}
+/* Source subscription manager */
+.source-manager{border-top:1px solid var(--border);margin-top:auto;padding-top:0}
+.source-manager-toggle{display:flex;align-items:center;gap:6px;padding:10px 20px;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;transition:all .15s;user-select:none}
+.source-manager-toggle:hover{color:var(--text);background:var(--accent-dim)}
+.source-manager-toggle .sm-arrow{font-size:10px;margin-left:auto;transition:transform .2s}
+.source-manager-toggle.open .sm-arrow{transform:rotate(180deg)}
+.source-manager-list{display:none;padding:4px 16px 12px}
+.source-manager-list.open{display:block}
+.source-manager-list label{display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:12px;color:var(--text);cursor:pointer;border-radius:4px;transition:background .15s}
+.source-manager-list label:hover{background:var(--accent-dim)}
+.source-manager-list input[type="checkbox"]{accent-color:var(--accent);margin:0;width:14px;height:14px;cursor:pointer}
+
+/* News section */
+.news-section{padding:0 32px 16px}
+.news-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.news-title{font-size:14px;font-weight:600;color:var(--text)}
+.news-date{font-size:11px;color:var(--text-dim)}
+.news-tabs{display:flex;gap:6px;margin-left:auto}
+.news-tab{font-size:12px;padding:4px 12px;border-radius:16px;cursor:pointer;border:1px solid var(--border);color:var(--text-dim);background:transparent;transition:all .2s}
+.news-tab:hover{border-color:var(--accent);color:var(--accent)}
+.news-tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.news-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;transition:border-color .2s}
+.news-card:hover{border-color:var(--accent)}
+.news-card .nc-cat{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500;display:inline-block;margin-bottom:6px}
+.news-card .nc-cat.cat-company{background:var(--accent-dim);color:var(--accent)}
+.news-card .nc-cat.cat-product{background:var(--blue-dim);color:var(--blue)}
+.news-card .nc-cat.cat-rule{background:var(--orange-dim);color:var(--orange)}
+.news-card .nc-cat.cat-policy{background:var(--purple-dim);color:var(--purple)}
+.news-card .nc-cat.cat-food{background:var(--green-dim);color:var(--green)}
+.news-card .nc-cat.cat-saas{background:var(--cyan-dim);color:var(--cyan)}
+.news-card .nc-cat.cat-ai{background:var(--red-dim);color:var(--red)}
+.news-card .nc-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4}
+.news-card .nc-summary{font-size:12px;color:var(--text-dim);line-height:1.5}
+.news-card .nc-time{font-size:10px;color:var(--text-dim);margin-top:6px;opacity:.6}
+.news-empty{text-align:center;color:var(--text-dim);padding:30px;font-size:13px}
+.news-card.news-read{opacity:.55;border-color:#f0f0f0}
+.news-card.news-read .nc-title{color:#999}
+.news-read-btn{background:#fff;border:1px solid #d2e3fc;color:#1a73e8;font-size:11px;padding:3px 10px;border-radius:12px;cursor:pointer;white-space:nowrap}
+.news-read-btn:hover{background:#e8f0fe}
+
+@media(max-width:768px){
+  .header{padding:14px 16px;flex-direction:column;gap:10px}
+  .stats-bar,.amount-bar,.alert-bar,.view-bar,.kanban,.table-wrap,.quick-entry{padding-left:16px;padding-right:16px}
+  .detail-panel{width:100vw}
+  .search-box{width:100%}
+  .header-right{flex-wrap:wrap;width:100%}
+}
+
+/* ===== Tab Navigation ===== */
+.top-nav{position:fixed;top:0;left:0;right:0;height:56px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 24px;z-index:200;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.nav-tab{padding:8px 16px;cursor:pointer;border-radius:8px;font-size:14px;color:#666;transition:all .15s;user-select:none}
+.nav-tab:hover{background:#f5f5f5}
+.nav-tab.active{background:#FFF3ED;color:#FF6B35;font-weight:600}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ===== Overview Tab ===== */
+.profile-bar{background:linear-gradient(135deg,#FF6B35,#FF8F5E);color:#fff;border-radius:12px;padding:20px 28px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.kpi-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ring-chart{width:80px;height:80px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+.ring-chart .ring-inner{width:60px;height:60px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#FF6B35}
+.bottom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.bottom-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);min-height:200px}
+.bottom-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.bottom-card-header h3{font-size:15px;margin:0}
+.bottom-card-header a{color:#FF6B35;font-size:13px;text-decoration:none}
+
+/* ===== Todos Tab ===== */
+.todo-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.todo-checkbox{width:18px;height:18px;cursor:pointer;accent-color:#FF6B35}
+.todo-done{text-decoration:line-through;color:#aaa}
+.priority-high{color:#e53e3e}
+.priority-normal{color:#FF6B35}
+.priority-low{color:#999}
+.todo-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.todo-filter-btn{padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #e8e8e8;background:#fff;color:#666;transition:all .15s}
+.todo-filter-btn:hover{border-color:#FF6B35;color:#FF6B35}
+.todo-filter-btn.active{background:#FFF3ED;color:#FF6B35;border-color:#FF6B35;font-weight:600}
+.todo-add-bar{display:flex;gap:10px;margin-bottom:16px;align-items:center}
+.todo-add-input{flex:1;padding:10px 14px;border:1px solid #e8e8e8;border-radius:8px;font-size:14px;outline:none;background:#fff;color:#333}
+.todo-add-input:focus{border-color:#FF6B35}
+.todo-add-btn{background:#FF6B35;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;white-space:nowrap}
+.todo-priority-sel{padding:8px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;background:#fff;color:#333;outline:none}
+.todo-date-input{padding:8px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;background:#fff;color:#333;outline:none}
+.todo-delete-btn{background:none;border:none;cursor:pointer;font-size:16px;opacity:.4;transition:opacity .15s;padding:4px}
+.todo-delete-btn:hover{opacity:1}
+.todo-edit-btn{background:none;border:none;cursor:pointer;font-size:14px;opacity:.4;transition:opacity .15s;padding:4px}
+.todo-edit-btn:hover{opacity:1}
+.todo-edit-inline{flex-wrap:wrap;gap:8px}
+.todo-link-tag{display:inline-block;background:#f0f7ff;color:#1a73e8;font-size:11px;padding:2px 8px;border-radius:10px;cursor:pointer;margin-left:6px;white-space:nowrap;border:1px solid #d2e3fc}
+.todo-link-tag:hover{background:#d2e3fc}
+
+/* ===== Calendar Tab (Daxiang-style Timeline) ===== */
+.cal-top-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.cal-top-bar .cal-nav-btn{background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;color:#333;font-weight:500;transition:all .15s}
+.cal-top-bar .cal-nav-btn:hover{background:#f5f5f5;border-color:#ccc}
+.cal-top-bar .cal-nav-btn.today-btn{font-weight:600}
+.cal-top-bar .cal-month-label{font-size:15px;font-weight:600;color:#333;margin-left:4px}
+.cal-top-bar .cal-sync-info{font-size:12px;color:#aaa;margin-left:auto;margin-right:8px}
+.cal-create-btn{background:#1677ff;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;margin-left:auto}
+.cal-create-btn:hover{background:#4096ff}
+
+.cal-header-row{display:flex;border-bottom:1px solid #e8e8e8;background:#fafafa;border-radius:8px 8px 0 0;position:sticky;top:0;z-index:10}
+.cal-header-row .cal-time-gutter{width:56px;flex-shrink:0}
+.cal-day-header{flex:1;text-align:center;padding:10px 0 8px;font-size:12px;color:#888;line-height:1.4;border-left:1px solid #f0f0f0;position:relative}
+.cal-day-header .cal-day-name{display:block;font-weight:500}
+.cal-day-header .cal-day-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:15px;font-weight:600;color:#333;margin-top:2px}
+.cal-day-header.is-today .cal-day-num{background:#1677ff;color:#fff}
+.cal-day-header.is-weekend .cal-day-name::after{content:'休';display:inline-block;font-size:9px;color:#ff4d4f;border:1px solid #ff4d4f;border-radius:3px;padding:0 3px;margin-left:3px;transform:scale(.9);vertical-align:middle}
+
+.cal-timeline-scroll{overflow-y:auto;overflow-x:hidden;max-height:640px;position:relative;border:1px solid #e8e8e8;border-top:none;border-radius:0 0 8px 8px;background:#fff}
+.cal-timeline{display:flex;position:relative;min-height:960px}
+.cal-time-gutter{width:56px;flex-shrink:0;position:relative}
+.cal-time-label{position:absolute;right:8px;font-size:11px;color:#aaa;transform:translateY(-50%);pointer-events:none;white-space:nowrap}
+.cal-day-col{flex:1;position:relative;border-left:1px solid #f0f0f0;min-height:960px}
+.cal-day-col:first-of-type{border-left:none}
+.cal-hour-line{position:absolute;left:0;right:0;border-top:1px solid #f0f0f0;pointer-events:none}
+.cal-day-col.is-today{background:rgba(22,119,255,.02)}
+
+.cal-event-block{position:absolute;left:3px;right:3px;border-radius:5px;padding:4px 7px;font-size:11px;line-height:1.35;overflow:hidden;cursor:pointer;z-index:2;transition:box-shadow .15s;box-sizing:border-box;border:1px solid transparent}
+.cal-event-block:hover{box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:5}
+.cal-event-block.daxiang{background:#e8f4ff;border-color:#bae0ff;color:#0958d9}
+.cal-event-block.local{background:#fff7ed;border-color:#ffd8bf;color:#d46b08}
+.cal-event-block .ev-title{font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-event-block .ev-time{font-size:10px;opacity:.75;display:block;white-space:nowrap}
+.cal-event-block .ev-del{position:absolute;top:3px;right:5px;cursor:pointer;opacity:0;font-size:11px;transition:opacity .15s}
+.cal-event-block:hover .ev-del{opacity:.6}
+.cal-event-block .ev-del:hover{opacity:1}
+
+.cal-now-line{position:absolute;left:0;right:0;height:2px;background:#ff4d4f;z-index:8;pointer-events:none}
+.cal-now-line::before{content:'';position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:#ff4d4f}
+
+/* Calendar Modal - Daxiang-style */
+.cal-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:9000;display:flex;align-items:center;justify-content:center}
+.cal-modal{background:#fff;border-radius:12px;width:680px;max-width:95vw;max-height:90vh;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.18);display:flex}
+.cal-modal-left{flex:1;padding:24px 28px;overflow-y:auto}
+.cal-modal-right{width:250px;background:#fafbfc;border-left:1px solid #f0f0f0;padding:16px;overflow-y:auto}
+.cal-modal-title-input{width:100%;font-size:18px;font-weight:600;border:none;outline:none;padding:8px 0;color:#333;background:transparent;border-bottom:2px solid transparent}
+.cal-modal-title-input::placeholder{color:#ccc;font-weight:400}
+.cal-modal-title-input:focus{border-bottom-color:#1677ff}
+.cal-modal-row{display:flex;align-items:center;gap:10px;margin-top:16px}
+.cal-modal-row .cm-icon{font-size:16px;color:#888;min-width:20px;text-align:center}
+.cal-modal-row input,.cal-modal-row select,.cal-modal-row textarea{padding:8px 12px;border:1px solid #e8e8e8;border-radius:8px;font-size:13px;outline:none;background:#fff;color:#333}
+.cal-modal-row input:focus,.cal-modal-row textarea:focus{border-color:#1677ff}
+.cal-modal-row textarea{width:100%;min-height:60px;resize:vertical;font-family:inherit}
+.cal-modal-row .cm-label{font-size:12px;color:#999;min-width:35px}
+.cal-modal .cal-modal-btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;padding-top:16px;border-top:1px solid #f0f0f0}
+.cal-modal .cal-modal-btns button{padding:8px 24px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e0e0e0;background:#fff;color:#333;transition:all .15s}
+.cal-modal .cal-modal-btns .cal-modal-save{background:#1677ff;color:#fff;border-color:#1677ff}
+.cal-modal .cal-modal-btns .cal-modal-save:hover{background:#4096ff}
+.cal-modal .cal-modal-btns button:first-child:hover{background:#f5f5f5}
+.cal-preview-title{font-size:12px;font-weight:600;color:#333;margin-bottom:8px;text-align:center}
+.cal-preview-conflict{font-size:11px;color:#e53e3e;text-align:center;margin-top:4px;font-weight:500}
+.cal-preview-axis{position:relative;height:480px;border-left:1px solid #eee;margin-left:32px}
+.cal-preview-hour{position:absolute;left:-32px;font-size:10px;color:#aaa;line-height:1}
+.cal-preview-line{position:absolute;left:0;right:0;border-top:1px solid #f0f0f0}
+.cal-preview-block{position:absolute;left:4px;right:4px;border-radius:4px;padding:3px 6px;font-size:10px;overflow:hidden;line-height:1.3}
+.cal-preview-block.existing{background:#e8f4fd;color:#1677ff;border:1px solid #bae0ff}
+.cal-preview-block.new-event{background:rgba(255,107,53,.1);color:#FF6B35;border:2px dashed #FF6B35}
+
+/* ===== Responsive for new tabs ===== */
+@media(max-width:900px){.kpi-grid,.bottom-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.kpi-grid,.bottom-grid{grid-template-columns:1fr}.cal-timeline-scroll{overflow-x:auto}.cal-timeline{min-width:700px}.cal-header-row{min-width:700px}.top-nav{padding:0 12px;height:auto;min-height:56px;flex-wrap:wrap;padding-bottom:8px}#navTabs{flex-wrap:wrap}.cal-top-bar{gap:6px}.cal-create-btn{margin-left:0;width:100%;margin-top:4px}.cal-modal{flex-direction:column;width:95vw}.cal-modal-right{width:100%;max-height:200px;border-left:none;border-top:1px solid #f0f0f0}}
+
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h2>🎯 CRM数据与任务看板</h2>
+    <div class="sub">请输入账号密码登录</div>
+    <input type="text" id="loginUser" placeholder="用户名" autocomplete="username">
+    <input type="password" id="loginPass" placeholder="密码" autocomplete="current-password">
+    <button onclick="doLogin()">登 录</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- Main App (hidden until login) -->
+<div id="mainApp" class="hidden">
+
+<nav class="top-nav" id="topNav">
+  <span style="font-size:18px;font-weight:700;margin-right:24px">🏆 CRM数据与任务看板</span>
+  <div style="display:flex;gap:4px;flex-wrap:wrap" id="navTabs">
+    <span class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">📊 总览</span>
+    <span class="nav-tab" data-tab="customers" onclick="switchTab('customers')">👥 客户跟进</span>
+    <span class="nav-tab" data-tab="todos" onclick="switchTab('todos')">✅ 待办清单</span>
+    <span class="nav-tab" data-tab="calendar" onclick="switchTab('calendar')">📅 日程</span>
+    <span class="nav-tab" data-tab="news" onclick="switchTab('news')">📰 重要资讯</span>
+    <span class="nav-tab" data-tab="projects" onclick="switchTab('projects')">🚀 其他项目跟进</span>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+    <span style="color:#888;font-size:13px" id="todayDate"></span>
+    <button onclick="switchTab('customers');setTimeout(()=>document.getElementById('quickInput').focus(),100)" style="background:#FF6B35;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">+ 快速录入</button>
+  </div>
+</nav>
+
+
+
+<!-- ===== OVERVIEW TAB ===== -->
+<div class="tab-content active" id="tab-overview" style="padding:20px 32px">
+  <div class="profile-bar">
+    <div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:6px">👤 周巍</div>
+      <div style="font-size:13px;opacity:.9">📍 餐饮SaaS/中小客户发展部/区域大客户组/上海一区团队 | 🎖 L6 | 📅 加入CKA: 2023-08-22 | ⏳ CKA年限: 2年8个月 | 📱 13564036486</div>
+    </div>
+    <button id="syncDataBtn" onclick="syncAllData()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;transition:all .3s">🔄 更新数据</button>
+    <button id="exportLsBtn" onclick="exportLocalStorageData()" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;transition:all .3s">📤 导出数据</button>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div style="font-size:13px;color:#888;margin-bottom:12px">本月总回款 <span style="background:#f0f0f0;padding:2px 8px;border-radius:4px;font-size:11px" id="kpiMonth">2026-04</span></div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="ring-chart" id="ringTotal"><div class="ring-inner" id="ringTotalPct">0%</div></div>
+        <div style="font-size:12px;line-height:2">
+          <div>● 目标 <span style="float:right;margin-left:16px;font-weight:600" id="kpiTarget">¥13.7w</span></div>
+          <div>● 实际 <span style="float:right;margin-left:16px;font-weight:600;color:#FF6B35" id="kpiActual">¥0</span></div>
+          <div>● 差距 <span style="float:right;margin-left:16px;font-weight:600;color:#e53e3e" id="kpiGap">-¥13.7w</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div style="font-size:13px;color:#888;margin-bottom:12px">本月新签回款 <span style="background:#E8F5E9;color:#2e7d32;padding:2px 8px;border-radius:4px;font-size:11px">新签</span></div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="ring-chart" id="ringNew"><div class="ring-inner" id="ringNewPct">0%</div></div>
+        <div style="font-size:12px;line-height:2">
+          <div>● 目标 <span style="float:right;margin-left:16px;font-weight:600" id="kpiNewTarget">¥0</span></div>
+          <div>● 实际 <span style="float:right;margin-left:16px;font-weight:600;color:#FF6B35" id="kpiNewActual">¥0</span></div>
+          <div>● 差距 <span style="float:right;margin-left:16px;font-weight:600;color:#2e7d32" id="kpiNewGap">✅ 已达标</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;color:#888">客户概览</span><a href="#" onclick="switchTab('customers');return false" style="color:#FF6B35;font-size:12px;text-decoration:none">查看全部 →</a></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center">
+        <div><div style="font-size:24px;font-weight:700;color:#FF6B35" id="kpiTotalCustomers">0</div><div style="font-size:11px;color:#888">跟进客户</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:#FF8F5E" id="kpiHighIntent">0</div><div style="font-size:11px;color:#888">高意向</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:#333" id="kpiTodayFollow">0</div><div style="font-size:11px;color:#888">今日跟进</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:#333" id="kpiSigned">0</div><div style="font-size:11px;color:#888">已签约</div></div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;color:#888">待办概览</span><a href="#" onclick="switchTab('todos');return false" style="color:#FF6B35;font-size:12px;text-decoration:none">查看全部 →</a></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center">
+        <div><div style="font-size:24px;font-weight:700;color:#e53e3e" id="kpiHighPriority">0</div><div style="font-size:11px;color:#888">高优先级</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:#FF6B35" id="kpiPending">0</div><div style="font-size:11px;color:#888">待处理</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:#2e7d32" id="kpiDone">0</div><div style="font-size:11px;color:#888">已完成</div></div>
+        <div><div style="font-size:24px;font-weight:700;color:#888" id="kpiOverdue">0</div><div style="font-size:11px;color:#888">已逾期</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-grid">
+    <div class="bottom-card">
+      <div class="bottom-card-header"><h3>📋 今日待跟进客户</h3><a href="#" onclick="switchTab('customers');return false">查看全部</a></div>
+      <div id="todayFollowList"><div style="text-align:center;color:#aaa;padding:40px 0">今日无待跟进客户</div></div>
+    </div>
+    <div class="bottom-card">
+      <div class="bottom-card-header"><h3>✅ 近期待办</h3><a href="#" onclick="switchTab('todos');return false">查看全部</a></div>
+      <div id="recentTodosList"><div style="text-align:center;color:#aaa;padding:40px 0">暂无待办事项</div></div>
+    </div>
+    <div class="bottom-card">
+      <div class="bottom-card-header"><h3>📰 重要资讯 <span id="newsUnreadBadge" style="font-size:11px;font-weight:400;color:#e53e3e"></span></h3><a href="#" onclick="switchTab('news');return false">查看全部</a></div>
+      <div id="recentNewsList"><div style="text-align:center;color:#aaa;padding:40px 0">暂无未读重要资讯</div></div>
+    </div>
+    <div class="bottom-card">
+      <div class="bottom-card-header"><h3>🎤 早启动安排</h3><a href="https://km.sankuai.com/xtable/2704537074?table=2704750389" target="_blank" style="font-size:12px;color:#888">查看完整排期</a></div>
+      <div id="overviewMorning"><div style="text-align:center;color:#aaa;padding:40px 0">暂无排期</div></div>
+    </div>
+    <div class="bottom-card">
+      <div class="bottom-card-header"><h3>📅 本周日程 🐘</h3><a href="#" onclick="switchTab('calendar');return false">查看全部</a></div>
+      <div id="overviewCalendar"><div style="text-align:center;color:#aaa;padding:40px 0">暂无日程</div></div>
+    </div>
+    <div class="bottom-card">
+      <div class="bottom-card-header"><h3>🚀 其他项目跟进</h3><a href="#" onclick="switchTab('projects');return false">查看全部</a></div>
+      <div id="overviewProjects"><div style="text-align:center;color:#aaa;padding:40px 0">暂无项目</div></div>
+    </div>
+  </div>
+</div>
+<!-- ===== END OVERVIEW TAB ===== -->
+
+<!-- ===== CUSTOMERS TAB ===== -->
+<div class="tab-content" id="tab-customers">
+<div class="header">
+  <h1>🎯 <span>CRM数据与任务看板</span></h1>
+  <div class="header-right">
+    <input class="search-box" placeholder="搜索品牌名、品类..." id="searchInput" />
+    <button class="hdr-btn" id="hideClosedBtn">隐藏已回款/已流失</button>
+    <button class="hdr-btn" id="addNewBtn">＋ 新增客户</button>
+  </div>
+</div>
+
+<!-- person-bar moved to overview tab -->
+
+<div class="quick-entry">
+  <span class="icon">⚡</span>
+  <div class="quick-wrap">
+    <input class="quick-input" id="quickInput" placeholder="一句话录入：山池玩茄 老板确认签约 下周走合同" autocomplete="off"/>
+    <div class="match-dropdown" id="matchDrop"></div>
+  </div>
+  <span class="quick-hint">品牌名 + 跟进内容，回车提交</span>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+<div class="target-section" id="targetSection"></div>
+
+<div class="amount-bar" id="amountBar"></div>
+<div class="alert-bar" id="alertBar"></div>
+
+<!-- news section moved to news tab -->
+
+<div class="view-bar">
+  <div class="view-toggle">
+    <button class="active" data-view="kanban">看板</button>
+    <button data-view="table">列表</button>
+  </div>
+  <div class="sort-dropdown">
+    <select id="sortSelect">
+      <option value="stage">按商机阶段</option>
+      <option value="time">按沟通时间（近→远）</option>
+      <option value="amount">按回款金额（高→低）</option>
+      <option value="name">按品牌名</option>
+    </select>
+  </div>
+</div>
+
+<div id="kanbanView" class="kanban"></div>
+<div id="tableView" class="table-wrap" style="display:none"></div>
+
+<div class="overlay" id="overlay"></div>
+<div class="detail-panel" id="detailPanel">
+  <button class="del-btn" id="deleteBtn" onclick="deleteCustomer()">🗑 删除</button>
+  <button class="close-btn" id="closeDetail">✕</button>
+  <div id="detailContent"></div>
+</div>
+
+<div class="modal-overlay" id="newModal">
+  <div class="modal">
+    <h2>新增客户</h2>
+    <div class="modal-field"><label>品牌名 *</label><input id="nm_brand"/></div>
+    <div class="modal-field"><label>品类 *</label><select id="nm_cat"><option value="">选择品类</option></select></div>
+    <div class="modal-field"><label>门店数</label><input id="nm_stores" type="number"/></div>
+    <div class="modal-field"><label>商机阶段</label><select id="nm_stage"></select></div>
+    <div class="modal-field"><label>合作模块（逗号分隔）</label><input id="nm_modules" placeholder="POS,小程序,会员"/></div>
+    <div class="modal-field"><label>预计回款金额</label><input id="nm_amount" placeholder="5w"/></div>
+    <div class="modal-field"><label>最新进展</label><textarea id="nm_progress" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNewModal()">取消</button>
+      <button class="btn-primary" onclick="saveNewCustomer()">创建</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+</div>
+<!-- ===== END CUSTOMERS TAB ===== -->
+
+<!-- ===== TODOS TAB ===== -->
+<div class="tab-content" id="tab-todos" style="padding:20px 32px">
+  <h2 style="margin-bottom:16px;font-size:20px">✅ 待办清单 <span id="todoSyncStatus" style="font-size:12px;color:#aaa;font-weight:400"></span></h2>
+  <div class="todo-add-bar">
+    <input class="todo-add-input" id="todoAddInput" placeholder="输入新待办事项..." onkeydown="if(event.key==='Enter')addTodo()"/>
+    <select class="todo-priority-sel" id="todoPrioritySel">
+      <option value="normal">普通</option>
+      <option value="high">高优先级</option>
+      <option value="low">低优先级</option>
+    </select>
+    <input type="date" class="todo-date-input" id="todoDateInput"/>
+    <div class="todo-link-wrapper" id="todoLinkWrapper" style="position:relative;display:inline-block">
+      <input type="text" class="todo-link-search" id="todoLinkSearch" placeholder="🔗 关联客户/项目" autocomplete="off"
+        onfocus="openLinkDropdown()" oninput="filterLinkDropdown()"
+        style="padding:8px 10px;border:1px solid #e8e8e8;border-radius:8px;font-size:12px;width:160px;color:#333;background:#fff"/>
+      <input type="hidden" id="todoLinkSel" value=""/>
+      <div class="todo-link-dropdown" id="todoLinkDropdown" style="display:none;position:absolute;top:100%;left:0;z-index:50;background:#fff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:240px;overflow-y:auto;width:220px;margin-top:4px">
+      </div>
+    </div>
+    <button class="todo-add-btn" onclick="addTodo()">添加</button>
+  </div>
+  <div class="todo-filters" id="todoFilters">
+    <button class="todo-filter-btn active" onclick="setTodoFilter('all')">全部</button>
+    <button class="todo-filter-btn" onclick="setTodoFilter('pending')">待处理</button>
+    <button class="todo-filter-btn" onclick="setTodoFilter('done')">已完成</button>
+    <button class="todo-filter-btn" onclick="setTodoFilter('high')">高优先级</button>
+    <button class="todo-filter-btn" onclick="setTodoFilter('overdue')">已逾期</button>
+  </div>
+  <div id="todoListContainer"></div>
+</div>
+
+<!-- ===== CALENDAR TAB (Daxiang-style Timeline) ===== -->
+<div class="tab-content" id="tab-calendar" style="padding:20px 32px">
+  <div class="cal-top-bar">
+    <button class="cal-nav-btn today-btn" onclick="calendarThisWeek()">今天</button>
+    <button class="cal-nav-btn" onclick="calendarPrevWeek()">‹</button>
+    <button class="cal-nav-btn" onclick="calendarNextWeek()">›</button>
+    <span class="cal-month-label" id="calendarWeekLabel"></span>
+    <span class="cal-sync-info" id="calSyncStatus"></span>
+    <button class="cal-create-btn" onclick="openCalModal()">＋ 创建日程</button>
+  </div>
+  <div class="cal-header-row" id="calHeaderRow">
+    <div class="cal-time-gutter"></div>
+  </div>
+  <div class="cal-timeline-scroll" id="calTimelineScroll">
+    <div class="cal-timeline" id="calTimeline"></div>
+  </div>
+</div>
+
+<!-- Calendar Create Modal (Daxiang-style) -->
+<div id="calModal" class="cal-modal-overlay" style="display:none" onclick="if(event.target===this)closeCalModal()">
+  <div class="cal-modal">
+    <div class="cal-modal-left">
+      <input type="text" class="cal-modal-title-input" id="calModalTitle" placeholder="请输入日程主题..." maxlength="200"/>
+      <div class="cal-modal-row">
+        <span class="cm-icon">🕐</span>
+        <input type="date" id="calModalDate" onchange="updateCalPreview()"/>
+        <input type="time" id="calModalStart" value="09:00" onchange="updateCalPreview()"/>
+        <span style="color:#999">至</span>
+        <input type="time" id="calModalEnd" value="10:00" onchange="updateCalPreview()"/>
+      </div>
+      <div class="cal-modal-row">
+        <span class="cm-icon">📍</span>
+        <input type="text" id="calModalLocation" placeholder="地点（选填）" style="flex:1"/>
+      </div>
+      <div class="cal-modal-row">
+        <span class="cm-icon">🔔</span>
+        <select id="calModalReminder">
+          <option value="">不提醒</option>
+          <option value="5">5分钟前</option>
+          <option value="15" selected>15分钟前</option>
+          <option value="30">30分钟前</option>
+          <option value="60">1小时前</option>
+        </select>
+      </div>
+      <div class="cal-modal-row" style="align-items:flex-start">
+        <span class="cm-icon" style="margin-top:8px">📝</span>
+        <textarea id="calModalNote" placeholder="会议目标 / 议程 / 备注（选填）" style="flex:1"></textarea>
+      </div>
+      <div class="cal-modal-btns">
+        <button onclick="closeCalModal()">取消</button>
+        <button class="cal-modal-save" onclick="saveCalModal()">保存</button>
+      </div>
+    </div>
+    <div class="cal-modal-right">
+      <div class="cal-preview-title" id="calPreviewTitle">日程预览</div>
+      <div id="calPreviewConflict"></div>
+      <div style="position:relative;overflow-y:auto;max-height:420px" id="calPreviewContainer">
+        <div class="cal-preview-axis" id="calPreviewAxis"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NEWS TAB ===== -->
+<div class="tab-content" id="tab-news" style="padding:0">
+  <div class="news-layout">
+    <div class="news-sidebar" id="newsSidebar"></div>
+    <div class="news-main">
+      <div class="news-section" id="newsSection" style="padding:16px 0">
+        <div class="news-header">
+          <span class="news-title">📰 近期重要资讯</span>
+          <span class="news-date" id="newsDate"></span>
+        </div>
+        <div class="news-content" id="newsContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROJECTS TAB ===== -->
+<div class="tab-content" id="tab-projects" style="padding:20px 32px">
+  <h2 style="margin-bottom:16px;font-size:20px">🚀 其他项目跟进</h2>
+  <div id="projectsTabContent">
+    <div class="project-section" id="projectSectionTab"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <span id="lastSave">数据未修改</span>
+  <div>
+    <button onclick="exportData()">导出JSON</button>
+    <button onclick="document.getElementById('importFile').click()">导入JSON</button>
+    <button onclick="resetData()">重置数据</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"/>
+  </div>
+</div>
+
+</div><!-- end #mainApp -->
+
+<script>
+// ===== Login Gate =====
+// SHA-256 hash of password (pre-computed, no plaintext stored)
+// Default: user=zhouwei, pass=zw2026
+const USERS={'zhouwei':'db0bbba77d5edce33d1bcdf13beeefd22bc286400c22fd1969f739b192d28a90'};
+
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin(){
+  const user=document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  const errEl=document.getElementById('loginErr');
+  if(!user||!pass){errEl.textContent='请输入用户名和密码';return}
+  const hash=await sha256(pass);
+  if(USERS[user]&&USERS[user]===hash){
+    sessionStorage.setItem('crm_auth',user);
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    errEl.textContent='';
+  }else{
+    errEl.textContent='用户名或密码错误';
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+// Enter key to login
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
+
+// Auto-login if session valid
+(function checkAuth(){
+  const u=sessionStorage.getItem('crm_auth');
+  if(u&&USERS[u]){
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+  }else{
+    document.getElementById('loginUser').focus();
+  }
+})();
+</script>
+
+<script>
+// Customer data - 59 records from XTable
+const RAW_DATA = [{"rowId":395871913,"品牌名":"牛小新/牛new寿喜烧","门店数":17,"品牌ID":555608,"公司名称":"上海引匠企业管理有限公司","注册资本":10000000,"经营模式":["纯直营"],"品类":["自助餐"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员","供应链"],"最新进展":"要从牛小新开始测试，约五一后沟通价格","上次沟通时间":1776182400000,"联系人KP":"创始人森哥","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"二维火","小程序系统":"二维火"},{"rowId":395876009,"品牌名":"阿大排档","门店数":19,"品牌ID":666499,"公司名称":"黑龙江前滩阿大餐饮供应链有限公司","注册资本":500000,"经营模式":["直营+加盟"],"品类":["粉面"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员","供应链"],"最新进展":"报价阶段，客户资金紧张","联系人KP":"创始人刘总","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"天财商龙","供应链系统":"天财商龙","小程序系统":"天财商龙","预计回款金额":"5w","预计签约时间":"202511"},{"rowId":395880105,"品牌名":"新荣记","门店数":19,"品牌ID":521949,"公司名称":"临海市新荣记餐饮服务有限公司","注册资本":58800000,"经营模式":["纯直营"],"品类":["地方菜"],"商机阶段":"已流失","合作机会模块":["POS","会员"],"最新进展":"功能对接","联系人KP":"IT 何总","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"天财商龙","供应链系统":"天财商龙"},{"rowId":395884201,"品牌名":"百联","门店数":0,"公司名称":"安付宝支付有限公司","注册资本":65000000,"经营模式":["纯直营"],"品类":["快餐"],"商机阶段":"已流失","合作机会模块":["小程序","会员","POS","供应链"],"最新进展":"等区里审批","联系人KP":"负责人周辉","线索来源":["新品牌"],"回款类型":"大单","POS系统":"其他","预计签约时间":"202512"},{"rowId":395888297,"品牌名":"超级盟星","门店数":0,"品类":["生态"],"商机阶段":"长期跟进","合作机会模块":["行业洞察"],"最新进展":"等小程序研发","联系人KP":"创始人王老黑","线索来源":["其它"],"回款类型":"大单"},{"rowId":395892393,"品牌名":"酷爸爸汤饭","门店数":1,"90天新开门店数":1,"品牌ID":721998,"经营模式":["直营+加盟"],"品类":["快餐"],"商机阶段":"已回款","合作机会模块":["POS","小程序"],"最新进展":"已签约","上次沟通时间":1764172800000,"联系人KP":"创始人项总","线索来源":["新品牌"],"回款类型":"小单","POS系统":"美团","预计回款金额":"1.7w","预计签约时间":"202511"},{"rowId":395896489,"品牌名":"食茶记","门店数":0,"公司名称":"上海荷风细雨餐饮管理有限公司","注册资本":1000000,"经营模式":["纯直营"],"品类":["茶饮"],"商机阶段":"已流失","合作机会模块":["POS","小程序","会员"],"最新进展":"暂不更换","联系人KP":"老板王总","线索来源":["公海品牌未签约"],"回款类型":"小单","POS系统":"奥琦玮","小程序系统":"奥琦玮"},{"rowId":395900585,"品牌名":"北羊北牧","门店数":2,"90天新开门店数":1,"品牌ID":719044,"公司名称":"上海虹申骏龙商业管理服务有限公司","注册资本":2000000,"经营模式":["纯直营"],"品类":["地方菜"],"商机阶段":"已回款","合作机会模块":["POS","小程序","会员"],"最新进展":"准备集采方案","上次沟通时间":1771776000000,"联系人KP":"负责人","线索来源":["新品牌"],"回款类型":"小单","POS系统":"美团","小程序系统":"美团","预计回款金额":"2.5w","预计签约时间":"2026Q1"},{"rowId":395904681,"品牌名":"DREAME CAFE","门店数":17,"品牌ID":677680,"公司名称":"乐喝咖啡（上海）有限公司","注册资本":1000000,"经营模式":["直营+加盟"],"品类":["咖啡"],"商机阶段":"已流失","合作机会模块":["供应链"],"最新进展":"集团已采购金蝶","上次沟通时间":1765296000000,"联系人KP":"李立纯","线索来源":["公海品牌未签约"],"POS系统":"企迈","供应链系统":"企迈","小程序系统":"企迈"},{"rowId":395908777,"品牌名":"尚普咨询","门店数":0,"公司名称":"尚普咨询集团有限公司","注册资本":20000000,"品类":["生态"],"商机阶段":"已回款","合作机会模块":["行业洞察"],"最新进展":"老板来互联宝地","上次沟通时间":1764000000000,"联系人KP":"伍铛","线索来源":["其它"],"回款类型":"大单","POS系统":"暂无","预计回款金额":"10w","预计签约时间":"202511"},{"rowId":395912873,"品牌名":"熊治","门店数":40,"90天新开门店数":4,"品牌ID":603980,"公司名称":"江苏熊治食品科技有限公司","注册资本":400000000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员","外卖中心","供应链"],"最新进展":"高层建联，下一步对接部门人员","上次沟通时间":1763654400000,"联系人KP":"殷总/汪总","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"客如云","供应链系统":"文典","小程序系统":"客如云","预计回款金额":"20w","预计签约时间":"2026Q1"},{"rowId":395916969,"品牌名":"沪嘻嘻","门店数":2,"品牌ID":720828,"公司名称":"上海飞骞食品有限公司","注册资本":1000000,"经营模式":["纯加盟"],"品类":["快餐"],"商机阶段":"已流失","合作机会模块":["POS","小程序","会员"],"最新进展":"11月底有3家开业要采购系统","联系人KP":"老板王总","线索来源":["新品牌"],"回款类型":"小单","POS系统":"暂无","供应链系统":"无系统","小程序系统":"无系统","预计回款金额":"1w","预计签约时间":"202603"},{"rowId":395921065,"品牌名":"第二碗面","门店数":24,"品牌ID":537602,"公司名称":"象山第二碗面餐饮管理有限公司","注册资本":1000000,"经营模式":["直营+加盟"],"品类":["粉面"],"商机阶段":"已回款","合作机会模块":["POS","会员"],"最新进展":"和KA联合，分6店","上次沟通时间":1775404800000,"联系人KP":"老板陈总","线索来源":["公海品牌未签约"],"回款类型":"小单","POS系统":"二维火,美团","供应链系统":"无系统","小程序系统":"无系统","预计回款金额":"2.3w","预计签约时间":"202604"},{"rowId":395925161,"品牌名":"开店兄弟帮","门店数":0,"公司名称":"上海漫唐堂文化传播有限公司","注册资本":3000000,"品类":["生态客户"],"商机阶段":"已回款","合作机会模块":["行业洞察"],"最新进展":"下周回款","上次沟通时间":1763568000000,"联系人KP":"创始人刘辉","线索来源":["其它"],"回款类型":"小单","预计回款金额":"5w","预计签约时间":"202512"},{"rowId":395929257,"品牌名":"洋江-商业街（美食城）","门店数":0,"品类":["小吃","快餐","茶饮"],"商机阶段":"已流失","合作机会模块":["POS","会员","小程序"],"最新进展":"12月会集采第一批系统","上次沟通时间":1764086400000,"联系人KP":"负责人刘海浪","线索来源":["其它"],"回款类型":"小单","预计回款金额":"5w","预计签约时间":"202512"},{"rowId":395933353,"品牌名":"宝钢集团食堂项目","门店数":0,"公司名称":"宝钢集团","注册资本":52897121000,"经营模式":["纯直营"],"品类":["快餐"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员"],"最新进展":"准备报价合同","上次沟通时间":1772035200000,"联系人KP":"项目负责人管总","线索来源":["其它"],"回款类型":"大单","POS系统":"自研","预计回款金额":"500000","预计签约时间":"2026Q3"},{"rowId":395937449,"品牌名":"YOGURTDAY","门店数":20,"90天新开门店数":16,"品牌ID":657292,"公司名称":"内蒙古蒙牛乳业（集团）股份有限公司","注册资本":1504290870000,"经营模式":["纯直营"],"品类":["茶饮"],"商机阶段":"已回款","合作机会模块":["小程序","会员","POS"],"最新进展":"南京6家续签推进中+硬件加白申请（节前需完成）","上次沟通时间":1777420800000,"联系人KP":"项目负责人孙仲杰","线索来源":["续签"],"回款类型":"小单","POS系统":"美团","供应链系统":"美团","小程序系统":"美团","预计回款金额":"30000","预计签约时间":"202603","下一步动作":"4/29 硬件加白申请（节前需批下来）→ 发合同给美玲（南京6家续签）","沟通记录汇总":"【4/29】硬件需今天申请加白，节前需审批通过\n【4/28】美玲催合同，南京6家：蒙牛优格（南京）餐饮管理有限公司，第1个6家（金陵中环/边城大厦/万谷科技金融中心/华贸中心/清江苏宁广场/水游城），本次开通：能悦坊/曼度年华/爱尚天地/弘阳广场及南京下2家"},{"rowId":395941545,"品牌名":"谷牛","门店数":16,"90天新开门店数":2,"品牌ID":537259,"公司名称":"上海谷牛餐饮服务有限公司","注册资本":2000000,"经营模式":["纯直营"],"品类":["正餐"],"商机阶段":"已回款","合作机会模块":["会员","小程序","POS"],"最新进展":"续签3店","联系人KP":"老板薛总","线索来源":["续签"],"回款类型":"小单","POS系统":"美团","供应链系统":"用友","小程序系统":"美团","预计回款金额":"10000","预计签约时间":"202604"},{"rowId":395945641,"品牌名":"五分之一","门店数":60,"品牌ID":641336,"公司名称":"新里（上海）食品科技有限公司","注册资本":50000000,"经营模式":["纯直营"],"品类":["快餐","小吃","正餐"],"商机阶段":"已回款","最新进展":"增购有赞商城","联系人KP":"IT张国海","线索来源":["增购"],"回款类型":"小单","POS系统":"美团","供应链系统":"美团","小程序系统":"美团","预计回款金额":"25000","预计签约时间":"202512"},{"rowId":395949737,"品牌名":"B&C","门店数":42,"90天新开门店数":1,"品牌ID":617479,"公司名称":"上海万红创赢餐饮管理有限公司","注册资本":3000000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"已回款","合作机会模块":["POS","小程序","会员"],"最新进展":"续签10家已在流程中","联系人KP":"IT赵总","线索来源":["续签"],"回款类型":"小单","POS系统":"美团","供应链系统":"美团","小程序系统":"美团","预计回款金额":"20000","预计签约时间":"202512"},{"rowId":395953833,"品牌名":"新顺记","门店数":8,"品牌ID":557963,"公司名称":"上海炙裕餐饮管理有限公司","注册资本":8000000,"经营模式":["纯直营"],"品类":["正餐"],"商机阶段":"已回款","合作机会模块":["供应链"],"最新进展":"向财务许总推介排队预点餐新功能（排队时预点餐→收台绑桌→后厨提前准备→节省上菜时间），许总表示感兴趣，将安排灰度测试","上次沟通时间":1776355200000,"联系人KP":"许莎莎（财务总监）","线索来源":["增购"],"回款类型":"小单","POS系统":"美团","供应链系统":"美团","小程序系统":"美团","预计回款金额":"3800","预计签约时间":"202512","下一步动作":"跟进许莎莎是否已安排排队预点餐灰度测试","沟通记录汇总":"[2026/04/17] 向财务许总推介排队预点餐新功能，许总回复'可以有，下周安排一下'"},{"rowId":395957929,"品牌名":"益海嘉里","门店数":0,"公司名称":"益海嘉里金龙鱼食品集团股份有限公司","注册资本":5421590000,"经营模式":["纯直营"],"品类":["生态客户"],"商机阶段":"长期跟进","最新进展":"需要对接内部其他的人负责","上次沟通时间":1765382400000,"联系人KP":"销售部张总","线索来源":["其它"]},{"rowId":395962025,"品牌名":"Laderach莱德拉","门店数":26,"90天新开门店数":2,"品牌ID":626477,"公司名称":"莱德拉食品贸易（上海）有限公司","注册资本":15000000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员","行业洞察"],"最新进展":"对经营洞察很感兴趣，目前使用的一个福建的不知名的小系统，和老板汇报方案","上次沟通时间":1766073600000,"联系人KP":"运营Serena","线索来源":["公海品牌未签约"],"回款类型":"小单","POS系统":"其他","供应链系统":"无系统","小程序系统":"无系统","预计回款金额":"50000","预计签约时间":"2026Q1"},{"rowId":395966121,"品牌名":"BalaThÉ","门店数":3,"品牌ID":686135,"公司名称":"上海罗港园餐饮管理有限公司","注册资本":1000000,"经营模式":["纯直营"],"品类":["茶饮"],"商机阶段":"长期跟进","合作机会模块":["POS","数智督导","供应链"],"最新进展":"目前门店盈利不错，持续有新店要开，正在选型供应链系统","上次沟通时间":1765987200000,"联系人KP":"运营部王总","线索来源":["公海品牌未签约"],"回款类型":"小单","POS系统":"企迈","供应链系统":"无系统","小程序系统":"企迈"},{"rowId":395970217,"品牌名":"崎本的店","门店数":38,"品牌ID":610620,"公司名称":"崎本家酵种吐司（沈阳市）有限公司","注册资本":50000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"长期跟进","合作机会模块":["供应链","POS"],"最新进展":"先测试一个单店的备餐","上次沟通时间":1765987200000,"联系人KP":"CEO 韩总 督导董 上海运营哲哥","线索来源":["续签"],"回款类型":"大单","POS系统":"其他,美团","小程序系统":"无系统"},{"rowId":395974313,"品牌名":"SE夜市","门店数":0,"品类":["美食城"],"商机阶段":"长期跟进","合作机会模块":["POS"],"最新进展":"有兴趣统一管控，公司汇报","上次沟通时间":1772121600000,"联系人KP":"运营Cici 总助 Lily","线索来源":["其它"],"回款类型":"小单","POS系统":"其他","预计签约时间":"2026Q1"},{"rowId":395978409,"品牌名":"汕心","门店数":93,"90天新开门店数":9,"品牌ID":676903,"公司名称":"上海汕心餐饮管理有限公司","注册资本":1000000,"经营模式":["直营+加盟"],"品类":["茶饮"],"商机阶段":"已回款","合作机会模块":["外卖中心"],"最新进展":"已回款","上次沟通时间":1767542400000,"联系人KP":"老板焦总","线索来源":["增购"],"回款类型":"大单","POS系统":"美团","供应链系统":"美团","小程序系统":"美团","预计回款金额":"15000","预计签约时间":"202601"},{"rowId":395982505,"品牌名":"天和大包","门店数":14,"90天新开门店数":2,"品牌ID":583781,"公司名称":"无","经营模式":["直营+加盟"],"品类":["早餐包子"],"商机阶段":"已流失","合作机会模块":["POS","小程序","会员","供应链"],"联系人KP":"老板黄总","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"客如云","预计回款金额":"50000","预计签约时间":"20206Q1"},{"rowId":395986601,"品牌名":"安居客","门店数":0,"公司名称":"上海瑞家信息技术有限公司","注册资本":201100000,"品类":["生态客户"],"商机阶段":"长期跟进","合作机会模块":["选址"],"最新进展":"已介绍产品，内部讨论看看可行性","上次沟通时间":1768492800000,"联系人KP":"产品经理","线索来源":["其它"],"回款类型":"大单","POS系统":"其他"},{"rowId":395990697,"品牌名":"锅圈","门店数":3,"品牌ID":730677,"公司名称":"锅圈食品（上海）股份有限公司","注册资本":2747360000,"品类":["生态客户"],"商机阶段":"长期跟进","合作机会模块":["选址"],"最新进展":"对接了产品，下一步沟通数据的来源","上次沟通时间":1768492800000,"联系人KP":"IT","线索来源":["其它"],"回款类型":"大单","POS系统":"其他"},{"rowId":395994793,"品牌名":"纪录片《人生一串》官方授权体验店","门店数":4,"品牌ID":604598,"公司名称":"上海人生一串餐饮管理有限公司","注册资本":500000,"经营模式":["纯直营"],"品类":["地方菜"],"商机阶段":"长期跟进","合作机会模块":["供应链"],"最新进展":"参加了沙龙有兴趣了解","上次沟通时间":1768406400000,"联系人KP":"运营张总","线索来源":["公海品牌未签约"],"回款类型":"小单","POS系统":"其他","预计回款金额":"50000"},{"rowId":395998889,"品牌名":"红唇串串香","门店数":17,"品牌ID":522914,"公司名称":"上海红唇餐饮管理有限公司","注册资本":100000,"经营模式":["直营+加盟"],"品类":["正餐"],"商机阶段":"长期跟进","最新进展":"子品牌已合作","上次沟通时间":1769356800000,"线索来源":["公海品牌未签约"],"POS系统":"奥琦玮","小程序系统":"奥琦玮"},{"rowId":396002985,"品牌名":"纪录片《人生一串》官方授权体验店","门店数":4,"品牌ID":604598,"公司名称":"上海人生一串餐饮管理有限公司","注册资本":500000,"经营模式":["纯直营"],"品类":["正餐"],"商机阶段":"长期跟进","最新进展":"等像公司汇报然后组织部门会议","上次沟通时间":1769443200000,"联系人KP":"张总","线索来源":["其它"],"POS系统":"其他"},{"rowId":396007081,"品牌名":"全日可颂","门店数":55,"90天新开门店数":1,"品牌ID":585032,"公司名称":"淮北全日可颂食品销售有限公司","注册资本":2000000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"已流失","上次沟通时间":1770048000000,"联系人KP":"蔡总（股东） 杨总（it负责人）","线索来源":["公海品牌未签约"],"POS系统":"其他","供应链系统":"金蝶"},{"rowId":396011177,"品牌名":"半山恰","门店数":1,"品牌ID":721661,"公司名称":"上海半山恰实业有限公司","注册资本":500000,"经营模式":["纯直营"],"品类":["茶饮"],"商机阶段":"线索","合作机会模块":["POS","小程序","会员","供应链"],"最新进展":"目前使用睿食拓，有机会切换","上次沟通时间":1769616000000,"联系人KP":"朱总","线索来源":["新品牌"],"回款类型":"小单","POS系统":"其他","预计签约时间":"2026Q1"},{"rowId":396015273,"品牌名":"山池玩茄","门店数":2,"品牌ID":709935,"公司名称":"山池玩茄（云南）科技有限责任公司","注册资本":1000000,"经营模式":["纯直营"],"品类":["咖啡"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员","数智督导"],"最新进展":"烟草证一直没下来，变更为长期跟进","上次沟通时间":1777132800000,"联系人KP":"张总","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"无系统","供应链系统":"无系统","小程序系统":"自研","预计签约时间":"2026Q1","沟通记录汇总":"[2026/04/26] 烟草证一直没下来，变更为长期跟进"},{"rowId":396019369,"品牌名":"ORTENSIA","门店数":2,"品牌ID":695834,"公司名称":"欧棠雅餐饮管理（上海）有限公司","注册资本":16000000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"长期跟进","合作机会模块":["会员"],"最新进展":"增购会员","上次沟通时间":1769961600000,"联系人KP":"许总","线索来源":["增购"],"回款类型":"大单","POS系统":"美团","供应链系统":"美团","小程序系统":"美团","预计回款金额":"6000"},{"rowId":396023465,"品牌名":"宝钢集团","门店数":0,"公司名称":"中国宝武钢铁集团有限公司","注册资本":52897121000,"经营模式":["纯直营"],"品类":["快餐"],"商机阶段":"长期跟进","最新进展":"准备方案汇报","上次沟通时间":1772467200000,"联系人KP":"管总","线索来源":["其它"],"POS系统":"自研","预计签约时间":"2026M3"},{"rowId":396027561,"品牌名":"思多趣","门店数":1,"90天新开门店数":1,"品牌ID":732245,"公司名称":"艺游味境（上海）健康科技有限公司","注册资本":2000000,"经营模式":["纯直营"],"品类":["咖啡"],"商机阶段":"长期跟进","合作机会模块":["POS","外卖中心"],"最新进展":"自动机器人咖啡项目，适合一些特殊场景，有POS合作机会","上次沟通时间":1772035200000,"联系人KP":"项目负责人徐总","线索来源":["新品牌"],"POS系统":"自研"},{"rowId":396031657,"品牌名":"老灶台地锅","门店数":22,"90天新开门店数":2,"品牌ID":674464,"经营模式":["纯加盟"],"品类":["正餐"],"商机阶段":"长期跟进","线索来源":["公海品牌未签约"],"POS系统":"其他"},{"rowId":396035753,"品牌名":"大匠传承","门店数":0,"公司名称":"安徽大匠传承食品有限公司","注册资本":5000000,"品类":["生态客户"],"商机阶段":"线索","合作机会模块":["行业洞察"],"最新进展":"有意向进一步沟通，演示产品","上次沟通时间":1772640000000,"联系人KP":"运营总","线索来源":["其它"],"回款类型":"大单"},{"rowId":396039849,"品牌名":"温氏食品","门店数":0,"品牌ID":581672,"公司名称":"温氏食品集团股份有限公司","注册资本":66539271410000,"品类":["生态客户"],"商机阶段":"30天内可回款","合作机会模块":["行业洞察"],"最新进展":"确定需要，下周开始走合同","上次沟通时间":1775750400000,"联系人KP":"CEO","线索来源":["其它"],"回款类型":"大单"},{"rowId":396043945,"品牌名":"秦皇岛美烨食品","门店数":0,"公司名称":"秦皇岛美烨食品有限公司","注册资本":10000000,"品类":["生态客户"],"商机阶段":"线索","合作机会模块":["行业洞察"],"最新进展":"有意向进一步沟通，演示产品","上次沟通时间":1772640000000,"联系人KP":"市场部","线索来源":["其它"],"回款类型":"大单"},{"rowId":396048041,"品牌名":"善志咨询","门店数":0,"公司名称":"善志咨询（无锡）有限公司","注册资本":10000000,"品类":["生态客户"],"商机阶段":"30天内可回款","合作机会模块":["行业洞察"],"最新进展":"4/28与善志杨丽、王平、陈童会面。达成：①50个监测点位5/15前开通②AI+数据共创灰度测试5月启动③6月中烹协大会联合参与④多账号权限5/10前协调","上次沟通时间":1777305600000,"联系人KP":"杨丽(总经理)、王平(项目负责人)、陈童","线索来源":["其它"],"回款类型":"大单","下一步动作":"5/10前协调账号权限→5/15前开通监测点位→5/20前确定中烹协大会方案→5/31前启动AI共创灰度测试","沟通记录汇总":"【4/28】与善志杨丽、王平、陈童深度沟通合作：①行业洞察50个监测点位需求确认5/15前走流程②AI+数据共创模式灰度测试5月启动③6月杭州中烹协产业大会联合发声+行业报告④账号权限多人使用问题需协调\n【3/5】沙龙来了4个高管，下周需要再去一趟，沟通合作"},{"rowId":396052137,"品牌名":"麦味宝食品","门店数":0,"公司名称":"北京麦味宝食品有限公司","注册资本":500000,"品类":["生态客户"],"商机阶段":"已流失","合作机会模块":["行业洞察"],"最新进展":"已演示产品，机会不大","上次沟通时间":1772640000000,"联系人KP":"市场部","线索来源":["其它"],"回款类型":"大单"},{"rowId":396056233,"品牌名":"花果山","门店数":38,"品牌ID":528724,"公司名称":"厦门市花果山食品有限公司","注册资本":5400000,"品类":["生态客户"],"商机阶段":"线索","合作机会模块":["行业洞察"],"最新进展":"已对接，需要汇报给董事长","上次沟通时间":1772640000000,"联系人KP":"市场部","线索来源":["其它"],"回款类型":"大单"},{"rowId":396060329,"品牌名":"厝内小眷村","门店数":42,"90天新开门店数":14,"品牌ID":501049,"公司名称":"江苏彩匠餐饮管理有限公司","注册资本":10000000,"经营模式":["直营+加盟"],"品类":["茶饮"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员","数智督导","外卖中心"],"最新进展":"已报价，下周答复","上次沟通时间":1772985600000,"联系人KP":"江总","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"企迈","供应链系统":"企迈","小程序系统":"企迈","预计回款金额":"125000","预计签约时间":"202603"},{"rowId":396064425,"品牌名":"POP BAKERY","门店数":2,"90天新开门店数":2,"品牌ID":707489,"公司名称":"北京泡泡玛特食品有限公司","注册资本":1000000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"7天内可回款","合作机会模块":["POS","小程序","会员"],"最新进展":"叫号系统测试推进中：章顺已安排俊杰发设备到北京，田朋要求开测试账号，已引导登录测试后台，对方确认OK","上次沟通时间":1777046400000,"联系人KP":"田朋（IT部田总）、章顺","线索来源":["续签"],"回款类型":"小单","POS系统":"美团","供应链系统":"美团","小程序系统":"美团","预计回款金额":"42000","预计签约时间":"202604","下一步动作":"跟进POP BAKERY叫号系统测试进展及效果反馈","沟通记录汇总":"[2026/04/25] 叫号系统沟通群：田朋催促尽快测试，章顺安排发设备到北京；田朋要测试账号，周巍引导用测试后台，田朋确认OK"},{"rowId":396068521,"品牌名":"凤添吉","门店数":7,"品牌ID":629643,"公司名称":"上海凤添吉餐饮管理有限责任公司","注册资本":50,"经营模式":["纯直营"],"品类":["正餐"],"商机阶段":"长期跟进","联系人KP":"刘总","线索来源":["公海品牌未签约"],"POS系统":"二维火","供应链系统":"无系统","小程序系统":"二维火"},{"rowId":396072617,"品牌名":"传奇韩式炸酱面","门店数":5,"90天新开门店数":3,"品牌ID":659332,"品类":["快餐"],"商机阶段":"30天内可回款","合作机会模块":["POS","小程序","会员","供应链"],"最新进展":"故乡妈妈介绍，有10家待开门的，要买供应链","联系人KP":"老板姜总","线索来源":["其它"],"POS系统":"美团","预计回款金额":"10000","预计签约时间":"202604"},{"rowId":396076713,"品牌名":"四川美味源","门店数":0,"公司名称":"四川美味源食品有限公司","注册资本":39000000,"品类":["生态客户"],"商机阶段":"已回款","合作机会模块":["行业洞察"],"最新进展":"已演示系统，提供报价单，正在内部申请费用流程中","上次沟通时间":1772812800000,"联系人KP":"品牌部 廖总","线索来源":["其它"],"回款类型":"大单","预计回款金额":"100000","预计签约时间":"202603"},{"rowId":396080809,"品牌名":"撞酒爷","门店数":3,"90天新开门店数":3,"品牌ID":736413,"品类":["茶饮"],"商机阶段":"已回款","合作机会模块":["小程序","POS","会员","数智督导","供应链"],"最新进展":"已介绍系统，比较有兴趣","上次沟通时间":1773331200000,"联系人KP":"运营/合伙人雷总","线索来源":["新品牌"],"回款类型":"大单","预计回款金额":"100000","预计签约时间":"202603"},{"rowId":396084905,"品牌名":"Pain Chaud（百丘）","门店数":8,"品牌ID":519485,"公司名称":"上海亚法餐饮管理有限公司","注册资本":15000000,"经营模式":["纯直营"],"品类":["烘焙"],"商机阶段":"长期跟进","合作机会模块":["POS","小程序","会员","外卖中心","数智督导","供应链"],"最新进展":"对系统感兴趣，已报价","上次沟通时间":1773763200000,"联系人KP":"老板王总","线索来源":["公海品牌未签约"],"回款类型":"大单","POS系统":"Filipos","预计回款金额":"100000","预计签约时间":"2026Q2"},{"rowId":396089001,"品牌名":"美兰机场","门店数":0,"品类":["美食城"],"商机阶段":"30天内可回款","合作机会模块":["POS","小程序","会员"],"最新进展":"已提供方案，持续对接","上次沟通时间":1773763200000,"联系人KP":"信息部汤亚飞","线索来源":["其它"],"回款类型":"小单","预计回款金额":"100000","预计签约时间":"202604"},{"rowId":396093097,"品牌名":"乐忻皇朝","门店数":3,"品牌ID":519899,"公司名称":"乐忻味（上海）餐饮管理有限公司","注册资本":5000000,"经营模式":["纯直营"],"品类":["正餐"],"商机阶段":"30天内可回款","合作机会模块":["POS","小程序","会员"],"最新进展":"想换系统，可以让民生银行买单","上次沟通时间":1774454400000,"联系人KP":"运营 徐总","线索来源":["公海品牌未签约"],"回款类型":"小单","POS系统":"其他","预计回款金额":"20000","预计签约时间":"202604"},{"rowId":396097193,"品牌名":"杨老馋川渝面馆","门店数":2,"品牌ID":668021,"公司名称":"上海梦可欣餐饮管理有限公司","注册资本":1000000,"经营模式":["直营+加盟"],"品类":["快餐"],"商机阶段":"30天内可回款","合作机会模块":["POS","小程序"],"最新进展":"要续签","上次沟通时间":1774713600000,"联系人KP":"老板 杨总","线索来源":["续签"],"回款类型":"小单","POS系统":"美团","预计回款金额":"20000","预计签约时间":"202604"},{"rowId":396101289,"品牌名":"生态客户华井","门店数":0,"品牌ID":1,"公司名称":"华井生物科技有限公司","注册资本":5000000,"经营模式":["纯直营"],"品类":["生态客户"],"商机阶段":"30天内可回款","合作机会模块":["行业洞察"],"最新进展":"商机预案，等内部沟通","上次沟通时间":1776096000000,"联系人KP":"刘总、赵总","线索来源":["其它"],"回款类型":"大单","POS系统":"无系统","供应链系统":"无系统","小程序系统":"无系统","预计回款金额":"100000","预计签约时间":"4.20"},{"rowId":396105385,"品牌名":"温氏食品","门店数":0,"公司名称":"温氏食品集团股份有限公司","注册资本":6653927141,"品类":["生态客户"],"商机阶段":"30天内可回款","合作机会模块":["行业洞察"],"最新进展":"合同流程中","上次沟通时间":1777046400000,"联系人KP":"王总、何总","线索来源":["其它"],"回款类型":"大单","POS系统":"无系统","预计回款金额":"100000","预计签约时间":"202605"},{"rowId":396109481,"品牌名":"鸭匠人","门店数":0,"公司名称":"合肥习香稷餐饮有限公司","注册资本":3000000,"品类":["生态客户"],"商机阶段":"30天内可回款","合作机会模块":["行业洞察"],"最新进展":"在评估需求","上次沟通时间":1776873600000,"联系人KP":"丁总","线索来源":["其它"],"回款类型":"大单","预计回款金额":"50000","预计签约时间":"202605"},{"rowId":49026530784,"品牌名":"唐捌玖","门店数":2,"品类":["快餐"],"商机阶段":"30天内可回款","最新进展":"报价阶段，与姜骏毅协同跟进","联系人KP":"（与姜骏毅协同跟进）","预计回款金额":"1W"},{"rowId":49026530785,"品牌名":"阿跷锅贴","门店数":1,"品类":["快餐"],"商机阶段":"30天内可回款","合作机会模块":["POS"],"最新进展":"需要派单和购买收银机","联系人KP":"","线索来源":["新品牌"],"回款类型":"小单","POS系统":"待采购"}];
+
+</script>
+<script>
+// 销售目标数据 (来源: bi.sankuai.com/dashboard/202704, 2026-04)
+const SALES_TARGET = {
+  month: '2026-05',
+  updated: '2026-05-13',
+  毛利目标: 52830.6930054443,      // 本月销售目标（毛利）
+  回款毛利: 0,        // 本月总回款（毛利）
+  新签目标毛利: 24558,       // 本月新签回款目标
+  新签回款毛利: 0,    // 本月新签回款
+  续签回款毛利: 0,    // 续签回款
+  横向回款毛利: 0,           // 横向回款（增购）
+  全成线目标: 26415.34650272215,      // 全成线目标
+  回款主食客数: 0           // 回款主食客数（收银数）
+};
+
+// 其他项目跟进数据
+const PROJECTS = [
+  {
+    name: 'AI智能排班',
+    contest: '创业赛',
+    status: 'prep', // prep|active|review
+    statusText: '方案准备中',
+    desc: '针对中小餐饮连锁的全职+兼职全场景智能排班方案——基于经营数据预测，AI自动生成排班+兼职一键招聘',
+    deadline: '2026-04-28',
+    deadlineLabel: '报名截止',
+    progress: [
+      '4/21 建群组队，周巍完成初步方案',
+      '4/22 技术可行性讨论：预估能力已有，核心差异化在排班编排+兼职招聘',
+      '待约时间对齐方案细节'
+    ],
+    todos: [
+      '周巍完善详细方案内容',
+      '团队对齐方案（约会议）',
+      '4/28前完成创业赛报名',
+      '评估经营数据预估准确率'
+    ],
+    members: [
+      {name:'周巍',me:true}, {name:'蒋意'}, {name:'王岳'}, {name:'徐静'}, {name:'刘瑞昌'}
+    ],
+    lastUpdate: '2026-04-22'
+  },
+  {
+    name: '餐饮知局',
+    contest: '创业赛',
+    status: 'active',
+    statusText: '推进中',
+    desc: '利用美团亿级餐饮交易数据+AI，为非餐食品巨头提供咨询级行业洞察报告。Slogan："我们不卖调研，我们卖真相。"',
+    deadline: null,
+    deadlineLabel: null,
+    progress: [
+      '4/22 蒋意发起项目，王萌分享外资客户名单+会议纪要',
+      '4/23 完成创业赛报名，项目名"餐饮知局"',
+      '4/24 姚远加入负责数据底层；王萌完成五大咨询公司对标研究',
+      '4/24 明确分工：蒋意+王萌(报告)、周巍(外部资源)、戴书明(方向)、姚远(数据)',
+      '4/24 定价标准：10万/份，对标Mintel(64万/年)',
+      '4/24 数据权限申请遇阻，姚远表示可从上游获取'
+    ],
+    todos: [
+      '数据权限申请（外卖菜品销量表+SaaS订单表）',
+      '姚远开发底层数据模型（分渠道分析）',
+      '品类映射更新同步',
+      '戴书明确定报告方向（乳品/调味品/食用油等）',
+      '周巍联络外部资源（逸之-毕马威背景）',
+      '蒋意制作Demo网页可视化报告'
+    ],
+    members: [
+      {name:'蒋意'}, {name:'王萌'}, {name:'周巍',me:true}, {name:'戴书明'}, {name:'姚远'}
+    ],
+    lastUpdate: '2026-04-24'
+  },
+  {
+    name: 'SIAL参展商筛选',
+    contest: '客户拓展',
+    status: 'prep',
+    statusText: '搜集准备中',
+    desc: '搜集2026 SIAL西雅国际食品展（上海，5/18-20）中国大陆餐饮品牌参展商清单，完善注册资本和经营内容，筛选作为餐饮SaaS潜在客户。',
+    deadline: '2026-05-18',
+    deadlineLabel: '展会开幕',
+    progress: [
+      '4/30 确定需求：筛选SIAL参展商中的中国大陆餐饮品牌',
+      '5/1 正式立项，目标为SaaS潜在客户开发'
+    ],
+    todos: [
+      '获取SIAL 2026完整参展商名录',
+      '筛选中国大陆餐饮品牌（连锁餐饮、茶饮、烘焙等）',
+      '完善企业注册资本信息',
+      '完善经营内容/主营业务',
+      '按规模排序，输出潜在客户清单',
+      '展会期间现场拜访重点客户'
+    ],
+    members: [
+      {name:'周巍',me:true}
+    ],
+    lastUpdate: '2026-05-01'
+  }
+];
+
+// 每日资讯数据
+const NEWS_DATA = [
+  // === SaaS直通车 ===
+  {cat:'政策宣导',catCls:'cat-policy',title:'【S级】CKA 2026年五一休假激励方案',summary:'区域大客户组（CKA）五一休假激励政策发布，请及时了解。',time:'2026-04-24',pinned:true,source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/564u4z304q2wzh2I1j37Ly106R01xzkk'},
+  {cat:'规则更新',catCls:'cat-rule',title:'【A级】品牌业态报错修改流程',summary:'品牌业态信息报错修改流程更新，涉及品牌分类调整操作规范。',time:'2026-04-26',source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/EaB7q3C4B3o035g2Tt4i8232E101QoYx'},
+  {cat:'产品更新',catCls:'cat-product',title:'【B级】硬件上新 L4 Pro 收银称重一体机上线',summary:'L4 Pro收银称重一体机正式上线，适用于需要称重场景的商户。',time:'2026-04-21',source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/9a0Bc1740xa02V0J4wfGb3962u01QSVz'},
+  {cat:'产品更新',catCls:'cat-product',title:'【S级】SaaS智能助理使用指南',summary:'大象搜索"SaaS智能助理"或拉SaaS智能助理进群，开启AI提效之路。',time:'2026-04-17',source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/tWh67arQh261X20e0m024A4MRa01QlpU'},
+  {cat:'规则更新',catCls:'cat-rule',title:'【B级】美团点菜宝及基站下架通知',summary:'美团点菜宝及基站产品正式下架，请注意客户沟通和替代方案。',time:'2026-04-14',source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/n80z1al20v034t7N0FIs498d1h01uZKY'},
+  {cat:'公司内部',catCls:'cat-company',title:'【S计划】百膳筑梦益同行杭州站研学营圆满结束',summary:'首期研学营圆满ending，经营型督导能力建设与培养实战。',time:'2026-04-23',source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/mMooq2kGoko1L0CA0x2c2Mw06101KtOK'},
+  {cat:'公司内部',catCls:'cat-company',title:'【S计划】2026从杭开始！督导能力建设实战营收官',summary:'经营型督导能力建设与培养实战营圆满收官。',time:'2026-04-22',source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/572C4c312y2biHr651R21B400r01ktPs'},
+  {cat:'公司内部',catCls:'cat-company',title:'【积分兑换】春日礼遇，惊喜好物等你pick！',summary:'SaaS积分兑换活动开启，春日好物等你来换。',time:'2026-04-09',source:'SaaS直通车',link:'https://xm.sankuai.com/cms/content/article/3b88e71584d302rO04740P1U2j01PzpR'},
+  // === 互联网+大学 ===
+  {cat:'产品更新',catCls:'cat-product',title:'【学习提醒】菜品列表装修+智能订货+评价专家+数智督导',summary:'菜品列表装修支持菜谱模式；智能订货支持选择订货模板；评价专家新增京东外卖店铺评价；数智督导新增「证书管理」「证书统计」功能。',time:'2026-04-26',source:'互联网+大学',link:'https://daxue.sankuai.com/personal.html#!/learn/classes/detail/87371'},
+  {cat:'产品更新',catCls:'cat-product',title:'【学习提醒】KDS分档口+智能电子秤+供应商多次发货',summary:'KDS支持按做法分档口展示和出餐；智能电子秤新增「收货看板」；供应商端支持多次发货（常规采购+直采直配）。',time:'2026-04-25',source:'互联网+大学',link:'https://daxue.sankuai.com/personal.html#!/learn/classes/detail/87209'},
+  // === 餐饮行业 ===
+  {cat:'餐饮行业',catCls:'cat-food',title:'餐饮业迈入增速换挡与结构重构关键阶段',summary:'新华网报道2026年餐饮行业进入深度调整期，连锁化率持续提升，单体门店加速出清，品牌化、数字化成为核心竞争力。',time:'2026-04-09',pinned:true,source:'新华网',link:'https://www.news.cn/food/20260409/b7f7bb4b60d548f191b1badd6d1241f9/c.html'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'2026餐饮行业舆情白皮书：闭店潮背后的真相',summary:'白皮书揭示2026年餐饮闭店潮核心原因：成本高企、流量碎片化、数字化能力不足。SaaS工具成为商户降本增效刚需。',time:'2026-04-09',source:'Knowlesys',link:'https://knowlesys.cn/blog/white-papers/2026_restaurantindustry_whitepaper.html'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'中国餐饮SaaS市场份额与公司排名分析2026',summary:'知乎深度分析国内餐饮SaaS赛道格局，美团餐饮SaaS在连锁客户市占率持续领先，中腰部市场竞争加剧。',time:'2026-03-27',source:'知乎',link:'https://zhuanlan.zhihu.com/p/2020654040028069961'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'网红爆品时代终结，餐饮回归经营本质',summary:'亿欧网指出餐饮行业从流量驱动转向经营驱动，门店精细化管理、供应链效率和数字化能力成为存活关键。',time:'2026-04-01',source:'亿欧网',link:'https://www.iyiou.com/t/canyin/'},
+  // === AI行业 ===
+  {cat:'AI行业',catCls:'cat-ai',title:'餐饮AI加速变革，驱动行业智能跃迁',summary:'新华网报道AI技术在餐饮领域加速落地，智能点餐、AI选址、智能排班等应用显著提升运营效率，SaaS+AI成为行业共识。',time:'2026-04-13',source:'新华网',link:'https://www.xinhuanet.com/food/20260413/d454ffa2625649a7a4180f08f8988242/c.html'},
+  {cat:'AI行业',catCls:'cat-ai',title:'国内首个数字菜谱AI系统Mer宝·AI开启内测',summary:'数字菜谱AI系统Mer宝·AI启动内测，可自动生成菜谱、智能定价、毛利分析，对餐饮SaaS产品形态带来新冲击。',time:'2026-03-30',source:'百家号',link:'https://baijiahao.baidu.com/s?id=1861049475796075530'},
+  {cat:'AI行业',catCls:'cat-ai',title:'中国餐饮AI应用研究报告2026发布',summary:'报告指出超60%连锁品牌已部署或计划部署AI工具，智能订货、AI营销、数智督导是三大热门方向，销售可借此切入客户需求。',time:'2026-03-31',source:'百家号',link:'https://baijiahao.baidu.com/s?id=1861157625338128155'},
+  // === 竞品动态 ===
+  {cat:'竞品动态',catCls:'cat-competitor',title:'哗啦啦收银暴雷：商户如何规避二清陷阱',summary:'哗啦啦收银系统暴雷事件持续发酵，涉及资金二清风险。销售拜访中可作为竞品风险案例，强调美团合规优势。',time:'2026-04-01',pinned:true,source:'今日头条',link:'https://www.toutiao.com/article/7488343929213944346/'},
+  {cat:'竞品动态',catCls:'cat-competitor',title:'2026年主流收银系统专业测评出炉',summary:'界面新闻对市面主流收银系统进行横评，从稳定性、功能完整度、售后服务等维度打分，美团收银综合评分领先。',time:'2026-04-24',source:'界面新闻',link:'https://www.jiemian.com/article/14312519.html'},
+  {cat:'竞品动态',catCls:'cat-competitor',title:'餐饮收银系统主流选择对比2026',summary:'银豹发布收银系统选型指南，对比美团、客如云、银豹等方案，可用于了解竞品话术和卖点定位。',time:'2026-04-01',source:'银豹',link:'https://www.pospal.cn/main/html/guide/catering-pos.html'},
+  {cat:'竞品动态',catCls:'cat-competitor',title:'2026年餐饮收银系统三款主流产品深度对比',summary:'搜狐测评美团收银、客如云、银豹三大产品，从硬件生态、软件功能、价格体系全方位PK，销售必读参考。',time:'2026-03-05',source:'搜狐',link:'https://www.sohu.com/a/992776632_122621399'},
+  // === SaaS行业 ===
+  {cat:'SaaS行业',catCls:'cat-saas',title:'和创科技SaaS+AI战略落地，现金流创新高',summary:'和创科技发布财报，SaaS+AI业务驱动现金流创历史新高，印证SaaS行业AI转型趋势不可逆。',time:'2026-04-20',source:'同花顺',link:'https://t.10jqka.com.cn/pid_615796164.shtml'},
+  {cat:'SaaS行业',catCls:'cat-saas',title:'科脉SaaS+AI重塑零售数智新生态',summary:'科脉以SaaS+AI双引擎驱动零售数智化，其在餐饮和零售的AI实践对我们的产品策略有参考价值。',time:'2026-04-20',source:'百家号',link:'https://baijiahao.baidu.com/s?id=1862972868094204960'},
+  {cat:'SaaS行业',catCls:'cat-saas',title:'软件公司集体大逃亡：SaaS行业何去何从',summary:'雪球热文分析传统软件公司向SaaS转型的困境与机遇，行业洗牌加速，头部平台型公司优势扩大。',time:'2026-04-16',source:'雪球',link:'http://xueqiu.com/6731239840/384148200'},
+  // === 内部政策 ===
+  {cat:'内部政策',catCls:'cat-internal-policy',title:'【通知】2026年Q2 SaaS销售激励方案更新',summary:'Q2激励方案重点调整：新签连锁客户额外奖励系数上调、续费达标团队享阶梯奖金，请仔细阅读并规划季度目标。',time:'2026-04-15',source:'内部通知',link:'#'},
+  {cat:'内部政策',catCls:'cat-internal-policy',title:'【通知】五一值班安排及调休规则',summary:'五一假期值班轮次及调休补偿规则已发布，请各组确认值班人员安排并提前报备。',time:'2026-04-18',source:'内部通知',link:'#'},
+  // === 其他内部 ===
+  {cat:'其他内部',catCls:'cat-other-internal',title:'【公告】4月SaaS直通车内容征稿启事',summary:'SaaS直通车4月征稿开启，欢迎投稿产品使用技巧、客户成功案例、行业洞察类内容，优秀稿件享额外积分奖励。',time:'2026-04-10',source:'SaaS直通车',link:'#'},
+  {cat:'其他内部',catCls:'cat-other-internal',title:'【分享】优秀CKA销售案例集锦·Q1季度',summary:'Q1季度CKA优秀签约案例精选，涵盖正餐连锁、快餐品牌等标杆打法，值得学习借鉴。',time:'2026-04-08',source:'SaaS直通车',link:'#'},
+  // === 行业资讯（第二批，互联网搜索补充） ===
+  {cat:'餐饮行业',catCls:'cat-food',title:'《2026中国餐饮连锁化发展白皮书》发布：连锁化率升至25%',summary:'CCFA与美团联合发布白皮书，2025年全国餐饮收入5.79万亿元同比增3.2%，连锁化率从18%升至25%，万店品牌持续增加。',time:'2026-04-17',source:'中国连锁经营协会',link:'http://www.ccfa.org.cn/portal/cn/xiangxi.jsp?id=447139&type=10003'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'Q1连锁餐饮开店战绩：小吃快餐扩张回暖，头部集中加剧',summary:'2026年Q1连锁餐饮品牌开店数据出炉，小吃快餐开闭店比提升，新茶饮和咖啡整体放缓，中小品牌面临闭店压力。',time:'2026-04-13',source:'GeoQ智图',link:'https://geoq.cn/newsinfo/9032356.html'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'7家电商平台因"幽灵外卖"被罚没35.97亿元',summary:'市场监管总局对美团、抖音、京东、饿了么等7家平台开出食安史上最大罚单，严惩平台放任"幽灵外卖"行为。',time:'2026-04-17',pinned:true,source:'央视网',link:'https://news.cctv.com/2026/04/17/ARTIa6JY3nXdfay4B9Xs3hFj260417.shtml'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'《餐饮供应链趋势研究报告2026》：3万亿赛道竞争升级',summary:'红餐产业研究院报告显示2025年餐饮供应链市场规模约2.8万亿元，2026年有望破3万亿，蒙牛、阿里等跨界巨头加速布局B端。',time:'2026-04-13',source:'新华网',link:'http://www.xinhuanet.com/food/20260413/da96be919d86403a8578bbbec7ac077a/c.html'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'2026中国连锁餐饮峰会上海召开：探寻下一个五年确定性机会',summary:'CCFA连锁餐饮峰会在沪举行，美团高级副总裁李树斌指出餐饮正从流量竞争转向信任竞争，建议商家适应AI推荐时代。',time:'2026-04-09',source:'中新网',link:'https://www.chinanews.com.cn/cj/2026/04-09/10600793.shtml'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'《餐饮业促进和经营管理办法》正式施行',summary:'商务部等部门发布餐饮业管理办法，规范餐饮服务经营活动，强化食品安全、制止餐饮浪费，为行业高质量发展提供法规保障。',time:'2025-11-13',source:'司法部/商务部',link:'https://www.moj.gov.cn/pub/sfbgw/flfggz/flfggzdfzwgz/202511/t20251113_527968.html'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'网络餐饮食品安全新规即将施行，平台被要求自查整改',summary:'市场监管总局要求美团、淘宝闪购、京东等平台严格落实网络餐饮食安主体责任监管规定，强化食安主体责任。',time:'2026-04-03',source:'央视新闻',link:'https://news.cctv.com/2026/04/03/ARTIC3YKZPI4eBYCbcheImEK260403.shtml'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'《2026中国餐饮产业生态白皮书》：拐点将至，产业重塑待启',summary:'白皮书指出餐饮产业业态分化与供应链革新趋势，小众品类挖掘和品类替代涌现新机会，数智化与冷链物流成为关键赋能环节。',time:'2026-04-02',source:'红餐产业研究院',link:'https://baijiahao.baidu.com/s?id=1861322507870644278'},
+  {cat:'餐饮行业',catCls:'cat-food',title:'美团升级2026"放心外卖"行动：AI巡检+多方共治',summary:'美团发布2026年"放心外卖"升级行动，以AI强化商家资质核验和后厨巡检，推动社会共治模式。',time:'2026-02-27',source:'美团官网',link:'https://www.meituan.com/news'},
+  {cat:'竞品动态',catCls:'cat-competitor',title:'客如云2026战略：AI五大智能体免费开放+POS 5N发布',summary:'客如云推出五大AI智能体（老板助手/营销助手/超级店员等）免费应用，并联合支付宝推出集成"碰一下"支付的POS 5N一体机。',time:'2026-03-26',source:'凤凰科技',link:'https://tech.ifeng.com/c/8roS40lulIm'},
+  {cat:'竞品动态',catCls:'cat-competitor',title:'客如云2026春耕计划启动：AI碰碰贴助力门店获客',summary:'客如云推出AI碰碰贴融合NFC与大模型，顾客"一碰"即完成会员注册和互动；联合美味不用等推出"探店达人包"。',time:'2026-04-02',source:'客如云官网',link:'https://www.keruyun.com/news/13263.html'},
+  {cat:'AI行业',catCls:'cat-ai',title:'2026年AI Agent企业应用：62%企业已入局，从概念走向落地',summary:'36氪分析30个顶级AI Agent产品，企业级市场成为商业化主战场，软件开发、客服、供应链管理成核心落地领域。',time:'2026-03-01',source:'36氪',link:'https://zhuanlan.zhihu.com/p/2011247693264076923'},
+  {cat:'AI行业',catCls:'cat-ai',title:'2026年AI SaaS潮水迅猛来袭：AI重构而非取代软件',summary:'36氪报告指出AI正重塑企业工作方式但并未消解SaaS价值，传统SaaS向AI-Native SaaS加速转型。',time:'2026-02-06',source:'36氪',link:'https://www.36kr.com/p/3671549180945033'},
+  {cat:'SaaS行业',catCls:'cat-saas',title:'2026连锁品牌数字化竞争力榜：五维重塑驱动增长',summary:'从产品创新、销售成交、品牌价值、供应链管理、组织效能五大维度评估连锁品牌数字化实力，POS与会员系统打通成关键指标。',time:'2026-04-09',source:'纵横有道咨询',link:'https://baijiahao.baidu.com/s?id=1862006149141687964'}
+];
+
+// 大象日程数据（由 Agent 定时同步）
+const DAXIANG_CALENDAR = [
+  {id:'2058367900061048858',date:'2026-05-27',time:'09:00',endTime:'11:00',title:'One One',location:'北京/望京研发园 - E座2F - 恒山厅',attendees:['郭炳明','许仁昕','周瑞生','张晓','简宇翔','姚阳','白杨','刘懿征','徐帅','彭一铭','周巍']},
+  {id:'2058368418146734139',date:'2026-05-27',time:'20:00',endTime:'21:00',title:'zhouwei96的会议',location:'上海/互联B2栋-1层 - 潜江厅',attendees:['周巍']}
+];
+// 上次同步时间
+const DAXIANG_CAL_SYNC = '2026-05-26 08:00';
+
+// 大象AI助理待办数据（由 Agent 同步）
+const DAXIANG_TODOS = [
+  {id:'dxt-1',text:'AI主题沙龙主持与筹备（协调胡国庆美化嘉宾介绍页、确认郭安琪配合圆桌提问、提供嘉宾头像、确认会场布置）',priority:'high',dueDate:'2026-04-23',category:'AI沙龙',done:false,source:'daxiang'},
+  {id:'dxt-2',text:'沙龙现场管理（协调结束时间约18:10、与场地工作人员沟通）',priority:'high',dueDate:'2026-04-23',category:'AI沙龙',done:false,source:'daxiang'},
+  {id:'dxt-3',text:'展会洞察推进策略考试（4/23 10:00 ~ 4/24 20:00）',priority:'normal',dueDate:'2026-04-24',category:'销售工作',done:false,source:'daxiang'},
+  {id:'dxt-4',text:'新品牌拜访任务（本周新品牌拜访不达标，需尽快安排）',priority:'normal',dueDate:'2026-04-25',category:'销售工作',done:false,source:'daxiang'},
+  {id:'dxt-5',text:'销售AI应用探索周会：分享排班和龙虾版行业洞察封装demo',priority:'normal',dueDate:'2026-04-23',category:'AI应用',done:false,source:'daxiang'},
+  {id:'dxt-6',text:'客户软件安装（郭安琪客户：崔总、徐总，13:30开始，约1-2小时）',priority:'high',dueDate:'2026-04-23',category:'技术安装',done:false,source:'daxiang'},
+  {id:'dxt-7',text:'技服群单店版上单权限（协助陆浩确认群组拉取）',priority:'low',dueDate:'2026-04-23',category:'权限申请',done:false,source:'daxiang'},
+  {id:'dxt-8',text:'阿跷锅贴莘庄店 — 派单',priority:'high',dueDate:'2026-04-28',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'49026530785',linkedName:'阿跷锅贴'},
+  {id:'dxt-9',text:'阿跷锅贴莘庄店 — 购买收银机',priority:'high',dueDate:'2026-04-28',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'49026530785',linkedName:'阿跷锅贴'},
+  {id:'dxt-10',text:'POP BAKERY杭州恒隆快闪 — 商场接口TT跟进（商户号59907089，TT #336311312）',priority:'high',dueDate:'2026-04-30',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'',linkedName:'泡泡玛特'},
+  {id:'dxt-11',text:'五分之一 — 订单发票冲销（订单号1000115882597928，需去发票平台申请冲销）',priority:'high',dueDate:'2026-04-30',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'395945641',linkedName:'五分之一'},
+  {id:'dxt-12',text:'YOGURTDAY南京6家续签 — 尽快发合同给美玲（蒙牛优格南京餐饮，门店：能悦坊/曼度年华/爱尚天地/弘阳广场等）',priority:'high',dueDate:'2026-04-29',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'395937449',linkedName:'YOGURTDAY'},
+  {id:'dxt-13',text:'善志咨询 — 协调账号权限策略，确保多账号使用不受限制',customer:'善志',due:'2026-05-10',done:false,link:''},
+  {id:'dxt-14',text:'善志咨询 — 启动AI+数据共创灰度测试，组建专项小组',customer:'善志',due:'2026-05-31',done:false,link:''},
+  {id:'dxt-15',text:'善志咨询 — 筹备6月杭州中烹协产业大会联合方案',customer:'善志',due:'2026-05-20',done:false,link:''},
+  {id:'dxt-16',text:'YOGURTDAY — 硬件加白申请（节前需审批通过）',priority:'high',dueDate:'2026-04-29',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'395937449',linkedName:'YOGURTDAY'},
+  {id:'dxt-17',text:'泡泡玛特 — 合同待办：20家框架，3个价格档位',priority:'high',dueDate:'2026-05-09',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'',linkedName:'泡泡玛特'},
+  {id:'dxt-18',text:'YOGURTDAY — 拉群，处理价格问题',priority:'high',dueDate:'2026-05-08',category:'客户跟进',done:false,source:'daxiang',linkedType:'customer',linkedId:'395937449',linkedName:'YOGURTDAY'}
+];
+const DAXIANG_TODOS_SYNC = '2026-05-06 21:44';
+const DAXIANG_TODOS_DATE = '2026-05-06';
+
+// 早启动排期数据（从学城XTable同步 contentId:2704537074 tableId:2704750389）
+const MORNING_SCHEDULE = [
+  {date:'2026-04-21',topic:'【V6.19新功能】管理SaaS+智能预订+财账（下）',speaker:'高圣杰',room:'滕州厅'},
+  {date:'2026-04-22',topic:'【V6.19新功能】供应链',speaker:'刘青',room:'滕州厅'},
+  {date:'2026-04-23',topic:'【V6.19新功能】营销SaaS',speaker:'姜骏毅',room:'潜江厅'},
+  {date:'2026-04-24',topic:'【V6.19新功能】创新业务SaaS + 数智策略SaaS',speaker:'王野',room:'潜江厅'},
+  {date:'2026-04-27',topic:'行业动态双周报(上)：餐饮AI趋势+竞品动态',speaker:'李毅',room:'潜江厅'},
+  {date:'2026-04-28',topic:'行业动态双周报(下)：正餐头部品牌+Q1大盘+泛SaaS趋势',speaker:'周巍',room:'潜江厅'},
+  {date:'2026-04-29',topic:'亮点功能H5学习(上)：收银POS/扫码点餐/支付/团购/KDS',speaker:'王梦奇',room:'潜江厅'},
+  {date:'2026-04-30',topic:'亮点功能H5学习(下)：会员营销/小程序/外卖/供应链/督导',speaker:'李卓艺',room:'滕州厅'},
+  {date:'2026-05-01',topic:'劳动节放假',speaker:'',room:'滕州厅'}
+];
+const MORNING_SCHEDULE_SYNC = '2026-04-28 08:35';
+
+const NEWS_CATEGORIES=['全部','公司内部','产品更新','规则更新','内部政策','政策宣导','其他内部','餐饮行业','SaaS行业','AI行业','竞品动态'];
+let activeNewsTab='全部';
+
+// 资讯已读状态（localStorage）
+const NEWS_READ_KEY = 'zhouwei-crm-news-read';
+function loadNewsRead() { try { return JSON.parse(localStorage.getItem(NEWS_READ_KEY)||'[]'); } catch(e) { return []; } }
+function saveNewsRead(arr) { try { localStorage.setItem(NEWS_READ_KEY, JSON.stringify(arr)); } catch(e) {} }
+function markNewsRead(title) {
+  const read = loadNewsRead();
+  if (!read.includes(title)) { read.push(title); saveNewsRead(read); }
+  renderNews();
+}
+let newsReadFilter = 'unread'; // 'all' | 'unread' | 'read'
+
+function renderNews(){
+  const section=document.getElementById('newsSection');
+  if(!section)return;
+  const dateEl=document.getElementById('newsDate');
+  const now=new Date();
+  dateEl.textContent=now.getFullYear()+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+String(now.getDate()).padStart(2,'0');
+
+  // Render sidebar
+  const sidebarEl=document.getElementById('newsSidebar');
+  if(sidebarEl){
+    const internalCats=['公司内部','产品更新','规则更新','内部政策','政策宣导','其他内部'];
+    const externalCats=['餐饮行业','SaaS行业','AI行业','竞品动态'];
+    let shtml='';
+    const _enabled=getEnabledSources();
+    const _srcData=NEWS_DATA.filter(n=>_enabled.includes(n.source));
+    // 全部（顶层）
+    const totalAll=_srcData.length;
+    shtml+='<div class="news-sidebar-item'+(activeNewsTab==='全部'?' active':'')+'" onclick="switchNewsTab(\'全部\')"><span class="nsi-icon">📰</span>全部资讯<span class="nsi-count">'+totalAll+'</span></div>';
+    // 公司内部组
+    shtml+='<div class="news-sidebar-group"><div class="news-sidebar-group-label">🏢 公司内部</div>';
+    const internalAll=_srcData.filter(n=>internalCats.includes(n.cat)).length;
+    shtml+='<div class="news-sidebar-item'+(activeNewsTab==='全部-内部'?' active':'')+'" onclick="switchNewsTab(\'全部-内部\')"><span class="nsi-icon"></span>全部<span class="nsi-count">'+internalAll+'</span></div>';
+    [{key:'产品更新',icon:'🔧'},{key:'规则更新',icon:'📋'},{key:'内部政策',icon:'🏛'},{key:'政策宣导',icon:'📢'},{key:'公司内部',icon:'📎',label:'其他'}].forEach(function(item){
+      var cnt=_srcData.filter(function(n){return n.cat===item.key}).length;
+      if(cnt>0) shtml+='<div class="news-sidebar-item'+(activeNewsTab===item.key?' active':'')+'" onclick="switchNewsTab(\''+item.key+'\')"><span class="nsi-icon">'+item.icon+'</span>'+(item.label||item.key)+'<span class="nsi-count">'+cnt+'</span></div>';
+    });
+    shtml+='</div>';
+    // 行业动态组
+    shtml+='<div class="news-sidebar-group"><div class="news-sidebar-group-label">🌐 行业动态</div>';
+    const externalAll=_srcData.filter(n=>externalCats.includes(n.cat)).length;
+    shtml+='<div class="news-sidebar-item'+(activeNewsTab==='全部-行业'?' active':'')+'" onclick="switchNewsTab(\'全部-行业\')"><span class="nsi-icon"></span>全部<span class="nsi-count">'+externalAll+'</span></div>';
+    [{key:'餐饮行业',icon:'🍜'},{key:'SaaS行业',icon:'💻'},{key:'AI行业',icon:'🤖'},{key:'竞品动态',icon:'⚔️'}].forEach(function(item){
+      var cnt=_srcData.filter(function(n){return n.cat===item.key}).length;
+      if(cnt>0) shtml+='<div class="news-sidebar-item'+(activeNewsTab===item.key?' active':'')+'" onclick="switchNewsTab(\''+item.key+'\')"><span class="nsi-icon">'+item.icon+'</span>'+item.key+'<span class="nsi-count">'+cnt+'</span></div>';
+    });
+    shtml+='</div>';
+    // Source subscription manager
+    shtml+='<div class="source-manager">';
+    shtml+='<div class="source-manager-toggle'+(window._sourceManagerOpen?' open':'')+'" onclick="toggleSourceManager()">';
+    shtml+='⚙️ 订阅管理<span class="sm-arrow">▼</span></div>';
+    shtml+='<div class="source-manager-list'+(window._sourceManagerOpen?' open':'')+'">';
+    var disabledSources=getDisabledSources();
+    getAllNewsSources().forEach(function(src){
+      var checked=!disabledSources.includes(src);
+      shtml+='<label><input type="checkbox" '+(checked?'checked':'')+' onchange="toggleSource(\''+src.replace(/'/g,"\\'")+'\')">' +src+'</label>';
+    });
+    shtml+='</div></div>';
+    sidebarEl.innerHTML=shtml;
+  }
+
+  // Filter logic
+  const internalCats=['公司内部','产品更新','规则更新','内部政策','政策宣导','其他内部'];
+  const externalCats=['餐饮行业','SaaS行业','AI行业','竞品动态'];
+  const enabledSources=getEnabledSources();
+  let filtered;
+  if(activeNewsTab==='全部') filtered=NEWS_DATA.filter(n=>enabledSources.includes(n.source));
+  else if(activeNewsTab==='全部-内部') filtered=NEWS_DATA.filter(n=>internalCats.includes(n.cat)&&enabledSources.includes(n.source));
+  else if(activeNewsTab==='全部-行业') filtered=NEWS_DATA.filter(n=>externalCats.includes(n.cat)&&enabledSources.includes(n.source));
+  else filtered=NEWS_DATA.filter(n=>n.cat===activeNewsTab&&enabledSources.includes(n.source));
+
+  // 已读/未读筛选
+  const readList = loadNewsRead();
+  const unreadCount = filtered.filter(n => !readList.includes(n.title)).length;
+  const readCount = filtered.filter(n => readList.includes(n.title)).length;
+  const contentEl=document.getElementById('newsContent');
+  let readFilterHtml = '<div style="display:flex;gap:8px;margin-bottom:12px">' +
+    '<button class="todo-filter-btn' + (newsReadFilter==='unread'?' active':'') + '" onclick="setNewsReadFilter(\'unread\')">未读 (' + unreadCount + ')</button>' +
+    '<button class="todo-filter-btn' + (newsReadFilter==='read'?' active':'') + '" onclick="setNewsReadFilter(\'read\')">已读 (' + readCount + ')</button>' +
+    '<button class="todo-filter-btn' + (newsReadFilter==='all'?' active':'') + '" onclick="setNewsReadFilter(\'all\')">全部</button>' +
+    (unreadCount > 0 ? '<button style="margin-left:auto;background:none;border:1px solid #e8e8e8;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;color:#888" onclick="markAllNewsRead()">全部标为已读</button>' : '') +
+    '</div>';
+  if (newsReadFilter === 'unread') filtered = filtered.filter(n => !readList.includes(n.title));
+  else if (newsReadFilter === 'read') filtered = filtered.filter(n => readList.includes(n.title));
+  if(filtered.length===0){contentEl.innerHTML=readFilterHtml+'<div class="news-empty">暂无' + (newsReadFilter==='unread'?'未读':'') + '资讯</div>';return}
+  contentEl.innerHTML=readFilterHtml+'<div class="news-grid">'+filtered.map(n=>{
+    const isRead = readList.includes(n.title);
+    return '<div class="news-card'+(n.pinned?' pinned':'')+(isRead?' news-read':'')+'" style="cursor:pointer">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+      '<span class="nc-cat '+n.catCls+'">'+n.cat+'</span>' +
+      (!isRead ? '<button class="news-read-btn" onclick="event.stopPropagation();markNewsRead(\''+n.title.replace(/'/g,"\\'")+'\')">\u2713 已读</button>' : '<span style="font-size:10px;color:#aaa">\u2713 已读</span>') +
+      '</div>' +
+      '<div class="nc-title" '+(n.link?'onclick="openNewsLink(\''+n.link+'\')" title="点击打开链接" style="cursor:pointer"':'')+'>'+
+      (n.pinned?'📌 ':'')+n.title+'</div>' +
+      '<div class="nc-summary">'+n.summary+'</div>' +
+      '<div class="nc-time">'+n.time+(n.source?' · 来源: '+n.source:'')+(n.link?' · <a href="'+n.link+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:#FF6B35;text-decoration:none">🔗打开链接</a>':'')+'</div></div>';
+  }).join('')+'</div>';
+}
+
+function setNewsReadFilter(f) { newsReadFilter = f; renderNews(); }
+function markAllNewsRead() {
+  const read = loadNewsRead();
+  const intCats=['公司内部','产品更新','规则更新','内部政策','政策宣导','其他内部'];
+  const extCats=['餐饮行业','SaaS行业','AI行业','竞品动态'];
+  let filtered;
+  if(activeNewsTab==='全部') filtered=NEWS_DATA;
+  else if(activeNewsTab==='全部-内部') filtered=NEWS_DATA.filter(n=>intCats.includes(n.cat));
+  else if(activeNewsTab==='全部-行业') filtered=NEWS_DATA.filter(n=>extCats.includes(n.cat));
+  else filtered=NEWS_DATA.filter(n=>n.cat===activeNewsTab);
+  filtered.forEach(n => { if (!read.includes(n.title)) read.push(n.title); });
+  saveNewsRead(read);
+  renderNews();
+  toast('✅ 已全部标为已读');
+}
+// === Source subscription management ===
+function getAllNewsSources(){
+  var seen={},list=[];
+  NEWS_DATA.forEach(function(n){if(n.source&&!seen[n.source]){seen[n.source]=1;list.push(n.source)}});
+  return list;
+}
+function getDisabledSources(){
+  try{var v=localStorage.getItem('zhouwei-crm-news-sources');return v?JSON.parse(v):[]}catch(e){return[]}
+}
+function getEnabledSources(){
+  var disabled=getDisabledSources();
+  return getAllNewsSources().filter(function(s){return !disabled.includes(s)});
+}
+function toggleSourceManager(){
+  window._sourceManagerOpen=!window._sourceManagerOpen;
+  var toggle=document.querySelector('.source-manager-toggle');
+  var list=document.querySelector('.source-manager-list');
+  if(toggle)toggle.classList.toggle('open',window._sourceManagerOpen);
+  if(list)list.classList.toggle('open',window._sourceManagerOpen);
+}
+function toggleSource(src){
+  var disabled=getDisabledSources();
+  var idx=disabled.indexOf(src);
+  if(idx>=0)disabled.splice(idx,1);else disabled.push(src);
+  localStorage.setItem('zhouwei-crm-news-sources',JSON.stringify(disabled));
+  renderNews();
+}
+function switchNewsTab(cat){activeNewsTab=cat;renderNews()}
+function openNewsLink(url){if(url&&url!=='#'){try{const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();document.body.removeChild(a)}catch(e){window.open(url,'_blank','noopener')}}else{showToast('⚠️ 该资讯暂无外部链接')}}
+function copyNewsLink(url){navigator.clipboard.writeText(url).then(()=>{showToast('🔗 链接已复制')}).catch(()=>{prompt('请复制链接：',url)})}
+
+const LS_KEY='zhouwei-crm-dashboard';
+const STAGES=[
+  {key:'7天内可回款',color:'#ef4444',dim:'rgba(239,68,68,.15)',cls:'s7'},
+  {key:'30天内可回款',color:'#f97316',dim:'rgba(249,115,22,.15)',cls:'s30'},
+  {key:'长期跟进',color:'#3b82f6',dim:'rgba(59,130,246,.15)',cls:'s长期'},
+
+  {key:'已回款',color:'#22c55e',dim:'rgba(34,197,94,.15)',cls:'s回款'},
+  {key:'已流失',color:'#8b8d98',dim:'rgba(255,255,255,.06)',cls:'s流失'}
+];
+
+let data=[], currentView='kanban', hideClosed=false, stageFilter=null, searchQuery='', sortBy='stage', currentEditId=null;
+
+// Init
+function init(){
+  try{
+    const saved=localStorage.getItem(LS_KEY);
+    if(saved){
+      try{
+        const parsed=JSON.parse(saved);
+        if(Array.isArray(parsed) && parsed.length > 0){
+          data = parsed;
+          // 合入 RAW_DATA 中的新条目（代码更新可能带来新客户）
+          const existingIds = new Set(data.map(d=>d.rowId));
+          RAW_DATA.forEach(r=>{
+            if(r.rowId && !existingIds.has(r.rowId)){
+              data.push(JSON.parse(JSON.stringify(r)));
+            }
+          });
+          save(); // 保存合入后的数据
+        } else {
+          // localStorage 数据异常，用 RAW_DATA
+          data=JSON.parse(JSON.stringify(RAW_DATA));
+          save();
+        }
+      }catch(e){
+        data=JSON.parse(JSON.stringify(RAW_DATA));
+        save();
+      }
+    } else {
+      // 首次使用，RAW_DATA 作为种子
+      data=JSON.parse(JSON.stringify(RAW_DATA));
+      save();
+    }
+  }catch(e){data=JSON.parse(JSON.stringify(RAW_DATA));save();}
+  showLastSave();
+  initCategorySelect();
+  initStageSelect();
+  render();
+}
+
+function save(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(data));localStorage.setItem(LS_KEY+'_time',new Date().toISOString())}catch(e){}
+  showLastSave();
+}
+function showLastSave(){
+  try{const t=localStorage.getItem(LS_KEY+'_time');if(t){const d=new Date(t);document.getElementById('lastSave').textContent='上次保存: '+d.toLocaleString('zh-CN')}}catch(e){}
+}
+
+function toast(msg,warn){
+  const el=document.createElement('div');
+  el.className='toast'+(warn?' warn':'');
+  el.textContent=msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3000);
+}
+
+// Helpers
+function parseAmount(s){if(!s)return 0;s=String(s).toLowerCase().replace(/,/g,'');if(s.includes('w')||s.includes('万'))return parseFloat(s)*10000||0;return parseFloat(s)||0}
+function fmtAmt(n){if(n>=10000)return'¥'+(n/10000).toFixed(1).replace(/\.0$/,'')+'w';if(n>0)return'¥'+n.toLocaleString();return'-'}
+function fmtDate(ts){if(!ts)return'-';const d=new Date(ts);return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')}
+function daysAgo(ts){if(!ts)return null;return Math.floor((Date.now()-ts)/86400000)}
+function today(){return new Date().toISOString().slice(0,10)}
+function stageOf(k){return STAGES.find(s=>s.key===k)||STAGES[STAGES.length-1]}
+function isStale(d){const da=daysAgo(d['上次沟通时间']);return da!==null&&da>=30&&!['已回款','已流失'].includes(d['商机阶段'])}
+
+// Fuzzy match
+function matchBrand(q){
+  q=q.toLowerCase();
+  let exact=data.filter(d=>(d['品牌名']||'').toLowerCase()===q);
+  if(exact.length)return exact;
+  let starts=data.filter(d=>(d['品牌名']||'').toLowerCase().startsWith(q));
+  if(starts.length)return starts;
+  return data.filter(d=>(d['品牌名']||'').toLowerCase().includes(q));
+}
+
+// Quick entry
+let matchResults=[], matchIdx=-1;
+const quickInput=document.getElementById('quickInput');
+const matchDrop=document.getElementById('matchDrop');
+
+quickInput.addEventListener('input',function(){
+  const v=this.value.trim();
+  if(!v){matchDrop.classList.remove('show');return}
+  const parts=v.split(/\s+/);
+  const brandQ=parts[0];
+  matchResults=matchBrand(brandQ).slice(0,8);
+  if(matchResults.length>0&&parts.length<=1){
+    matchDrop.innerHTML=matchResults.map((d,i)=>`<div class="match-item${i===matchIdx?' sel':''}" data-idx="${i}"><span>${d['品牌名']}</span><span class="stage-tag">${d['商机阶段']}</span></div>`).join('');
+    matchDrop.classList.add('show');
+  }else matchDrop.classList.remove('show');
+});
+
+matchDrop.addEventListener('click',function(e){
+  const item=e.target.closest('.match-item');
+  if(!item)return;
+  const idx=parseInt(item.dataset.idx);
+  const d=matchResults[idx];
+  if(d){quickInput.value=d['品牌名']+' ';quickInput.focus();matchDrop.classList.remove('show')}
+});
+
+quickInput.addEventListener('keydown',function(e){
+  if(e.key==='ArrowDown'&&matchDrop.classList.contains('show')){
+    e.preventDefault();matchIdx=Math.min(matchIdx+1,matchResults.length-1);updateMatchHL()
+  }else if(e.key==='ArrowUp'&&matchDrop.classList.contains('show')){
+    e.preventDefault();matchIdx=Math.max(matchIdx-1,0);updateMatchHL()
+  }else if(e.key==='Enter'){
+    e.preventDefault();matchDrop.classList.remove('show');
+    if(matchIdx>=0&&matchDrop.classList.contains('show')){
+      const d=matchResults[matchIdx];
+      quickInput.value=d['品牌名']+' ';matchIdx=-1;return
+    }
+    processQuickEntry(this.value.trim())
+  }else if(e.key==='Escape'){matchDrop.classList.remove('show')}
+});
+
+quickInput.addEventListener('blur',()=>setTimeout(()=>matchDrop.classList.remove('show'),200));
+
+function updateMatchHL(){
+  matchDrop.querySelectorAll('.match-item').forEach((el,i)=>el.classList.toggle('sel',i===matchIdx));
+}
+
+function processQuickEntry(text){
+  if(!text)return;
+  // Try progressively longer prefixes to find best brand match
+  const parts=text.split(/\s+/);
+  let brand=null, content='';
+  // Try from longest prefix down
+  for(let i=parts.length-1;i>=1;i--){
+    const prefix=parts.slice(0,i).join(' ');
+    const matches=matchBrand(prefix);
+    if(matches.length===1){brand=matches[0];content=parts.slice(i).join(' ');break}
+    if(matches.length>1&&i===1){brand=matches[0];content=parts.slice(i).join(' ');break}
+  }
+  if(!brand&&parts.length>=2){
+    const matches=matchBrand(parts[0]);
+    if(matches.length>=1){brand=matches[0];content=parts.slice(1).join(' ')}
+  }
+  if(!brand){toast('⚠️ 未找到匹配的品牌: '+parts[0],true);return}
+  if(!content){toast('⚠️ 请输入跟进内容',true);return}
+
+  // Detect stage change
+  let newStage=null;
+  if(/签约|合同/.test(content))newStage='30天内可回款';
+  if(/已?回款|到账/.test(content))newStage='已回款';
+  if(/流失|放弃|丢了|没戏/.test(content))newStage='已流失';
+  if(/7天|本周/.test(content))newStage='7天内可回款';
+
+  // Update
+  brand['最新进展']=content;
+  brand['上次沟通时间']=Date.now();
+  const record='['+today()+'] '+content;
+  brand['沟通记录汇总']=record+(brand['沟通记录汇总']?'\n'+brand['沟通记录汇总']:'');
+  if(newStage)brand['商机阶段']=newStage;
+
+  save();render();
+  quickInput.value='';
+  toast('✅ 已更新: '+brand['品牌名']+(newStage?' → '+newStage:''));
+}
+
+// Categories
+function getAllCategories(){
+  const s=new Set();  data.forEach(d=>(d['品类']||[]).forEach(c=>s.add(c)));
+  return [...s].sort();
+}
+function initCategorySelect(){
+  const sel=document.getElementById('nm_cat');
+  getAllCategories().forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+}
+function initStageSelect(){
+  const sel=document.getElementById('nm_stage');
+  STAGES.forEach(s=>{const o=document.createElement('option');o.value=s.key;o.textContent=s.key;sel.appendChild(o)});
+}
+
+// Filters
+function getFiltered(){
+  let d=[...data];
+  if(hideClosed)d=d.filter(x=>!['已回款','已流失'].includes(x['商机阶段']));
+  if(stageFilter)d=d.filter(x=>x['商机阶段']===stageFilter);
+  if(searchQuery){
+    const q=searchQuery.toLowerCase();
+    d=d.filter(x=>{
+      return [x['品牌名'],(x['品类']||[]).join(','),(x['合作机会模块']||[]).join(','),x['最新进展'],x['下一步动作'],x['联系人KP']].filter(Boolean).join(' ').toLowerCase().includes(q);
+    });
+  }
+  if(sortBy==='time')d.sort((a,b)=>(b['上次沟通时间']||0)-(a['上次沟通时间']||0));
+  else if(sortBy==='amount')d.sort((a,b)=>parseAmount(b['预计回款金额'])-parseAmount(a['预计回款金额']));
+  else if(sortBy==='name')d.sort((a,b)=>(a['品牌名']||'').localeCompare(b['品牌名']||''));
+  return d;
+}
+
+// Render
+function renderStats(){
+  const base=hideClosed?data.filter(d=>!['已回款','已流失'].includes(d['商机阶段'])):data;
+  const counts={};STAGES.forEach(s=>counts[s.key]=0);
+  base.forEach(d=>{if(counts[d['商机阶段']]!==undefined)counts[d['商机阶段']]++});
+  const scm={'7天内可回款':'stage-7天','30天内可回款':'stage-30天','长期跟进':'stage-长期','已回款':'stage-回款','已流失':'stage-流失'};
+  let h=`<div class="stat-card ${!stageFilter?'active':''}" onclick="setStage(null)"><div class="stat-label">全部客户</div><div class="stat-value">${base.length}</div></div>`;
+  STAGES.forEach(s=>{
+    if(hideClosed&&(s.key==='已回款'||s.key==='已流失'))return;
+    h+=`<div class="stat-card ${scm[s.key]} ${stageFilter===s.key?'active':''}" onclick="setStage('${s.key}')"><div class="stat-label">${s.key}</div><div class="stat-value">${counts[s.key]||0}</div></div>`;
+  });
+  document.getElementById('statsBar').innerHTML=h;
+
+  // Projects Section
+  function daysUntil(ds){if(!ds)return null;return Math.ceil((new Date(ds)-Date.now())/86400000)}
+  let projHTML='<div class="project-title"><span class="proj-icon">🚀</span> 其他项目跟进 <span>创业赛项目</span></div><div class="project-grid">';
+  PROJECTS.forEach(p=>{
+    const dl=daysUntil(p.deadline);
+    projHTML+=`<div class="project-card">
+      <div class="pc-header">
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-status ${p.status}">${p.statusText}</div>
+      </div>
+      <div class="pc-desc">${p.desc}</div>
+      ${p.deadline?`<div class="pc-deadline">⏰ ${p.deadlineLabel}：${p.deadline}${dl!==null?(dl>0?` (还剩${dl}天)`:(dl===0?' (今天!)':` (已过${-dl}天)`)):''}}</div>`:''}
+      <div class="pc-section">
+        <div class="pc-section-title">📋 最新进展</div>
+        ${p.progress.slice(-3).map(t=>`<div class="pc-item">${t}</div>`).join('')}
+      </div>
+      <div class="pc-section">
+        <div class="pc-section-title">📌 关键待办</div>
+        ${p.todos.slice(0,4).map(t=>`<div class="pc-item">${t}</div>`).join('')}
+        ${p.todos.length>4?`<div class="pc-item" style="color:var(--text-dim)">+${p.todos.length-4}项...</div>`:''}
+      </div>
+      <div class="pc-section">
+        <div class="pc-section-title">👥 成员</div>
+        <div class="pc-members">${p.members.map(m=>`<span class="pc-member${m.me?' me':''}">${m.name}</span>`).join('')}</div>
+      </div>
+      <div class="pc-updated">最后更新: ${p.lastUpdate}</div>
+    </div>`;
+  });
+  projHTML+='</div>';
+  document.getElementById('projectSectionTab').innerHTML=projHTML;
+
+  // Sales Target Section
+  const T=SALES_TARGET;
+  const totalPct=T.毛利目标>0?((T.回款毛利/T.毛利目标)*100):0;
+  const newPct=T.新签目标毛利>0?((T.新签回款毛利/T.新签目标毛利)*100):0;
+  function pctColor(p){return p>=100?'var(--green)':p>=70?'var(--accent)':p>=40?'var(--orange)':'var(--red)'}
+  function fmtW(n){return (n/10000).toFixed(2)+'w'}
+  document.getElementById('targetSection').innerHTML=`
+    <div class="target-title">📈 销售目标达成 <span>数据来源: 销售目标自查 · ${T.month} · 截至${T.updated}</span></div>
+    <div class="target-bar">
+      <div class="target-card">
+        <div class="t-label">本月销售目标（毛利）</div>
+        <div class="t-row"><div class="t-value" style="color:${pctColor(totalPct)}">${fmtW(T.回款毛利)}</div><div class="t-target">/ ${fmtW(T.毛利目标)}</div></div>
+        <div class="t-progress-bar"><div class="t-progress-fill" style="width:${Math.min(totalPct,100)}%;background:${pctColor(totalPct)}"></div></div>
+        <div class="t-pct" style="color:${pctColor(totalPct)}">${totalPct.toFixed(1)}%</div>
+      </div>
+      <div class="target-card">
+        <div class="t-label">本月新签回款目标（毛利）</div>
+        <div class="t-row"><div class="t-value" style="color:${pctColor(newPct)}">${fmtW(T.新签回款毛利)}</div><div class="t-target">/ ${fmtW(T.新签目标毛利)}</div></div>
+        <div class="t-progress-bar"><div class="t-progress-fill" style="width:${Math.min(newPct,100)}%;background:${pctColor(newPct)}"></div></div>
+        <div class="t-pct" style="color:${pctColor(newPct)}">${newPct.toFixed(1)}%</div>
+      </div>
+      <div class="target-card">
+        <div class="t-label">回款构成明细</div>
+        <div style="margin-top:6px;font-size:13px;line-height:1.8">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-dim)">新签回款</span><span style="color:var(--orange);font-weight:600">${fmtW(T.新签回款毛利)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-dim)">续签回款</span><span style="color:var(--blue);font-weight:600">${fmtW(T.续签回款毛利)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text-dim)">横向回款</span><span style="color:var(--text-dim);font-weight:600">${fmtW(T.横向回款毛利)}</span></div>
+          <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:4px;margin-top:2px"><span style="color:var(--text-dim)">回款主食客数</span><span style="font-weight:600">${T.回款主食客数}</span></div>
+        </div>
+      </div>
+    </div>`;
+
+  // Amounts
+  const active=data.filter(d=>!['已回款','已流失'].includes(d['商机阶段']));
+  const tAmt=active.reduce((s,d)=>s+parseAmount(d['预计回款金额']),0);
+  const s7=data.filter(d=>d['商机阶段']==='7天内可回款').reduce((s,d)=>s+parseAmount(d['预计回款金额']),0);
+  const s30=data.filter(d=>d['商机阶段']==='30天内可回款').reduce((s,d)=>s+parseAmount(d['预计回款金额']),0);
+  const done=data.filter(d=>d['商机阶段']==='已回款').reduce((s,d)=>s+parseAmount(d['预计回款金额']),0);
+  document.getElementById('amountBar').innerHTML=`
+    <div class="amount-card"><div class="a-label">活跃商机总金额</div><div class="a-value">${fmtAmt(tAmt)}</div></div>
+    <div class="amount-card"><div class="a-label">7天内可回款</div><div class="a-value" style="color:var(--red)">${fmtAmt(s7)}</div></div>
+    <div class="amount-card"><div class="a-label">30天内可回款</div><div class="a-value" style="color:var(--orange)">${fmtAmt(s30)}</div></div>
+    <div class="amount-card"><div class="a-label">已回款总额</div><div class="a-value" style="color:var(--green)">${fmtAmt(done)}</div></div>`;
+
+  // Alerts
+  const staleList=data.filter(isStale);
+  const weekUpdates=data.filter(d=>{const da=daysAgo(d['上次沟通时间']);return da!==null&&da<=7}).length;
+  let ah='';
+  if(staleList.length)ah+=`<div class="alert-card">⚠️ <span class="num">${staleList.length}</span> 个活跃客户超过30天未联系</div>`;
+  ah+=`<div class="alert-card" style="border-color:var(--green);color:var(--green)">📊 本周跟进 <span class="num">${weekUpdates}</span> 个客户</div>`;
+  document.getElementById('alertBar').innerHTML=ah;
+}
+
+function cardHTML(d){
+  const amt=parseAmount(d['预计回款金额']);const cats=d['品类']||[];const mods=d['合作机会模块']||[];
+  const da=daysAgo(d['上次沟通时间']);let ts=d['上次沟通时间']?fmtDate(d['上次沟通时间']):'';
+  if(da!==null)ts+=' ('+da+'天前)';
+  const stale=isStale(d);
+  let tags=cats.map(c=>`<span class="tag tag-cat">${c}</span>`).join('');
+  if(amt>0)tags+=`<span class="tag tag-amt">${fmtAmt(amt)}</span>`;
+  const storeNum=d['门店数'];const new90=d['90天新开门店数'];
+  let poiTag='';
+  if(storeNum!=null&&storeNum!==''&&storeNum!==undefined){
+    poiTag=`<span class="tag" style="background:rgba(99,102,241,.15);color:#818cf8">🏪 ${storeNum}店`;
+    if(new90!=null&&new90!==undefined&&new90>0)poiTag+=` <span style="color:#34d399;font-size:11px">+${new90}</span>`;
+    poiTag+=`</span>`;
+  }
+  return `<div class="kanban-card${stale?' stale':''}" draggable="true" data-rowid="${d.rowId}" onclick="showDetail(${d.rowId})" ondragstart="onDragStart(event,${d.rowId})" ondragend="onDragEnd(event)">
+    <div class="brand">${d['品牌名']||'?'}</div>
+    <div class="meta">${tags}${poiTag}</div>
+    ${mods.length?`<div class="meta">${mods.slice(0,4).map(m=>`<span class="tag tag-mod">${m}</span>`).join('')}</div>`:''}
+    ${d['最新进展']?`<div class="progress">${(d['最新进展']||'').substring(0,55)}${(d['最新进展']||'').length>55?'...':''}</div>`:''}
+    ${ts?`<div class="time">📅 ${ts}</div>`:''}
+    ${stale?`<div class="stale-badge">⚠️ 超过${da}天未联系</div>`:''}
+  </div>`;
+}
+
+function renderKanban(){
+  const fd=getFiltered();
+  if(stageFilter){
+    const sc=stageOf(stageFilter);
+    document.getElementById('kanbanView').innerHTML=`<div class="kanban-col" style="max-width:none;min-width:100%">
+      <div class="kanban-col-header" style="background:${sc.dim};color:${sc.color}">${stageFilter} <span class="count">${fd.length}</span></div>
+      <div class="kanban-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px">${fd.map(cardHTML).join('')}</div></div>`;
+    return;
+  }
+  let h='';
+  STAGES.forEach(s=>{
+    if(hideClosed&&(s.key==='已回款'||s.key==='已流失'))return;
+    const items=fd.filter(d=>d['商机阶段']===s.key);
+    h+=`<div class="kanban-col" data-stage="${s.key}" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${s.key}')"><div class="kanban-col-header" style="background:${s.dim};color:${s.color}">${s.key} <span class="count">${items.length}</span></div><div class="kanban-cards" ondragover="onCardsDragOver(event)" ondragleave="onCardsDragLeave(event)">${items.map(cardHTML).join('')}</div></div>`;
+  });
+  document.getElementById('kanbanView').innerHTML=h;
+}
+
+function renderTable(){
+  const fd=getFiltered();
+  let h=`<table class="data-table"><thead><tr><th>品牌名</th><th>品类</th><th>门店</th><th>商机阶段</th><th>合作模块</th><th>预计回款</th><th>最新进展</th><th>上次沟通</th><th>下一步</th></tr></thead><tbody>`;
+  fd.forEach(d=>{
+    const sc=stageOf(d['商机阶段']);const stale=isStale(d);
+    h+=`<tr class="${stale?'stale-row':''}" onclick="showDetail(${d.rowId})" style="cursor:pointer">
+      <td><strong>${d['品牌名']||''}</strong></td>
+      <td>${(d['品类']||[]).join('/')}</td>
+      <td>${d['门店数']||'-'}</td>
+      <td><span class="stage-badge ${sc.cls}">${d['商机阶段']||'-'}</span></td>
+      <td>${(d['合作机会模块']||[]).slice(0,3).join('/')}</td>
+      <td>${d['预计回款金额']||'-'}</td>
+      <td title="${d['最新进展']||''}">${(d['最新进展']||'').substring(0,28)}${(d['最新进展']||'').length>28?'...':''}</td>
+      <td>${d['上次沟通时间']?fmtDate(d['上次沟通时间']):'-'}</td>
+      <td>${d['下一步动作']||'-'}</td></tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('tableView').innerHTML=h;
+}
+
+function render(){renderStats();renderNews();initTodoLinkOptions();if(currentView==='kanban')renderKanban();else renderTable()}
+function setStage(s){stageFilter=stageFilter===s?null:s;render()}
+
+// Detail panel with editing
+function showDetail(rowId){
+  const d=data.find(r=>r.rowId===rowId);if(!d)return;
+  currentEditId=rowId;const sc=stageOf(d['商机阶段']);const amt=parseAmount(d['预计回款金额']);
+  const da=daysAgo(d['上次沟通时间']);
+
+  let h=`<h2 onclick="editBrandName(this)" title="点击修改品牌名" style="cursor:pointer">${d['品牌名']||'?'}</h2>`;
+
+  // Editable fields
+  h+=`<div class="detail-section"><h3>基本信息 <span style="font-size:10px;color:var(--text-dim);font-weight:400">（点击可编辑）</span></h3>`;
+  const fields=[
+    ['商机阶段','商机阶段','select'],
+    ['品牌ID','品牌ID','number'],
+    ['公司名称','公司名称','text'],
+    ['注册资本','注册资本','number'],
+    ['品类','品类','text'],
+    ['门店数','门店数','number'],
+    ['90天新开门店数','90天新开门店数','number'],
+    ['经营模式','经营模式','text'],
+    ['回款类型','回款类型','text'],
+    ['合作模块','合作机会模块','text'],
+    ['预计回款','预计回款金额','text'],
+    ['预计签约','预计签约时间','text'],
+    ['联系人KP','联系人KP','text'],
+    ['联系电话','联系电话','text'],
+    ['线索来源','线索来源','text'],
+  ];
+  fields.forEach(([label,key,type])=>{
+    let val=d[key];
+    if(Array.isArray(val))val=val.join(', ');
+    if(val==null||val===undefined)val='';
+    // Format 注册资本 for display
+    let displayVal=val===0?'0':(val||'');
+    if(key==='注册资本' && val && !isNaN(val)){
+      const n=Number(val);
+      if(n>=100000000) displayVal=(n/100000000).toFixed(2).replace(/\.?0+$/,'')+'亿元';
+      else if(n>=10000) displayVal=(n/10000).toFixed(2).replace(/\.?0+$/,'')+'万元';
+      else displayVal=n+'元';
+    }
+    if(key==='商机阶段'){
+      h+=`<div class="detail-row"><span class="label">${label}</span><span class="value"><span class="stage-badge ${sc.cls}" onclick="editField(this,'${key}','select')">${val||'-'}</span></span></div>`;
+    }else{
+      h+=`<div class="detail-row"><span class="label">${label}</span><span class="value" onclick="editField(this,'${key}','${type}')">${displayVal!==''&&displayVal!==null&&displayVal!==undefined?displayVal:'-'}</span></div>`;
+    }
+  });
+  h+='</div>';
+
+  // Systems
+  h+=`<div class="detail-section"><h3>系统现状</h3>`;
+  ['POS系统','供应链系统','小程序系统'].forEach(key=>{
+    h+=`<div class="detail-row"><span class="label">${key.replace('系统','')}</span><span class="value" onclick="editField(this,'${key}','text')">${d[key]||'-'}</span></div>`;
+  });
+  h+='</div>';
+
+  // Progress
+  h+=`<div class="detail-section"><h3>最新进展</h3>`;
+  h+=`<div class="detail-progress" onclick="editField(this,'最新进展','textarea')">${d['最新进展']||'点击编辑...'}</div>`;
+  if(d['上次沟通时间'])h+=`<div style="margin-top:6px;font-size:12px;color:var(--text-dim)">📅 上次沟通: ${fmtDate(d['上次沟通时间'])}${da!==null?' ('+da+'天前)':''}</div>`;
+  h+='</div>';
+
+  // Next action
+  h+=`<div class="detail-section"><h3>下一步动作</h3>`;
+  h+=`<div class="detail-progress" style="border-left:3px solid var(--accent)" onclick="editField(this,'下一步动作','textarea')">${d['下一步动作']||'点击编辑...'}</div></div>`;
+
+  // Communication log
+  h+=`<div class="detail-section"><h3>沟通记录</h3>`;
+  h+=`<div class="detail-progress" style="max-height:200px;overflow-y:auto">${(d['沟通记录汇总']||'暂无记录').replace(/\n/g,'<br>')}</div>`;
+  h+=`<div class="add-record-area"><textarea id="newRecordText" placeholder="输入新的跟进记录..."></textarea><button class="add-record-btn" onclick="addRecord()">📝 添加跟进记录</button></div></div>`;
+
+  // Linked todos
+  const linkedTodos = loadTodos().filter(t => t.linkedType === 'customer' && String(t.linkedId) === String(rowId));
+  if (linkedTodos.length > 0) {
+    h += '<div class="detail-section"><h3>📌 关联待办 (' + linkedTodos.length + ')</h3>';
+    linkedTodos.forEach(t => {
+      const pIcon = t.priority === 'high' ? '🔴' : t.priority === 'low' ? '⚪' : '🟠';
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5">' +
+        '<span>' + pIcon + '</span>' +
+        '<span style="flex:1;font-size:13px' + (t.done ? ';text-decoration:line-through;color:#aaa' : '') + '">' + t.text + '</span>' +
+        (t.dueDate ? '<span style="font-size:11px;color:#888">' + t.dueDate + '</span>' : '') +
+        '</div>';
+    });
+    h += '</div>';
+  }
+
+  // Milestone
+  if(d['里程碑链接'])h+=`<div class="detail-section"><h3>里程碑</h3><div class="detail-progress">${d['里程碑链接']}</div></div>`;
+
+  document.getElementById('detailContent').innerHTML=h;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function editField(el,key,type){
+  const d=data.find(r=>r.rowId===currentEditId);if(!d)return;
+  let val=d[key];if(Array.isArray(val))val=val.join(', ');val=val||'';
+
+  if(type==='select'&&key==='商机阶段'){
+    let opts=STAGES.map(s=>`<option value="${s.key}"${s.key===val?' selected':''}>${s.key}</option>`).join('');
+    el.innerHTML=`<select onchange="saveField('${key}',this.value,this)" style="background:var(--card);border:1px solid var(--accent);border-radius:4px;color:var(--text);padding:4px;font-size:13px">${opts}</select>`;
+    el.querySelector('select').focus();
+    return;
+  }
+  if(type==='textarea'){
+    el.innerHTML=`<textarea style="width:100%;min-height:60px;background:var(--card);border:1px solid var(--accent);border-radius:6px;color:var(--text);padding:8px;font-size:13px;resize:vertical;outline:none" onblur="saveField('${key}',this.value,this.parentElement)">${val}</textarea>`;
+    el.querySelector('textarea').focus();
+    return;
+  }
+  el.innerHTML=`<input type="${type==='number'?'number':'text'}" value="${val}" onblur="saveField('${key}',this.value,this.parentElement)" onkeydown="if(event.key==='Enter'){saveField('${key}',this.value,this.parentElement)}" style="background:var(--card);border:1px solid var(--accent);border-radius:4px;color:var(--text);padding:4px 8px;font-size:13px;width:100%;text-align:right;outline:none"/>`;
+  el.querySelector('input').focus();
+}
+
+function saveField(key,val,container){
+  const d=data.find(r=>r.rowId===currentEditId);if(!d)return;
+  // Convert arrays
+  if(['品类','合作机会模块','线索来源','经营模式'].includes(key)){
+    d[key]=val.split(/[,，、]/).map(s=>s.trim()).filter(Boolean);
+  }else if(['门店数','90天新开门店数','品牌ID','注册资本'].includes(key)){
+    const pv=parseInt(val); d[key]=isNaN(pv)?null:pv;
+  }else{
+    d[key]=val||null;
+  }
+  save();render();
+  toast('✅ 已保存: '+key);
+  // Refresh detail
+  showDetail(currentEditId);
+}
+
+function addRecord(){
+  const text=document.getElementById('newRecordText')?.value?.trim();
+  if(!text)return;
+  const d=data.find(r=>r.rowId===currentEditId);if(!d)return;
+  const record='['+today()+'] '+text;
+  d['沟通记录汇总']=record+(d['沟通记录汇总']?'\n'+d['沟通记录汇总']:'');
+  d['最新进展']=text;
+  d['上次沟通时间']=Date.now();
+
+  // Auto detect stage
+  if(/签约|合同/.test(text)&&!['已回款','已流失'].includes(d['商机阶段']))d['商机阶段']='30天内可回款';
+  if(/已?回款|到账/.test(text))d['商机阶段']='已回款';
+  if(/流失|放弃/.test(text))d['商机阶段']='已流失';
+
+  save();render();showDetail(currentEditId);
+  toast('✅ 已添加跟进记录');
+}
+
+function closeDetail(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('detailPanel').classList.remove('open');
+  currentEditId=null;
+}
+
+// New customer modal
+function closeNewModal(){document.getElementById('newModal').classList.remove('open')}
+document.getElementById('addNewBtn').onclick=()=>{document.getElementById('newModal').classList.add('open');document.getElementById('nm_brand').focus()};
+document.getElementById('newModal').addEventListener('click',function(e){if(e.target===this)closeNewModal()});
+
+function saveNewCustomer(){
+  const brand=document.getElementById('nm_brand').value.trim();
+  const cat=document.getElementById('nm_cat').value;
+  if(!brand){toast('⚠️ 请输入品牌名',true);return}
+  if(!cat){toast('⚠️ 请选择品类',true);return}
+
+  const newId=Math.max(...data.map(d=>d.rowId))+1;
+  const d={
+    rowId:newId,
+    '品牌名':brand,
+    '品类':[cat],
+    '商机阶段':document.getElementById('nm_stage').value||'长期跟进',
+    '上次沟通时间':Date.now()
+  };
+  const stores=parseInt(document.getElementById('nm_stores').value);
+  if(stores)d['门店数']=stores;
+  const mods=document.getElementById('nm_modules').value.trim();
+  if(mods)d['合作机会模块']=mods.split(/[,，、]/).map(s=>s.trim()).filter(Boolean);
+  const amt=document.getElementById('nm_amount').value.trim();
+  if(amt)d['预计回款金额']=amt;
+  const progress=document.getElementById('nm_progress').value.trim();
+  if(progress){d['最新进展']=progress;d['沟通记录汇总']='['+today()+'] '+progress}
+
+  data.push(d);save();render();closeNewModal();
+  // Reset form
+  ['nm_brand','nm_stores','nm_modules','nm_amount','nm_progress'].forEach(id=>document.getElementById(id).value='');
+  toast('✅ 已创建: '+brand);
+}
+
+// Import/Export
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='客户看板_'+today()+'.json';a.click();
+  toast('✅ 数据已导出');
+}
+function exportLocalStorageData(){
+  const raw=localStorage.getItem('zhouwei-crm-dashboard');
+  if(!raw){toast('⚠️ localStorage 中无数据',true);return}
+  const blob=new Blob([raw],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+  a.download='crm-data-export-'+y+'-'+m+'-'+dd+'.json';a.click();
+  toast('✅ localStorage 数据已导出');
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const imported=JSON.parse(ev.target.result);
+      if(!Array.isArray(imported)){toast('⚠️ 格式错误',true);return}
+      data=imported;save();render();
+      toast('✅ 已导入 '+data.length+' 条数据');
+    }catch(err){toast('⚠️ 解析失败: '+err.message,true)}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+function resetData(){
+  if(!confirm('⚠️ 危险操作！\n\n重置将清空所有本地修改的客户数据，恢复为代码中的初始数据。\n\n此操作不可撤销，确定要继续吗？'))return;
+  if(!confirm('再次确认：你的所有编辑记录将永久丢失，是否继续？'))return;
+  try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_KEY+'_time')}catch(e){}
+  data=JSON.parse(JSON.stringify(RAW_DATA));
+  save();
+  render();
+  document.getElementById('lastSave').textContent='数据已重置';
+  toast('✅ 数据已重置为初始值');
+}
+
+// Events
+document.getElementById('closeDetail').onclick=closeDetail;
+document.getElementById('overlay').onclick=closeDetail;
+document.getElementById('searchInput').oninput=e=>{searchQuery=e.target.value;render()};
+document.getElementById('hideClosedBtn').onclick=function(){hideClosed=!hideClosed;this.classList.toggle('active',hideClosed);stageFilter=null;render()};
+document.getElementById('sortSelect').onchange=e=>{sortBy=e.target.value;render()};
+document.querySelectorAll('.view-toggle button').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');currentView=btn.dataset.view;
+    document.getElementById('kanbanView').style.display=currentView==='kanban'?'flex':'none';
+    document.getElementById('tableView').style.display=currentView==='table'?'block':'none';
+    render();
+  };
+});
+document.onkeydown=e=>{if(e.key==='Escape'){closeDetail();closeNewModal()}};
+
+// ===== Edit Brand Name =====
+function editBrandName(el){
+  const d=data.find(r=>r.rowId===currentEditId);if(!d)return;
+  const old=d['品牌名']||'';
+  el.innerHTML=`<input type="text" value="${old}" style="background:var(--card);border:1px solid var(--accent);border-radius:6px;color:var(--text);padding:6px 10px;font-size:18px;font-weight:600;width:100%;outline:none" onblur="saveBrandName(this)" onkeydown="if(event.key==='Enter')saveBrandName(this);if(event.key==='Escape'){this.blur()}">`;
+  el.querySelector('input').focus();
+  el.querySelector('input').select();
+}
+function saveBrandName(input){
+  const d=data.find(r=>r.rowId===currentEditId);if(!d)return;
+  const val=input.value.trim();
+  if(!val){showDetail(currentEditId);return}
+  if(val!==d['品牌名']){
+    d['品牌名']=val;
+    save();render();
+    toast('✅ 品牌名已改为: '+val);
+  }
+  showDetail(currentEditId);
+}
+
+// ===== Delete Customer =====
+function deleteCustomer(){
+  if(!currentEditId)return;
+  const d=data.find(r=>r.rowId===currentEditId);
+  if(!d)return;
+  if(!confirm('确定删除「'+d['品牌名']+'」？此操作不可撤销。')){return}
+  const deletedId=String(currentEditId);
+  const deletedName=d['品牌名']||'已删除客户';
+  data=data.filter(r=>r.rowId!==currentEditId);
+  // Clean up linked todos: remove customer links pointing to deleted customer
+  try{
+    const local=localStorage.getItem(TODOS_LS_KEY);
+    if(local){
+      const todos=JSON.parse(local);
+      let changed=false;
+      todos.forEach(t=>{
+        if(t.linkedType==='customer'&&String(t.linkedId)===deletedId){
+          t.linkedType=null;t.linkedId=null;t.linkedName=null;changed=true;
+        }
+      });
+      if(changed)localStorage.setItem(TODOS_LS_KEY,JSON.stringify(todos));
+    }
+  }catch(e){}
+  save();closeDetail();render();
+  // Refresh todo link dropdown options
+  initTodoLinkOptions();
+  toast('🗑 已删除: '+deletedName);
+}
+
+// ===== Drag & Drop =====
+let dragRowId=null, isDragging=false;
+
+function onDragStart(e, rowId){
+  dragRowId=rowId;
+  isDragging=true;
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',rowId);
+  // Delay adding class so the drag image captures the card properly
+  requestAnimationFrame(()=>{
+    const el=document.querySelector(`.kanban-card[data-rowid="${rowId}"]`);
+    if(el)el.classList.add('dragging');
+  });
+}
+
+function onDragEnd(e){
+  isDragging=false;
+  dragRowId=null;
+  document.querySelectorAll('.kanban-card.dragging').forEach(el=>el.classList.remove('dragging'));
+  document.querySelectorAll('.kanban-col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  document.querySelectorAll('.kanban-cards.drag-over').forEach(el=>el.classList.remove('drag-over'));
+}
+
+function onDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  const col=e.currentTarget;
+  col.classList.add('drag-over');
+}
+
+function onDragLeave(e){
+  const col=e.currentTarget;
+  // Only remove if actually leaving the column
+  if(!col.contains(e.relatedTarget)){
+    col.classList.remove('drag-over');
+  }
+}
+
+function onCardsDragOver(e){
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onCardsDragLeave(e){
+  if(!e.currentTarget.contains(e.relatedTarget)){
+    e.currentTarget.classList.remove('drag-over');
+  }
+}
+
+function onDrop(e, newStage){
+  e.preventDefault();
+  const col=e.currentTarget;
+  col.classList.remove('drag-over');
+  col.querySelectorAll('.kanban-cards.drag-over').forEach(el=>el.classList.remove('drag-over'));
+
+  const rowId=parseInt(e.dataTransfer.getData('text/plain'));
+  if(!rowId)return;
+
+  const d=data.find(r=>r.rowId===rowId);
+  if(!d)return;
+
+  const oldStage=d['商机阶段'];
+  if(oldStage===newStage)return;
+
+  // Update stage
+  d['商机阶段']=newStage;
+  // Log the change
+  const record='['+today()+'] 商机阶段: '+oldStage+' → '+newStage;
+  d['沟通记录汇总']=record+(d['沟通记录汇总']?'\n'+d['沟通记录汇总']:'');
+  d['上次沟通时间']=Date.now();
+
+  save();render();
+  toast('✅ '+d['品牌名']+': '+oldStage+' → '+newStage);
+}
+
+
+// ===== Tab Switching =====
+function switchTab(tabName) {
+  // Hide all tabs
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  // Deactivate all nav tabs
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  // Activate selected
+  const tabEl = document.getElementById('tab-' + tabName);
+  if (tabEl) tabEl.classList.add('active');
+  const navEl = document.querySelector('.nav-tab[data-tab="' + tabName + '"]');
+  if (navEl) navEl.classList.add('active');
+  
+  // Re-render content for certain tabs
+  if (tabName === 'overview') refreshOverview();
+  if (tabName === 'news') renderNews();
+  if (tabName === 'todos') { initTodoLinkOptions(); renderTodos(); }
+  if (tabName === 'calendar') renderCalendar();
+  if (tabName === 'customers') render();
+}
+
+// ===== Sync All Data =====
+function syncAllData() {
+  const btn = document.getElementById('syncDataBtn');
+  if (!btn) return;
+  const origText = btn.textContent;
+  btn.textContent = '⏳ 同步中...';
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+
+  setTimeout(() => {
+    try {
+      // 1. 从 localStorage 加载最新数据（以 localStorage 为准）
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          data = parsed;
+        }
+      }
+
+      // 2. 合入 RAW_DATA 中的新条目（代码更新可能带来新客户）
+      const existingIds = new Set(data.map(d=>d.rowId));
+      let newCount = 0;
+      RAW_DATA.forEach(r=>{
+        if(r.rowId && !existingIds.has(r.rowId)){
+          data.push(JSON.parse(JSON.stringify(r)));
+          newCount++;
+        }
+      });
+      if(newCount > 0) save(); // 保存合入的新数据
+
+      // 3. Re-render all views
+      render();
+      refreshOverview();
+      renderTodos();
+      renderCalendar();
+      renderNews();
+      initTodoLinkOptions();
+
+      // 4. Update sync timestamp
+      const now = new Date();
+      const ts = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+      localStorage.setItem('zhouwei-crm-last-sync', ts);
+
+      const msg = newCount > 0 ? 
+        '🔄 已同步，新增 ' + newCount + ' 条数据（' + ts + '）' :
+        '🔄 数据已同步刷新（' + ts + '）';
+      btn.textContent = '✅ 已同步';
+      btn.style.opacity = '1';
+      toast(msg);
+
+      setTimeout(() => {
+        btn.textContent = origText;
+        btn.disabled = false;
+      }, 2000);
+    } catch(e) {
+      btn.textContent = '❌ 同步失败';
+      btn.style.opacity = '1';
+      toast('❌ 同步失败: ' + e.message);
+      setTimeout(() => {
+        btn.textContent = origText;
+        btn.disabled = false;
+      }, 2000);
+    }
+  }, 300);
+}
+
+// ===== Overview KPI =====
+function refreshOverview() {
+  const T = SALES_TARGET;
+  
+  // Month
+  const kpiMonth = document.getElementById('kpiMonth');
+  if (kpiMonth) kpiMonth.textContent = T.month;
+  
+  // Total payment KPI
+  const totalPct = T.毛利目标 > 0 ? (T.回款毛利 / T.毛利目标 * 100) : 0;
+  setRing('ringTotal', totalPct);
+  setText('ringTotalPct', Math.round(totalPct) + '%');
+  setText('kpiTarget', '¥' + (T.毛利目标/10000).toFixed(1) + 'w');
+  setText('kpiActual', '¥' + (T.回款毛利/10000).toFixed(1) + 'w');
+  const gap = T.回款毛利 - T.毛利目标;
+  const kpiGapEl = document.getElementById('kpiGap');
+  if (kpiGapEl) {
+    if (gap >= 0) { kpiGapEl.textContent = '✅ 已达标'; kpiGapEl.style.color = '#2e7d32'; }
+    else { kpiGapEl.textContent = '-¥' + (Math.abs(gap)/10000).toFixed(1) + 'w'; kpiGapEl.style.color = '#e53e3e'; }
+  }
+  
+  // New sign KPI
+  const newPct = T.新签目标毛利 > 0 ? (T.新签回款毛利 / T.新签目标毛利 * 100) : 0;
+  setRing('ringNew', newPct);
+  setText('ringNewPct', Math.round(newPct) + '%');
+  setText('kpiNewTarget', '¥' + (T.新签目标毛利/10000).toFixed(1) + 'w');
+  setText('kpiNewActual', '¥' + (T.新签回款毛利/10000).toFixed(1) + 'w');
+  const newGap = T.新签回款毛利 - T.新签目标毛利;
+  const kpiNewGapEl = document.getElementById('kpiNewGap');
+  if (kpiNewGapEl) {
+    if (newGap >= 0) { kpiNewGapEl.textContent = '✅ 已达标'; kpiNewGapEl.style.color = '#2e7d32'; }
+    else { kpiNewGapEl.textContent = '-¥' + (Math.abs(newGap)/10000).toFixed(1) + 'w'; kpiNewGapEl.style.color = '#e53e3e'; }
+  }
+  
+  // Customer overview
+  const active = data.filter(d => !['已回款','已流失'].includes(d['商机阶段']));
+  const highIntent = data.filter(d => ['7天内可回款','30天内可回款'].includes(d['商机阶段']));
+  const todayFollowCount = data.filter(d => {
+    const da = daysAgo(d['上次沟通时间']);
+    return da !== null && da <= 1 && !['已回款','已流失'].includes(d['商机阶段']);
+  }).length;
+  const signed = data.filter(d => d['商机阶段'] === '已回款').length;
+  
+  setText('kpiTotalCustomers', active.length);
+  setText('kpiHighIntent', highIntent.length);
+  setText('kpiTodayFollow', todayFollowCount);
+  setText('kpiSigned', signed);
+  
+  // Todo overview
+  const todos = loadTodos();
+  const highP = todos.filter(t => t.priority === 'high' && !t.done).length;
+  const pending = todos.filter(t => !t.done).length;
+  const done = todos.filter(t => t.done).length;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const overdue = todos.filter(t => !t.done && t.dueDate && new Date(t.dueDate) < now).length;
+  
+  setText('kpiHighPriority', highP);
+  setText('kpiPending', pending);
+  setText('kpiDone', done);
+  setText('kpiOverdue', overdue);
+  
+  // Today follow list
+  renderTodayFollow();
+  // Recent todos
+  renderRecentTodos();
+  // Morning schedule
+  renderOverviewMorning();
+  // Recent news
+  renderRecentNews();
+  // Calendar preview
+  renderOverviewCalendar();
+  // Projects preview
+  renderOverviewProjects();
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function setRing(id, pct) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  pct = Math.min(Math.max(pct, 0), 100);
+  const color = pct >= 100 ? '#22c55e' : pct >= 70 ? '#FF6B35' : pct >= 40 ? '#f97316' : '#ef4444';
+  const deg = (pct / 100) * 360;
+  if (deg <= 180) {
+    el.style.background = 'conic-gradient(' + color + ' 0deg ' + deg + 'deg, #f0f0f0 ' + deg + 'deg 360deg)';
+  } else {
+    el.style.background = 'conic-gradient(' + color + ' 0deg ' + deg + 'deg, #f0f0f0 ' + deg + 'deg 360deg)';
+  }
+}
+
+function renderTodayFollow() {
+  const container = document.getElementById('todayFollowList');
+  if (!container) return;
+  // Show customers that need follow-up: active stage + last contact > 7 days ago, or high-intent
+  const needFollow = data.filter(d => {
+    if (['已回款','已流失'].includes(d['商机阶段'])) return false;
+    const da = daysAgo(d['上次沟通时间']);
+    if (da !== null && da >= 7) return true;
+    if (['7天内可回款','30天内可回款'].includes(d['商机阶段'])) return true;
+    return false;
+  }).slice(0, 5);
+  
+  if (needFollow.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">今日无待跟进客户 🎉</div>';
+    return;
+  }
+  container.innerHTML = needFollow.map(d => {
+    const da = daysAgo(d['上次沟通时间']);
+    const sc = stageOf(d['商机阶段']);
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="switchTab(\'customers\');setTimeout(()=>showDetail(' + d.rowId + '),200)">' +
+      '<div><div style="font-size:13px;font-weight:600">' + (d['品牌名']||'?') + '</div>' +
+      '<div style="font-size:11px;color:#888">' + (da !== null ? da + '天未联系' : '') + '</div></div>' +
+      '<span class="stage-badge ' + sc.cls + '" style="font-size:11px">' + d['商机阶段'] + '</span></div>';
+  }).join('');
+}
+
+function renderRecentTodos() {
+  const container = document.getElementById('recentTodosList');
+  if (!container) return;
+  const todos = loadTodos().filter(t => !t.done).slice(0, 5);
+  if (todos.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">暂无待办事项 🎉</div>';
+    return;
+  }
+  container.innerHTML = todos.map(t => {
+    const pClass = t.priority === 'high' ? 'priority-high' : t.priority === 'low' ? 'priority-low' : 'priority-normal';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0">' +
+      '<span style="font-size:11px" class="' + pClass + '">' + (t.priority === 'high' ? '🔴' : t.priority === 'low' ? '⚪' : '🟠') + '</span>' +
+      '<span style="font-size:13px;flex:1">' + (t.source === 'daxiang' ? '🐘 ' : '') + t.text + '</span>' +
+      (t.dueDate ? '<span style="font-size:11px;color:#888">' + t.dueDate + '</span>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function renderOverviewMorning() {
+  const container = document.getElementById('overviewMorning');
+  if (!container) return;
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  // 从今天开始往后取5条（含今天），如果不够则往前补
+  const upcoming = MORNING_SCHEDULE.filter(s => s.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 5);
+  const recent = MORNING_SCHEDULE.filter(s => s.date < todayStr).sort((a,b) => b.date.localeCompare(a.date)).slice(0, 5 - upcoming.length);
+  const items = [...recent.reverse(), ...upcoming];
+  if (items.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">暂无排期</div>';
+    return;
+  }
+  container.innerHTML = items.map(s => {
+    const isToday = s.date === todayStr;
+    const isPast = s.date < todayStr;
+    const d = new Date(s.date);
+    const weekDay = ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+    const dateLabel = s.date.slice(5) + ' ' + weekDay;
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0' + (isPast ? ';opacity:.5' : '') + (isToday ? ';background:#fffbeb;margin:0 -8px;padding:8px;border-radius:8px' : '') + '">' +
+      '<div style="min-width:70px;font-size:11px;color:' + (isToday ? '#FF6B35;font-weight:700' : '#888') + '">' + (isToday ? '📍 今天' : dateLabel) + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+      '<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + s.topic + '">' + s.topic + '</div>' +
+      '</div>' +
+      (s.speaker ? '<div style="min-width:50px;text-align:right;font-size:11px;color:#1a73e8;font-weight:500">' + s.speaker + '</div>' : '<div style="min-width:50px;text-align:right;font-size:11px;color:#aaa">休</div>') +
+      '</div>';
+  }).join('');
+}
+
+function renderRecentNews() {
+  const container = document.getElementById('recentNewsList');
+  if (!container) return;
+  const readList = loadNewsRead();
+  const allUnread = NEWS_DATA.filter(n => !readList.includes(n.title));
+  const badge = document.getElementById('newsUnreadBadge');
+  if (badge) badge.textContent = allUnread.length > 0 ? allUnread.length + '条未读' : '';
+  const unread = allUnread.slice(0, 5);
+  if (unread.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">暂无未读重要资讯 🎉</div>';
+    return;
+  }
+  container.innerHTML = unread.map(n => {
+    return '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;cursor:pointer"' + (n.link ? ' onclick="openNewsLink(\''+n.link+'\')"' : '') + '>' +
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">' +
+      '<span class="nc-cat ' + n.catCls + '" style="font-size:10px;padding:1px 6px;border-radius:3px">' + n.cat + '</span>' +
+      '<span style="font-size:12px;font-weight:600">' + n.title.substring(0, 30) + (n.title.length > 30 ? '...' : '') + '</span></div>' +
+      '<div style="font-size:11px;color:#888">' + n.time + '</div></div>';
+  }).join('');
+}
+
+function renderOverviewCalendar() {
+  const container = document.getElementById('overviewCalendar');
+  if (!container) return;
+  const events = loadCalendar ? loadCalendar() : [];
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Monday
+  startOfWeek.setHours(0,0,0,0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23,59,59,999);
+  
+  const weekEvents = events.filter(e => {
+    const d = new Date(e.date);
+    return d >= startOfWeek && d <= endOfWeek;
+  }).sort((a, b) => {
+    const da = new Date(a.date + (a.time ? ' ' + a.time : ''));
+    const db = new Date(b.date + (b.time ? ' ' + b.time : ''));
+    return da - db;
+  }).slice(0, 5);
+  
+  if (weekEvents.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">本周暂无日程 📅</div>';
+    return;
+  }
+  const days = ['周日','周一','周二','周三','周四','周五','周六'];
+  container.innerHTML = weekEvents.map(e => {
+    const d = new Date(e.date);
+    const dayStr = days[d.getDay()];
+    const dateStr = (d.getMonth()+1) + '/' + d.getDate();
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0">' +
+      '<span style="font-size:11px;color:#FF6B35;font-weight:600;min-width:60px">' + dateStr + ' ' + dayStr + '</span>' +
+      (e.time ? '<span style="font-size:11px;color:#888;min-width:40px">' + e.time + '</span>' : '') +
+      '<span style="font-size:13px;flex:1">' + (e.source === 'daxiang' ? '🐘 ' : '') + e.title + '</span></div>';
+  }).join('');
+}
+
+function renderOverviewProjects() {
+  const container = document.getElementById('overviewProjects');
+  if (!container) return;
+  if (!PROJECTS || PROJECTS.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">暂无项目 🚀</div>';
+    return;
+  }
+  container.innerHTML = PROJECTS.map(p => {
+    const latestProgress = p.progress.length > 0 ? p.progress[p.progress.length - 1] : '';
+    return '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">' +
+      '<span style="font-size:13px;font-weight:600">' + p.name + '</span>' +
+      '<span style="font-size:11px;padding:2px 8px;border-radius:12px;' +
+        (p.status === 'active' ? 'background:#E8F5E9;color:#2e7d32' : p.status === 'prep' ? 'background:#FFF3ED;color:#FF6B35' : 'background:#E3F2FD;color:#1976d2') +
+      '">' + p.statusText + '</span></div>' +
+      (latestProgress ? '<div style="font-size:12px;color:#666;line-height:1.5">📋 ' + latestProgress + '</div>' : '') +
+      '<div style="font-size:11px;color:#aaa;margin-top:4px">更新: ' + p.lastUpdate + '</div></div>';
+  }).join('');
+}
+
+// ===== Todos CRUD =====
+const TODOS_LS_KEY = 'zhouwei-crm-todos';
+let todoFilter = 'all';
+
+function loadTodos() {
+  try {
+    const local = localStorage.getItem(TODOS_LS_KEY);
+    const localTodos = local ? JSON.parse(local) : [];
+    const dxDone = loadDxDone();
+    const dxTodos = (DAXIANG_TODOS || []).map(t => ({...t, source: 'daxiang', done: !!dxDone[t.id]}));
+    return [...localTodos, ...dxTodos];
+  } catch(e) { return []; }
+}
+
+function saveTodos(todos) {
+  try { localStorage.setItem(TODOS_LS_KEY, JSON.stringify(todos)); } catch(e) {}
+}
+
+function addTodo() {
+  const input = document.getElementById('todoAddInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const priority = document.getElementById('todoPrioritySel').value;
+  const dueDate = document.getElementById('todoDateInput').value || null;
+  const linkVal = document.getElementById('todoLinkSel').value || '';
+  let linkedType = null, linkedId = null, linkedName = null;
+  if (linkVal) {
+    const [type, id] = linkVal.split(':');
+    linkedType = type; // 'customer' or 'project'
+    linkedId = id;
+    if (type === 'customer') {
+      const c = data.find(d => d.rowId === Number(id));
+      linkedName = c ? c['品牌名'] : id;
+    } else {
+      linkedName = id; // project name
+    }
+  }
+  const local = localStorage.getItem(TODOS_LS_KEY);
+  const todos = local ? JSON.parse(local) : [];
+  todos.unshift({
+    id: Date.now(),
+    text: text,
+    priority: priority,
+    dueDate: dueDate,
+    done: false,
+    created: new Date().toISOString(),
+    linkedType: linkedType,
+    linkedId: linkedId,
+    linkedName: linkedName
+  });
+  try { localStorage.setItem(TODOS_LS_KEY, JSON.stringify(todos)); } catch(e) {}
+  input.value = '';
+  document.getElementById('todoDateInput').value = '';
+  document.getElementById('todoLinkSel').value = '';
+  document.getElementById('todoLinkSearch').value = '';
+  renderTodos();
+  refreshOverview();
+  toast('✅ 待办已添加');
+}
+
+function todoJumpTo(type, id) {
+  if (type === 'customer') {
+    switchTab('customers');
+    setTimeout(() => showDetail(Number(id)), 200);
+  } else if (type === 'project') {
+    switchTab('projects');
+    setTimeout(() => {
+      const cards = document.querySelectorAll('.project-card');
+      cards.forEach(c => {
+        if (c.textContent.includes(id)) {
+          c.scrollIntoView({behavior:'smooth', block:'center'});
+          c.style.boxShadow = '0 0 0 3px #FF6B35';
+          setTimeout(() => c.style.boxShadow = '', 2000);
+        }
+      });
+    }, 200);
+  }
+}
+
+// Searchable link dropdown data
+let _linkOptions = [];
+function initTodoLinkOptions() {
+  const customers = data.filter(d => d['商机阶段'] !== '已流失').sort((a,b) => (a['品牌名']||'').localeCompare(b['品牌名']||''));
+  const projects = (typeof PROJECTS !== 'undefined' ? PROJECTS : []);
+  _linkOptions = [
+    {group:'📋 客户', items: customers.map(d=>({value:'customer:'+d.rowId, label:d['品牌名']||'未知', stage:d['商机阶段']||''}))},
+    {group:'🚀 项目', items: projects.map(p=>({value:'project:'+p.name, label:p.name, stage:p.status||''}))}
+  ];
+}
+function openLinkDropdown() {
+  filterLinkDropdown();
+  document.getElementById('todoLinkDropdown').style.display = 'block';
+}
+function closeLinkDropdown() {
+  setTimeout(()=>{ document.getElementById('todoLinkDropdown').style.display = 'none'; }, 150);
+}
+function filterLinkDropdown() {
+  const dd = document.getElementById('todoLinkDropdown');
+  const q = (document.getElementById('todoLinkSearch').value||'').trim().toLowerCase();
+  let html = '<div onclick="selectLinkOption(\'\',\'不关联\')" style="padding:8px 12px;cursor:pointer;color:#aaa;font-size:12px;border-bottom:1px solid #f0f0f0" onmouseenter="this.style.background=\'#f9f9f9\'" onmouseleave="this.style.background=\'\'">不关联</div>';
+  _linkOptions.forEach(g => {
+    const filtered = g.items.filter(i => !q || i.label.toLowerCase().includes(q));
+    if (filtered.length === 0) return;
+    html += '<div style="padding:6px 12px;font-size:11px;color:#999;font-weight:600;background:#fafafa">' + g.group + '</div>';
+    filtered.forEach(i => {
+      const stageTag = i.stage ? '<span style="font-size:10px;color:#aaa;margin-left:4px">' + i.stage + '</span>' : '';
+      html += '<div onclick="selectLinkOption(\'' + i.value.replace(/'/g,"\\'") + '\',\'' + i.label.replace(/'/g,"\\'") + '\')" style="padding:7px 12px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:4px" onmouseenter="this.style.background=\'#FFF5F0\'" onmouseleave="this.style.background=\'\'">' + i.label + stageTag + '</div>';
+    });
+  });
+  if (html.indexOf('group') === -1 && q) html += '<div style="padding:16px;text-align:center;color:#ccc;font-size:12px">无匹配结果</div>';
+  dd.innerHTML = html;
+}
+function selectLinkOption(value, label) {
+  document.getElementById('todoLinkSel').value = value;
+  document.getElementById('todoLinkSearch').value = value ? label : '';
+  document.getElementById('todoLinkDropdown').style.display = 'none';
+}
+// Close dropdown on outside click
+document.addEventListener('click', function(e) {
+  const w = document.getElementById('todoLinkWrapper');
+  if (w && !w.contains(e.target)) {
+    document.getElementById('todoLinkDropdown').style.display = 'none';
+  }
+});
+
+// 大象待办完成状态（localStorage）
+const DX_DONE_KEY = 'zhouwei-crm-dx-done';
+function loadDxDone() { try { return JSON.parse(localStorage.getItem(DX_DONE_KEY)||'{}'); } catch(e) { return {}; } }
+function saveDxDone(m) { try { localStorage.setItem(DX_DONE_KEY, JSON.stringify(m)); } catch(e) {} }
+
+function toggleTodo(id) {
+  // Check if it's a daxiang todo (string id starting with 'dxt-')
+  if (typeof id === 'string' && id.startsWith('dxt-')) {
+    const m = loadDxDone();
+    m[id] = !m[id];
+    saveDxDone(m);
+  } else {
+    const local = localStorage.getItem(TODOS_LS_KEY);
+    const todos = local ? JSON.parse(local) : [];
+    const t = todos.find(x => x.id === id);
+    if (t) t.done = !t.done;
+    try { localStorage.setItem(TODOS_LS_KEY, JSON.stringify(todos)); } catch(e) {}
+  }
+  renderTodos();
+  refreshOverview();
+}
+
+function deleteTodo(id) {
+  const local = localStorage.getItem(TODOS_LS_KEY);
+  let todos = local ? JSON.parse(local) : [];
+  todos = todos.filter(x => x.id !== id);
+  try { localStorage.setItem(TODOS_LS_KEY, JSON.stringify(todos)); } catch(e) {}
+  renderTodos();
+  refreshOverview();
+  toast('🗑 待办已删除');
+}
+
+let editingTodoId = null;
+
+function startEditTodo(id) {
+  editingTodoId = id;
+  renderTodos();
+}
+
+function cancelEditTodo() {
+  editingTodoId = null;
+  renderTodos();
+}
+
+function saveEditTodo(id) {
+  const local = localStorage.getItem(TODOS_LS_KEY);
+  const todos = local ? JSON.parse(local) : [];
+  const t = todos.find(x => x.id === id);
+  if (!t) return;
+  const textEl = document.getElementById('edit-text-' + id);
+  const prioEl = document.getElementById('edit-prio-' + id);
+  const dateEl = document.getElementById('edit-date-' + id);
+  if (textEl) t.text = textEl.value.trim() || t.text;
+  if (prioEl) t.priority = prioEl.value;
+  if (dateEl) t.dueDate = dateEl.value || null;
+  // Save linked entity
+  const linkEl = document.getElementById('edit-link-' + id);
+  if (linkEl) {
+    const linkVal = linkEl.value;
+    if (linkVal) {
+      const [type, ...rest] = linkVal.split(':');
+      const lid = rest.join(':');
+      t.linkedType = type;
+      t.linkedId = lid;
+      if (type === 'customer') {
+        const c = data.find(d => String(d.rowId) === String(lid));
+        t.linkedName = c ? c['品牌名'] : lid;
+      } else {
+        t.linkedName = lid;
+      }
+    } else {
+      t.linkedType = null; t.linkedId = null; t.linkedName = null;
+    }
+  }
+  try { localStorage.setItem(TODOS_LS_KEY, JSON.stringify(todos)); } catch(e) {}
+  editingTodoId = null;
+  renderTodos();
+  refreshOverview();
+  toast('✏️ 待办已更新');
+}
+
+function setTodoFilter(f) {
+  todoFilter = f;
+  document.querySelectorAll('.todo-filter-btn').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTodos();
+}
+
+function renderTodos() {
+  const container = document.getElementById('todoListContainer');
+  if (!container) return;
+  // Ensure link options are fresh
+  initTodoLinkOptions();
+  // Show Daxiang todos sync status
+  const todoSyncEl = document.getElementById('todoSyncStatus');
+  if (todoSyncEl) {
+    if (DAXIANG_TODOS_SYNC) {
+      todoSyncEl.innerHTML = '🐘 AI助理待办已同步 · ' + DAXIANG_TODOS_DATE + ' · ' + DAXIANG_TODOS_SYNC;
+    } else {
+      todoSyncEl.innerHTML = '<span style="color:#ccc">🐘 AI助理待办未同步</span>';
+    }
+  }
+  let todos = loadTodos();
+  const now = new Date(); now.setHours(0,0,0,0);
+  
+  if (todoFilter === 'pending') todos = todos.filter(t => !t.done);
+  else if (todoFilter === 'done') todos = todos.filter(t => t.done);
+  else if (todoFilter === 'high') todos = todos.filter(t => t.priority === 'high' && !t.done);
+  else if (todoFilter === 'overdue') todos = todos.filter(t => !t.done && t.dueDate && new Date(t.dueDate) < now);
+  
+  // Sort: undone first, done last; within each group keep original order
+  todos.sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
+  
+  if (todos.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#aaa;padding:60px 0">暂无待办事项</div>';
+    return;
+  }
+  
+  container.innerHTML = todos.map(t => {
+    if (editingTodoId === t.id && t.source !== 'daxiang') {
+      const curLink = t.linkedType ? (t.linkedType + ':' + t.linkedId) : '';
+      let linkOpts = '<option value="">不关联</option>';
+      _linkOptions.forEach(g => {
+        linkOpts += '<optgroup label="' + g.group + '">';
+        g.items.forEach(i => {
+          linkOpts += '<option value="' + i.value + '"' + (i.value === curLink ? ' selected' : '') + '>' + i.label + '</option>';
+        });
+        linkOpts += '</optgroup>';
+      });
+      return '<div class="todo-item todo-edit-inline" style="flex-wrap:wrap;gap:6px">' +
+        '<input type="text" id="edit-text-' + t.id + '" value="' + t.text.replace(/"/g,'&quot;') + '" onkeydown="if(event.key===\'Enter\')saveEditTodo(' + t.id + ')" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #FF6B35;border-radius:6px;font-size:14px;outline:none"/>' +
+        '<select id="edit-prio-' + t.id + '" style="padding:6px 8px;border:1px solid #e8e8e8;border-radius:6px;font-size:12px">' +
+        '<option value="high"' + (t.priority==='high'?' selected':'') + '>🔴 高</option>' +
+        '<option value="normal"' + (t.priority==='normal'?' selected':'') + '>🟠 中</option>' +
+        '<option value="low"' + (t.priority==='low'?' selected':'') + '>⚪ 低</option>' +
+        '</select>' +
+        '<input type="date" id="edit-date-' + t.id + '" value="' + (t.dueDate||'') + '" style="padding:6px 8px;border:1px solid #e8e8e8;border-radius:6px;font-size:12px"/>' +
+        '<select id="edit-link-' + t.id + '" style="padding:6px 8px;border:1px solid #e8e8e8;border-radius:6px;font-size:12px;max-width:160px">' + linkOpts + '</select>' +
+        '<button onclick="saveEditTodo(' + t.id + ')" style="background:#FF6B35;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">保存</button>' +
+        '<button onclick="cancelEditTodo()" style="background:#f5f5f5;color:#666;border:1px solid #e8e8e8;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">取消</button>' +
+        '</div>';
+    }
+    const isOverdue = !t.done && t.dueDate && new Date(t.dueDate) < now;
+    const pClass = t.priority === 'high' ? 'priority-high' : t.priority === 'low' ? 'priority-low' : 'priority-normal';
+    return '<div class="todo-item">' +
+      '<input type="checkbox" class="todo-checkbox" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(' + (t.source === 'daxiang' ? "'" + t.id + "'" : t.id) + ')"/>' +
+      '<span style="font-size:11px" class="' + pClass + '">' + (t.priority === 'high' ? '🔴' : t.priority === 'low' ? '⚪' : '🟠') + '</span>' +
+      '<span style="flex:1;font-size:14px' + (t.done ? ';text-decoration:line-through;color:#aaa' : '') + '">' + (t.source === 'daxiang' ? '🐘 ' : '') + t.text + 
+      (t.linkedType ? ' <span class="todo-link-tag" onclick="event.stopPropagation();todoJumpTo(\'' + t.linkedType + '\',\'' + t.linkedId + '\')" title="点击查看">' + (t.linkedType === 'customer' ? '📋 ' : '🚀 ') + (t.linkedName || t.linkedId) + '</span>' : '') +
+      '</span>' +
+      (t.dueDate ? '<span style="font-size:12px;color:' + (isOverdue ? '#e53e3e' : '#888') + '">' + (isOverdue ? '⚠️ ' : '') + t.dueDate + '</span>' : '') +
+      (t.source === 'daxiang' ? '<span style="font-size:10px;color:#aaa;padding:0 4px" title="来源：大象AI助理 ' + (DAXIANG_TODOS_DATE||'') + '">🐘</span>' : '<button class="todo-edit-btn" onclick="startEditTodo(' + t.id + ')" title="编辑">✏️</button><button class="todo-delete-btn" onclick="deleteTodo(' + t.id + ')">✕</button>') +
+      '</div>';
+  }).join('');
+}
+
+// ===== Calendar CRUD =====
+const CAL_LS_KEY = 'zhouwei-crm-calendar';
+let calWeekOffset = 0;
+
+function loadCalendar() {
+  try {
+    const local = localStorage.getItem(CAL_LS_KEY);
+    const localEvents = local ? JSON.parse(local) : [];
+    // Merge Daxiang calendar events (marked with source)
+    const dxEvents = (DAXIANG_CALENDAR || []).map(e => ({...e, source: 'daxiang'}));
+    return [...localEvents, ...dxEvents];
+  } catch(e) { return []; }
+}
+
+function saveCalendar(events) {
+  try { localStorage.setItem(CAL_LS_KEY, JSON.stringify(events)); } catch(e) {}
+}
+
+/* ---- Calendar Modal helpers ---- */
+function openCalModal(prefillDate, prefillStart) {
+  const modal = document.getElementById('calModal');
+  if (!modal) return;
+  document.getElementById('calModalTitle').value = '';
+  document.getElementById('calModalLocation').value = '';
+  document.getElementById('calModalNote').value = '';
+  document.getElementById('calModalReminder').value = '15';
+  const today = new Date();
+  document.getElementById('calModalDate').value = prefillDate || today.toISOString().slice(0, 10);
+  document.getElementById('calModalStart').value = prefillStart || '09:00';
+  // Auto-set end time = start + 1 hour
+  const [h, m] = (prefillStart || '09:00').split(':').map(Number);
+  const endH = Math.min(h + 1, 22);
+  document.getElementById('calModalEnd').value = String(endH).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  modal.style.display = 'flex';
+  updateCalPreview();
+  document.getElementById('calModalTitle').focus();
+}
+function closeCalModal() {
+  const modal = document.getElementById('calModal');
+  if (modal) modal.style.display = 'none';
+}
+function saveCalModal() {
+  const title = document.getElementById('calModalTitle').value.trim();
+  const date = document.getElementById('calModalDate').value;
+  const startTime = document.getElementById('calModalStart').value;
+  const endTime = document.getElementById('calModalEnd').value;
+  const location = document.getElementById('calModalLocation').value.trim();
+  const reminder = document.getElementById('calModalReminder').value;
+  const note = document.getElementById('calModalNote').value.trim();
+  if (!title) { toast('⚠️ 请输入日程主题'); return; }
+  if (!date) { toast('⚠️ 请选择日期'); return; }
+  const events = loadCalendar();
+  events.push({
+    id: Date.now(),
+    date: date,
+    time: startTime || '09:00',
+    endTime: endTime || '10:00',
+    title: title,
+    location: location || undefined,
+    reminder: reminder || undefined,
+    note: note || undefined
+  });
+  saveCalendar(events);
+  closeCalModal();
+  renderCalendar();
+  refreshOverview();
+  toast('✅ 日程已创建');
+}
+
+function updateCalPreview() {
+  const dateVal = document.getElementById('calModalDate').value;
+  const startVal = document.getElementById('calModalStart').value;
+  const endVal = document.getElementById('calModalEnd').value;
+  const titleEl = document.getElementById('calPreviewTitle');
+  const axisEl = document.getElementById('calPreviewAxis');
+  const conflictEl = document.getElementById('calPreviewConflict');
+  if (!dateVal) { titleEl.textContent = '日程预览'; axisEl.innerHTML = ''; conflictEl.innerHTML = ''; return; }
+  const d = new Date(dateVal);
+  const weekDay = ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+  titleEl.textContent = dateVal.slice(5).replace('-','/') + ' ' + weekDay;
+  // Build time axis (06:00-22:00, 30px per hour)
+  const hourH = 30, startHour = 6, endHour = 22, totalH = (endHour - startHour) * hourH;
+  let html = '';
+  for (let h = startHour; h <= endHour; h++) {
+    const top = (h - startHour) * hourH;
+    html += '<div class="cal-preview-hour" style="top:' + top + 'px">' + String(h).padStart(2,'0') + ':00</div>';
+    html += '<div class="cal-preview-line" style="top:' + top + 'px"></div>';
+  }
+  // Existing events for this date
+  const allEvents = [...loadCalendar(), ...DAXIANG_CALENDAR.map(e => ({...e, source:'daxiang'}))];
+  const dayEvents = allEvents.filter(e => e.date === dateVal);
+  let hasConflict = false;
+  dayEvents.forEach(e => {
+    const [sh, sm] = (e.time || '09:00').split(':').map(Number);
+    const [eh, em] = (e.endTime || String(sh+1).padStart(2,'0')+':'+String(sm).padStart(2,'0')).split(':').map(Number);
+    const top = Math.max(0, (sh - startHour) * hourH + sm * hourH / 60);
+    const height = Math.max(hourH/2, ((eh - sh) * 60 + (em - sm)) * hourH / 60);
+    html += '<div class="cal-preview-block existing" style="top:' + top + 'px;height:' + height + 'px">' +
+      (e.source === 'daxiang' ? '🐘 ' : '') + (e.title||'').substring(0,15) + '<br>' + e.time + '-' + (e.endTime||'') + '</div>';
+    // Check conflict with new event
+    if (startVal && endVal) {
+      const [ns, ne] = [startVal, endVal].map(t => { const p = t.split(':').map(Number); return p[0]*60+p[1]; });
+      const es = sh*60+sm, ee = eh*60+em;
+      if (ns < ee && ne > es) hasConflict = true;
+    }
+  });
+  // New event preview
+  if (startVal && endVal) {
+    const [sh, sm] = startVal.split(':').map(Number);
+    const [eh, em] = endVal.split(':').map(Number);
+    const top = Math.max(0, (sh - startHour) * hourH + sm * hourH / 60);
+    const height = Math.max(hourH/2, ((eh - sh) * 60 + (em - sm)) * hourH / 60);
+    html += '<div class="cal-preview-block new-event" style="top:' + top + 'px;height:' + height + 'px">新日程</div>';
+  }
+  axisEl.style.height = totalH + 'px';
+  axisEl.innerHTML = html;
+  conflictEl.innerHTML = hasConflict ? '⚠️ 与已有日程时间冲突' : '';
+}
+
+function addEvent() {
+  // Kept for backward compat; now delegates to modal
+  openCalModal();
+}
+
+function deleteEvent(id) {
+  let events = loadCalendar();
+  events = events.filter(e => e.id !== id);
+  saveCalendar(events);
+  renderCalendar();
+}
+
+function calendarPrevWeek() { calWeekOffset--; renderCalendar(); }
+function calendarNextWeek() { calWeekOffset++; renderCalendar(); }
+function calendarThisWeek() { calWeekOffset = 0; renderCalendar(); }
+
+function renderCalendar() {
+  const headerRow = document.getElementById('calHeaderRow');
+  const timeline = document.getElementById('calTimeline');
+  const label = document.getElementById('calendarWeekLabel');
+  const scrollBox = document.getElementById('calTimelineScroll');
+  if (!timeline) return;
+
+  // Daxiang sync status
+  const syncEl = document.getElementById('calSyncStatus');
+  if (syncEl) {
+    if (DAXIANG_CAL_SYNC) {
+      syncEl.innerHTML = '🐘 已同步 · ' + DAXIANG_CAL_SYNC;
+    } else {
+      syncEl.innerHTML = '<span style="color:#ccc">🐘 未同步</span>';
+    }
+  }
+
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+  const CAL_START_HOUR = 6, CAL_END_HOUR = 22, HOUR_PX = 60;
+  const totalHours = CAL_END_HOUR - CAL_START_HOUR;
+  const totalPx = totalHours * HOUR_PX;
+
+  // Monday of the displayed week
+  const monday = new Date(now);
+  monday.setDate(monday.getDate() - (monday.getDay() === 0 ? 6 : monday.getDay() - 1) + calWeekOffset * 7);
+
+  const events = loadCalendar();
+  const dayNames = ['周一','周二','周三','周四','周五','周六','周日'];
+
+  let days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(d.getDate() + i);
+    const dateStr = d.toISOString().slice(0,10);
+    const dayEvents = events.filter(e => e.date === dateStr).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+    days.push({
+      date: dateStr,
+      dayName: dayNames[i],
+      dayNum: d.getDate(),
+      month: d.getMonth() + 1,
+      year: d.getFullYear(),
+      isToday: dateStr === todayStr,
+      isWeekend: i >= 5,
+      events: dayEvents
+    });
+  }
+
+  // Month label — show the month that Monday falls in, with year
+  const monLabel = days[0].year + '年' + String(days[0].month).padStart(2,'0') + '月';
+  if (label) label.textContent = monLabel;
+
+  // ---- Header row ----
+  headerRow.innerHTML = '<div class="cal-time-gutter"></div>' + days.map(d => {
+    let cls = 'cal-day-header';
+    if (d.isToday) cls += ' is-today';
+    if (d.isWeekend) cls += ' is-weekend';
+    return '<div class="'+cls+'"><span class="cal-day-name">'+d.dayName+'</span><span class="cal-day-num">'+d.dayNum+'</span></div>';
+  }).join('');
+
+  // ---- Timeline body ----
+  // Time gutter
+  let gutterHtml = '';
+  for (let h = CAL_START_HOUR; h <= CAL_END_HOUR; h++) {
+    const top = (h - CAL_START_HOUR) * HOUR_PX;
+    if (h > CAL_START_HOUR) {
+      gutterHtml += '<span class="cal-time-label" style="top:'+top+'px">'+String(h).padStart(2,'0')+':00</span>';
+    }
+  }
+
+  // Day columns
+  let colsHtml = '';
+  days.forEach((d, idx) => {
+    let colCls = 'cal-day-col';
+    if (d.isToday) colCls += ' is-today';
+
+    // Hour grid lines
+    let linesHtml = '';
+    for (let h = CAL_START_HOUR; h <= CAL_END_HOUR; h++) {
+      const top = (h - CAL_START_HOUR) * HOUR_PX;
+      linesHtml += '<div class="cal-hour-line" style="top:'+top+'px"></div>';
+    }
+
+    // Events
+    let eventsHtml = '';
+    d.events.forEach(ev => {
+      const [eh, em] = (ev.time || '09:00').split(':').map(Number);
+      let endH, endM;
+      if (ev.endTime) {
+        [endH, endM] = ev.endTime.split(':').map(Number);
+      } else {
+        endH = eh + 1; endM = em;
+      }
+      const topPx = (eh - CAL_START_HOUR) * HOUR_PX + em;
+      const durationMin = (endH * 60 + endM) - (eh * 60 + em);
+      const heightPx = Math.max(durationMin, 15); // min 15px for visibility
+      const isDx = ev.source === 'daxiang';
+      const blockCls = 'cal-event-block ' + (isDx ? 'daxiang' : 'local');
+      const timeStr = (ev.time || '') + (ev.endTime ? ' - ' + ev.endTime : '');
+      const prefix = isDx ? '🐘 ' : '';
+      // Use string id safely
+      const evId = typeof ev.id === 'string' ? "'" + ev.id + "'" : ev.id;
+      const delBtn = isDx ? '' : '<span class="ev-del" onclick="event.stopPropagation();deleteEvent('+evId+')">✕</span>';
+      eventsHtml += '<div class="'+blockCls+'" style="top:'+topPx+'px;height:'+heightPx+'px" title="'+prefix+ev.title+'\n'+timeStr+(ev.location?'\n📍'+ev.location:'')+'">'+
+        '<span class="ev-title">'+prefix+ev.title+'</span>'+
+        (heightPx >= 30 ? '<span class="ev-time">'+timeStr+'</span>' : '')+
+        delBtn+
+        '</div>';
+    });
+
+    // Click-to-create on column (but not on event blocks)
+    colsHtml += '<div class="'+colCls+'" data-date="'+d.date+'" onclick="onCalColClick(event,\''+d.date+'\')">'+linesHtml+eventsHtml+'</div>';
+  });
+
+  timeline.innerHTML = '<div class="cal-time-gutter">'+gutterHtml+'</div>' + colsHtml;
+  timeline.style.minHeight = totalPx + 'px';
+
+  // ---- Now line ----
+  // Remove old now line
+  const oldLine = timeline.querySelector('.cal-now-line');
+  if (oldLine) oldLine.remove();
+
+  if (calWeekOffset === 0) {
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const startMin = CAL_START_HOUR * 60;
+    const endMin = CAL_END_HOUR * 60;
+    if (nowMinutes >= startMin && nowMinutes <= endMin) {
+      const nowTop = (nowMinutes - startMin);
+      const nowLine = document.createElement('div');
+      nowLine.className = 'cal-now-line';
+      nowLine.style.top = nowTop + 'px';
+      nowLine.style.left = '56px'; // after gutter
+      timeline.appendChild(nowLine);
+
+      // Auto-scroll to current time (center it in view)
+      if (scrollBox) {
+        const scrollTarget = Math.max(0, nowTop - scrollBox.clientHeight / 3);
+        scrollBox.scrollTop = scrollTarget;
+      }
+    }
+  } else {
+    // Scroll to 8am area for non-current weeks
+    if (scrollBox) {
+      scrollBox.scrollTop = (8 - CAL_START_HOUR) * HOUR_PX;
+    }
+  }
+}
+
+// Click on empty area in a day column → open modal with prefilled date + time
+function onCalColClick(evt, dateStr) {
+  // Don't trigger if clicking on an event block
+  if (evt.target.closest('.cal-event-block')) return;
+  const col = evt.currentTarget;
+  const rect = col.getBoundingClientRect();
+  const yOff = evt.clientY - rect.top + (col.closest('.cal-timeline-scroll')?.scrollTop || 0);
+  const CAL_START_HOUR = 6, HOUR_PX = 60;
+  const totalMin = (yOff / HOUR_PX) * 60 + CAL_START_HOUR * 60;
+  const clickH = Math.floor(totalMin / 60);
+  const clickM = Math.round((totalMin % 60) / 15) * 15; // snap to 15min
+  const hh = String(Math.min(Math.max(clickH, 6), 21)).padStart(2,'0');
+  const mm = String(clickM % 60).padStart(2,'0');
+  openCalModal(dateStr, hh + ':' + mm);
+}
+
+// ===== Today Date Display =====
+function setTodayDate() {
+  const now = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  const str = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 周' + days[now.getDay()];
+  const el = document.getElementById('todayDate');
+  if (el) el.textContent = str;
+}
+
+setTodayDate();
+init();
+initTodoLinkOptions();
+refreshOverview();
+</script>
+</body>
+</html>

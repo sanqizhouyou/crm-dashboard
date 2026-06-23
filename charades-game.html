@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你来比划我来猜</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        /* 设置页面 */
+        .setup-section {
+            margin-bottom: 20px;
+        }
+        .setup-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #444;
+            font-size: 1.1em;
+        }
+        .team-inputs {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .team-input {
+            flex: 1;
+        }
+        .team-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        .team-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .setting-row label {
+            font-size: 1em;
+            color: #555;
+            margin: 0;
+        }
+        .setting-row select, .setting-row input[type="number"] {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        /* 按钮 */
+        .btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            color: white;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(86, 171, 47, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+            color: white;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(235, 51, 73, 0.4);
+        }
+        .btn-skip {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #333;
+        }
+        .btn-skip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(247, 151, 30, 0.4);
+        }
+        .btn-small {
+            padding: 10px 25px;
+            font-size: 0.95em;
+        }
+        /* 游戏界面 */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .team-score {
+            text-align: center;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .team-score.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .team-score .team-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .team-score .score {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .timer {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+        }
+        .timer.warning {
+            color: #eb3349;
+            animation: pulse 0.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .word-display {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #333;
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 15px;
+            letter-spacing: 5px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .word-category {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .round-info {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        /* 结果页 */
+        .result-section {
+            padding: 20px;
+        }
+        .winner-announce {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        .final-scores {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+        }
+        .final-score-card {
+            padding: 20px 40px;
+            border-radius: 15px;
+            background: #f8f9fa;
+        }
+        .final-score-card.winner {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.1);
+        }
+        .final-score-card .team-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .final-score-card .score {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .hidden { display: none; }
+        /* 词库管理 */
+        .category-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        .category-tag {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        .category-tag.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .category-tag:hover {
+            border-color: #667eea;
+        }
+        .pass-count {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+        .ready-screen {
+            padding: 30px;
+        }
+        .ready-screen h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .ready-team {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 设置页面 -->
+        <div id="setupPage">
+            <h1>🎭 你来比划我来猜</h1>
+            <p class="subtitle">两组对战，看谁猜得多！</p>
+            
+            <div class="setup-section">
+                <label>队伍名称</label>
+                <div class="team-inputs">
+                    <div class="team-input">
+                        <input type="text" id="team1Name" placeholder="第1组名称" value="🔥 火焰队">
+                    </div>
+                    <div class="team-input">
+                        <input type="text" id="team2Name" placeholder="第2组名称" value="⚡ 闪电队">
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <div class="setting-row">
+                    <label>每轮时间：</label>
+                    <select id="roundTime">
+                        <option value="30">30秒</option>
+                        <option value="45">45秒</option>
+                        <option value="60" selected>60秒</option>
+                        <option value="90">90秒</option>
+                        <option value="120">120秒</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>总轮数：</label>
+                    <select id="totalRounds">
+                        <option value="2">2轮（每队1轮）</option>
+                        <option value="4" selected>4轮（每队2轮）</option>
+                        <option value="6">6轮（每队3轮）</option>
+                        <option value="8">8轮（每队4轮）</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <label>跳过次数限制：</label>
+                    <select id="skipLimit">
+                        <option value="2">2次</option>
+                        <option value="3" selected>3次</option>
+                        <option value="5">5次</option>
+                        <option value="99">不限</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <label>选择词库类别</label>
+                <div class="category-selector" id="categorySelector"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startGame()">🎬 开始游戏</button>
+        </div>
+
+        <!-- 准备页面 -->
+        <div id="readyPage" class="hidden">
+            <div class="ready-screen">
+                <h2>🎯 准备好了吗？</h2>
+                <div class="round-info" id="roundInfo"></div>
+                <div class="ready-team" id="readyTeam"></div>
+                <p style="color:#888; margin-bottom:30px;">请让比划的人面对屏幕，猜的人背对屏幕</p>
+                <button class="btn btn-primary" onclick="startRound()">👋 开始比划！</button>
+            </div>
+        </div>
+
+        <!-- 游戏页面 -->
+        <div id="gamePage" class="hidden">
+            <div class="game-header">
+                <div class="team-score" id="team1ScoreBox">
+                    <div class="team-name" id="team1Label"></div>
+                    <div class="score" id="team1Score">0</div>
+                </div>
+                <div>
+                    <div class="round-info" id="gameRoundInfo"></div>
+                    <div class="timer" id="timer">60</div>
+                    <div class="pass-count" id="passCount"></div>
+                </div>
+                <div class="team-score" id="team2ScoreBox">
+                    <div class="team-name" id="team2Label"></div>
+                    <div class="score" id="team2Score">0</div>
+                </div>
+            </div>
+
+            <div class="word-category" id="wordCategory"></div>
+            <div class="word-display" id="wordDisplay">准备...</div>
+
+            <div class="action-buttons">
+                <button class="btn btn-success btn-small" onclick="correctAnswer()">✅ 猜对了</button>
+                <button class="btn btn-skip btn-small" onclick="skipWord()">⏭️ 跳过</button>
+            </div>
+        </div>
+
+        <!-- 轮次结果页面 -->
+        <div id="roundResultPage" class="hidden">
+            <h2>⏰ 时间到！</h2>
+            <div id="roundResultContent"></div>
+            <button class="btn btn-primary" onclick="nextRound()" id="nextRoundBtn">➡️ 下一轮</button>
+        </div>
+
+        <!-- 最终结果页面 -->
+        <div id="resultPage" class="hidden">
+            <div class="result-section">
+                <h1>🏆 游戏结束！</h1>
+                <div class="winner-announce" id="winnerAnnounce"></div>
+                <div class="final-scores" id="finalScores"></div>
+                <button class="btn btn-primary" onclick="resetGame()">🔄 再来一局</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 词库
+        const wordBank = {
+            '动物': ['大象', '猴子', '企鹅', '袋鼠', '长颈鹿', '蜗牛', '螃蟹', '蝴蝶', '孔雀', '鹦鹉', 
+                    '恐龙', '蜘蛛', '海豚', '章鱼', '蚂蚁', '刺猬', '狐狸', '熊猫', '猫头鹰', '变色龙',
+                    '河马', '鳄鱼', '蜜蜂', '蝎子', '火烈鸟', '树懒', '水母', '海马', '鸵鸟', '蜻蜓'],
+            '动作': ['游泳', '跳绳', '弹吉他', '打篮球', '包饺子', '骑马', '滑雪', '拔河', '打太极', '扭秧歌',
+                    '举重', '射箭', '投篮', '翻跟头', '劈叉', '走钢丝', '冲浪', '攀岩', '蹦极', '跳伞',
+                    '划船', '甩鞭子', '抛媚眼', '挤牙膏', '拧瓶盖', '吹蜡烛', '剪头发', '擦玻璃', '拖地', '炒菜'],
+            '物品': ['冰箱', '吹风机', '雨伞', '高跟鞋', '口红', '方向盘', '遥控器', '灭火器', '剪刀', '望远镜',
+                    '听诊器', '手电筒', '订书机', '保温杯', '拖把', '电饭煲', '创可贴', '计算器', '指南针', '闹钟',
+                    '秋千', '摇椅', '话筒', '鼠标', '耳机', '钥匙', '打火机', '温度计', '风扇', '轮椅'],
+            '食物': ['火锅', '冰糖葫芦', '棉花糖', '爆米花', '臭豆腐', '糖醋排骨', '北京烤鸭', '汉堡包', '意大利面', '寿司',
+                    '奶茶', '甜甜圈', '煎饼果子', '小龙虾', '螺蛳粉', '拉面', '月饼', '粽子', '汤圆', '麻辣烫',
+                    '三明治', '披萨', '生鱼片', '冰淇淋', '果冻', '薯条', '鸡翅', '肉夹馍', '热干面', '酸辣粉'],
+            '职业': ['医生', '消防员', '模特', '魔术师', '厨师', '交警', '快递员', '理发师', '飞行员', '裁判',
+                    '木匠', '画家', 'DJ', '调酒师', '潜水员', '指挥家', '矿工', '空姐', '保安', '程序员',
+                    '农夫', '渔夫', '牙医', '催眠师', '驯兽师', '考古学家', '宇航员', '特工', '主持人', '摄影师'],
+            '影视': ['西游记', '葫芦娃', '灌篮高手', '名侦探柯南', '变形金刚', '蜡笔小新', '猫和老鼠', '功夫熊猫', '蜘蛛侠', '钢铁侠',
+                    '超人', '哪吒', '大话西游', '唐伯虎点秋香', '少林足球', '让子弹飞', '泰坦尼克号', '速度与激情', '复仇者联盟', '阿凡达',
+                    '冰雪奇缘', '疯狂动物城', '千与千寻', '龙猫', '黑客帝国', '侏罗纪公园', '加勒比海盗', '指环王', '哈利波特', '战狼'],
+            '成语': ['手舞足蹈', '狼吞虎咽', '鸡飞蛋打', '对牛弹琴', '画蛇添足', '井底之蛙', '守株待兔', '掩耳盗铃', '杯弓蛇影', '盲人摸象',
+                    '三头六臂', '抱头鼠窜', '狗急跳墙', '鹤立鸡群', '胸有成竹', '指鹿为马', '亡羊补牢', '刻舟求剑', '拔苗助长', '叶公好龙',
+                    '坐井观天', '纸上谈兵', '破釜沉舟', '卧薪尝胆', '一箭双雕', '龙飞凤舞', '虎头蛇尾', '九牛一毛', '狐假虎威', '画龙点睛', '战马奔腾'],
+            '明星': ['周杰伦', '成龙', '蔡徐坤', '姚明', '李小龙', '刘翔', '张学友', '周星驰', '赵本山', '黄渤',
+                    '沈腾', '范冰冰', '刘亦菲', '杨幂', '邓超', '王宝强', '谢娜', '郭德纲', '林俊杰', '易烊千玺']
+        };
+
+        // 游戏状态
+        let gameState = {
+            teams: ['', ''],
+            scores: [0, 0],
+            currentTeam: 0,
+            currentRound: 1,
+            totalRounds: 4,
+            roundTime: 60,
+            skipLimit: 3,
+            skipsUsed: 0,
+            timer: null,
+            timeLeft: 0,
+            currentWord: '',
+            usedWords: [],
+            selectedCategories: [],
+            roundCorrect: 0,
+            roundSkipped: 0,
+            wordPool: []
+        };
+
+        // 初始化类别选择器
+        function initCategorySelector() {
+            const selector = document.getElementById('categorySelector');
+            const categories = Object.keys(wordBank);
+            selector.innerHTML = categories.map(cat => 
+                `<div class="category-tag selected" onclick="toggleCategory(this, '${cat}')">${cat} (${wordBank[cat].length})</div>`
+            ).join('');
+            gameState.selectedCategories = [...categories];
+        }
+
+        function toggleCategory(el, category) {
+            el.classList.toggle('selected');
+            if (el.classList.contains('selected')) {
+                gameState.selectedCategories.push(category);
+            } else {
+                gameState.selectedCategories = gameState.selectedCategories.filter(c => c !== category);
+            }
+        }
+
+        // 开始游戏
+        function startGame() {
+            if (gameState.selectedCategories.length === 0) {
+                alert('请至少选择一个词库类别！');
+                return;
+            }
+
+            gameState.teams[0] = document.getElementById('team1Name').value || '第1组';
+            gameState.teams[1] = document.getElementById('team2Name').value || '第2组';
+            gameState.roundTime = parseInt(document.getElementById('roundTime').value);
+            gameState.totalRounds = parseInt(document.getElementById('totalRounds').value);
+            gameState.skipLimit = parseInt(document.getElementById('skipLimit').value);
+            gameState.scores = [0, 0];
+            gameState.currentRound = 1;
+            gameState.currentTeam = 0;
+            gameState.usedWords = [];
+
+            // 构建词池
+            gameState.wordPool = [];
+            gameState.selectedCategories.forEach(cat => {
+                wordBank[cat].forEach(word => {
+                    gameState.wordPool.push({ word, category: cat });
+                });
+            });
+            shuffleArray(gameState.wordPool);
+
+            showReadyPage();
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        function showReadyPage() {
+            hideAll();
+            document.getElementById('readyPage').classList.remove('hidden');
+            document.getElementById('roundInfo').textContent = `第 ${gameState.currentRound}/${gameState.totalRounds} 轮`;
+            document.getElementById('readyTeam').textContent = `${gameState.teams[gameState.currentTeam]} 准备！`;
+        }
+
+        function startRound() {
+            hideAll();
+            document.getElementById('gamePage').classList.remove('hidden');
+            
+            gameState.skipsUsed = 0;
+            gameState.roundCorrect = 0;
+            gameState.roundSkipped = 0;
+            gameState.timeLeft = gameState.roundTime;
+
+            // 更新UI
+            document.getElementById('team1Label').textContent = gameState.teams[0];
+            document.getElementById('team2Label').textContent = gameState.teams[1];
+            document.getElementById('team1Score').textContent = gameState.scores[0];
+            document.getElementById('team2Score').textContent = gameState.scores[1];
+            document.getElementById('gameRoundInfo').textContent = `第 ${gameState.currentRound}/${gameState.totalRounds} 轮`;
+            updatePassCount();
+
+            // 高亮当前队伍
+            document.getElementById('team1ScoreBox').classList.toggle('active', gameState.currentTeam === 0);
+            document.getElementById('team2ScoreBox').classList.toggle('active', gameState.currentTeam === 1);
+
+            nextWord();
+            startTimer();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerDisplay();
+                if (gameState.timeLeft <= 0) {
+                    endRound();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.getElementById('timer');
+            timerEl.textContent = gameState.timeLeft;
+            timerEl.classList.toggle('warning', gameState.timeLeft <= 10);
+        }
+
+        function updatePassCount() {
+            const remaining = gameState.skipLimit - gameState.skipsUsed;
+            document.getElementById('passCount').textContent = 
+                gameState.skipLimit >= 99 ? '跳过不限' : `剩余跳过: ${remaining}次`;
+        }
+
+        function nextWord() {
+            if (gameState.wordPool.length === 0) {
+                // 重新洗牌
+                gameState.selectedCategories.forEach(cat => {
+                    wordBank[cat].forEach(word => {
+                        gameState.wordPool.push({ word, category: cat });
+                    });
+                });
+                shuffleArray(gameState.wordPool);
+            }
+            
+            const item = gameState.wordPool.pop();
+            gameState.currentWord = item.word;
+            document.getElementById('wordDisplay').textContent = item.word;
+            document.getElementById('wordCategory').textContent = `【${item.category}】`;
+        }
+
+        function correctAnswer() {
+            gameState.scores[gameState.currentTeam]++;
+            gameState.roundCorrect++;
+            document.getElementById(`team${gameState.currentTeam + 1}Score`).textContent = gameState.scores[gameState.currentTeam];
+            
+            // 闪绿色反馈
+            const wordEl = document.getElementById('wordDisplay');
+            wordEl.style.background = 'linear-gradient(135deg, #56ab2f, #a8e063)';
+            wordEl.style.color = 'white';
+            setTimeout(() => {
+                wordEl.style.background = 'linear-gradient(135deg, #f5f7fa, #c3cfe2)';
+                wordEl.style.color = '#333';
+                nextWord();
+            }, 300);
+        }
+
+        function skipWord() {
+            if (gameState.skipsUsed >= gameState.skipLimit) {
+                alert('跳过次数已用完！');
+                return;
+            }
+            gameState.skipsUsed++;
+            gameState.roundSkipped++;
+            updatePassCount();
+
+            // 闪黄色反馈
+            const wordEl = document.getElementById('wordDisplay');
+            wordEl.style.background = 'linear-gradient(135deg, #f7971e, #ffd200)';
+            setTimeout(() => {
+                wordEl.style.background = 'linear-gradient(135deg, #f5f7fa, #c3cfe2)';
+                nextWord();
+            }, 300);
+        }
+
+        function endRound() {
+            clearInterval(gameState.timer);
+            hideAll();
+            document.getElementById('roundResultPage').classList.remove('hidden');
+
+            const content = document.getElementById('roundResultContent');
+            content.innerHTML = `
+                <div style="margin:20px 0;">
+                    <h3 style="color:#667eea;">${gameState.teams[gameState.currentTeam]}</h3>
+                    <p style="font-size:1.5em; margin:15px 0;">✅ 猜对 <strong>${gameState.roundCorrect}</strong> 个</p>
+                    <p style="color:#999;">跳过 ${gameState.roundSkipped} 个</p>
+                </div>
+                <div style="margin:20px 0; padding:15px; background:#f8f9fa; border-radius:10px;">
+                    <strong>当前比分</strong><br>
+                    ${gameState.teams[0]}: ${gameState.scores[0]} 分 &nbsp;|&nbsp; ${gameState.teams[1]}: ${gameState.scores[1]} 分
+                </div>
+            `;
+
+            if (gameState.currentRound >= gameState.totalRounds) {
+                document.getElementById('nextRoundBtn').textContent = '🏆 查看最终结果';
+            } else {
+                document.getElementById('nextRoundBtn').textContent = '➡️ 下一轮';
+            }
+        }
+
+        function nextRound() {
+            if (gameState.currentRound >= gameState.totalRounds) {
+                showResult();
+                return;
+            }
+            gameState.currentRound++;
+            gameState.currentTeam = (gameState.currentTeam + 1) % 2;
+            showReadyPage();
+        }
+
+        function showResult() {
+            hideAll();
+            document.getElementById('resultPage').classList.remove('hidden');
+
+            const winnerEl = document.getElementById('winnerAnnounce');
+            if (gameState.scores[0] > gameState.scores[1]) {
+                winnerEl.textContent = `🎉 ${gameState.teams[0]} 获胜！`;
+            } else if (gameState.scores[1] > gameState.scores[0]) {
+                winnerEl.textContent = `🎉 ${gameState.teams[1]} 获胜！`;
+            } else {
+                winnerEl.textContent = '🤝 平局！势均力敌！';
+            }
+
+            const scoresEl = document.getElementById('finalScores');
+            scoresEl.innerHTML = `
+                <div class="final-score-card ${gameState.scores[0] >= gameState.scores[1] ? 'winner' : ''}">
+                    <div class="team-name">${gameState.teams[0]}</div>
+                    <div class="score">${gameState.scores[0]}</div>
+                </div>
+                <div class="final-score-card ${gameState.scores[1] >= gameState.scores[0] ? 'winner' : ''}">
+                    <div class="team-name">${gameState.teams[1]}</div>
+                    <div class="score">${gameState.scores[1]}</div>
+                </div>
+            `;
+        }
+
+        function resetGame() {
+            hideAll();
+            document.getElementById('setupPage').classList.remove('hidden');
+        }
+
+        function hideAll() {
+            document.getElementById('setupPage').classList.add('hidden');
+            document.getElementById('readyPage').classList.add('hidden');
+            document.getElementById('gamePage').classList.add('hidden');
+            document.getElementById('roundResultPage').classList.add('hidden');
+            document.getElementById('resultPage').classList.add('hidden');
+        }
+
+        // 初始化
+        initCategorySelector();
+    </script>
+</body>
+</html>
