@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quotetool-v8';
+const CACHE_NAME = 'quotetool-v9';
 const URLS_TO_CACHE = [
   './quote-tool.html',
   './icon-192.png',
