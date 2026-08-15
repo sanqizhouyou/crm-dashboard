@@ -353,6 +353,230 @@ body {
   font-size: 22px; color: #999; cursor: pointer; line-height: 1;
 }
 .reward-close:hover { color: #333; }
+
+/* ===== 友商成本对比 ===== */
+.compare-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #0f3460, #16213e);
+  color: #7ab3ef;
+  border: 1px solid #1e4a7a;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(15,52,96,0.3);
+}
+.compare-btn:hover {
+  background: linear-gradient(135deg, #1e4a7a, #0f3460);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(15,52,96,0.4);
+}
+.compare-btn .icon { font-size: 18px; }
+
+.compare-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 9990;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 30px 16px;
+}
+.compare-overlay.show { display: flex; }
+.compare-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 1100px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 60px);
+  overflow: hidden;
+}
+.compare-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+.compare-header h2 {
+  font-size: 17px;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+.compare-close {
+  width: 34px; height: 34px;
+  border: none; background: #f0f0f0;
+  border-radius: 50%; cursor: pointer;
+  font-size: 20px; color: #666;
+  display: flex; align-items: center; justify-content: center;
+}
+.compare-close:hover { background: #e0e0e0; }
+.compare-body {
+  overflow-y: auto;
+  padding: 20px 24px;
+  flex: 1;
+}
+.compare-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.compare-col {
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 16px;
+}
+.compare-col-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid;
+}
+.col-youfang .compare-col-title { color: #e65100; border-color: #ffe0b2; }
+.col-meituan .compare-col-title { color: #1565c0; border-color: #bbdefb; }
+.cf-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+.cf-row label {
+  font-size: 12px;
+  color: #555;
+  min-width: 130px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.cf-row input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  min-width: 0;
+}
+.cf-row input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25,118,210,0.1);
+}
+.cf-unit {
+  font-size: 11px;
+  color: #999;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+.cf-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  margin: 14px 0 8px;
+  padding-left: 4px;
+  border-left: 3px solid #ccc;
+  padding-bottom: 0;
+}
+.cf-disabled input {
+  background: #f5f5f5;
+  color: #999;
+}
+.col-meituan .cf-disabled input::placeholder { color: #bbb; }
+
+.compare-actions {
+  text-align: center;
+  margin: 20px 0;
+}
+.compare-calc-btn {
+  padding: 10px 40px;
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 2px;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(13,71,161,0.3);
+}
+.compare-calc-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(13,71,161,0.4);
+}
+
+/* 结果表格 */
+.compare-result { display: none; margin-top: 24px; }
+.compare-result.show { display: block; }
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.cmp-table th, .cmp-table td {
+  padding: 10px 12px;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+.cmp-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+.cmp-table .row-header {
+  text-align: left;
+  font-weight: 600;
+  background: #fafafa;
+  color: #444;
+  min-width: 140px;
+}
+.cmp-table td.col-youfang { color: #e65100; }
+.cmp-table td.col-meituan { color: #1565c0; }
+.cmp-table tr.total-row td {
+  font-weight: 700;
+  font-size: 14px;
+  background: #f0f7ff;
+}
+.cmp-table .saving { color: #2e7d32; font-weight: 700; }
+.cmp-table .worse { color: #c62828; font-weight: 700; }
+.cmp-summary {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  text-align: center;
+}
+.cmp-summary .big {
+  font-size: 24px;
+  font-weight: 700;
+  color: #166534;
+  margin: 4px 0;
+}
+.cmp-summary .desc {
+  font-size: 13px;
+  color: #555;
+}
+.cmp-summary .desc-worse {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.cmp-summary .desc-worse .big { color: #991b1b; }
 </style>
 </head>
 <body>
@@ -393,12 +617,17 @@ body {
   <!-- 功能更新记录 -->
   <div class="changelog">
     <div class="changelog-title">📋 功能更新记录</div>
-    <div class="changelog-list">
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.03</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">硬件产品图片优化：选择硬件后，图片自动附加在报价方案末尾（不再仅悬停预览）</span>
-      </div>
+  <div class="changelog-list">
+    <div class="changelog-item">
+      <span class="changelog-date">2026.08-15</span>
+      <span class="changelog-tag tag-new">NEW</span>
+      <span class="changelog-text">新增「友商成本对比」功能：输入友商各项年费/费率，一键对比美团vs友商年度综合成本，输出逐项对比表格和节省金额</span>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-date">2026.08.03</span>
+      <span class="changelog-tag tag-feat">FEAT</span>
+      <span class="changelog-text">硬件产品图片优化：选择硬件后，图片自动附加在报价方案末尾（不再仅悬停预览）</span>
+    </div>
       <div class="changelog-item">
         <span class="changelog-date">2026.08.03</span>
         <span class="changelog-tag tag-new">NEW</span>
@@ -490,6 +719,13 @@ body {
         <span class="changelog-text">新增「可编辑模式」，报价单生成后支持自由编辑内容</span>
       </div>
     </div>
+  </div>
+
+  <!-- 友商成本对比入口 -->
+  <div style="text-align:center;">
+    <button class="compare-btn" onclick="openCompareModal()">
+      <span class="icon">⚖️</span> 友商成本对比
+    </button>
   </div>
 
   <div class="cards">
@@ -787,6 +1023,274 @@ window.addEventListener('load', () => {
   });
 })();
 </script>
-<!-- ===== /产品功能清单 ===== -->
+
+<!-- ===== 友商成本对比模态框 ===== -->
+<div class="compare-overlay" id="compareOverlay" onclick="if(event.target===this)closeCompareModal()">
+  <div class="compare-modal">
+    <div class="compare-header">
+      <h2>⚖️ 友商成本对比分析</h2>
+      <button class="compare-close" onclick="closeCompareModal()">×</button>
+    </div>
+    <div class="compare-body">
+      <div class="compare-inputs">
+        <!-- 友商输入 -->
+        <div class="compare-col col-youfang">
+          <div class="compare-col-title">🔶 竞品友商</div>
+          <div class="cf-row">
+            <label>友商名称</label>
+            <input type="text" id="yfName" placeholder="如：客如云" style="flex:1">
+          </div>
+          <div class="cf-section-title">系统年费（元/店/年）</div>
+          <div class="cf-row">
+            <label>POS系统</label>
+            <input type="number" id="yfPos" placeholder="0">
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-row">
+            <label>供应链系统</label>
+            <input type="number" id="yfSupply" placeholder="0">
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-row">
+            <label>督导系统</label>
+            <input type="number" id="yfSuper" placeholder="0">
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-row">
+            <label>外卖管理系统</label>
+            <input type="number" id="yfWaimai" placeholder="0">
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-section-title">费率类</div>
+          <div class="cf-row">
+            <label>支付费率</label>
+            <input type="number" id="yfPayRate" step="0.01" placeholder="如：0.6">
+            <span class="cf-unit">%</span>
+          </div>
+          <div class="cf-row">
+            <label>外卖接单手续费</label>
+            <input type="number" id="yfOrderFee" step="0.01" placeholder="如：0.5">
+            <span class="cf-unit">分/单</span>
+          </div>
+          <div class="cf-row">
+            <label>订货手续费</label>
+            <input type="number" id="yfOrderSupplyRate" step="0.01" placeholder="如：0.3">
+            <span class="cf-unit">%</span>
+          </div>
+          <div class="cf-row">
+            <label>分账手续费</label>
+            <input type="number" id="yfSplitFee" step="0.01" placeholder="如：0.1">
+            <span class="cf-unit">元/笔</span>
+          </div>
+          <div class="cf-row">
+            <label>管理费提点</label>
+            <input type="number" id="yfMgmtRate" step="0.01" placeholder="如：0.5">
+            <span class="cf-unit">%</span>
+          </div>
+        </div>
+
+        <!-- 美团输入 -->
+        <div class="compare-col col-meituan">
+          <div class="compare-col-title">🔷 美团餐饮SaaS</div>
+          <div class="cf-row cf-disabled">
+            <label>POS系统</label>
+            <input type="text" value="免费" disabled>
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-row cf-disabled">
+            <label>供应链系统</label>
+            <input type="text" value="免费" disabled>
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-row cf-disabled">
+            <label>督导系统</label>
+            <input type="text" value="免费" disabled>
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-row cf-disabled">
+            <label>外卖管理系统</label>
+            <input type="text" value="免费" disabled>
+            <span class="cf-unit">元</span>
+          </div>
+          <div class="cf-section-title">费率类</div>
+          <div class="cf-row">
+            <label>支付费率</label>
+            <input type="number" id="mtPayRate" step="0.01" placeholder="如：0.38">
+            <span class="cf-unit">%</span>
+          </div>
+          <div class="cf-row cf-disabled">
+            <label>外卖接单手续费</label>
+            <input type="text" value="0" disabled>
+            <span class="cf-unit">分/单</span>
+          </div>
+          <div class="cf-row cf-disabled">
+            <label>订货手续费</label>
+            <input type="text" value="0" disabled>
+            <span class="cf-unit">%</span>
+          </div>
+          <div class="cf-row cf-disabled">
+            <label>分账手续费</label>
+            <input type="text" value="0" disabled>
+            <span class="cf-unit">元/笔</span>
+          </div>
+          <div class="cf-row cf-disabled">
+            <label>管理费提点</label>
+            <input type="text" value="0" disabled>
+            <span class="cf-unit">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 公共参数 -->
+      <div class="cf-section-title">📊 公共参数</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:20px;">
+        <div class="cf-row">
+          <label>门店数量</label>
+          <input type="number" id="cpStore" placeholder="如：50">
+          <span class="cf-unit">家</span>
+        </div>
+        <div class="cf-row">
+          <label>交易金额</label>
+          <input type="number" id="cpTrade" placeholder="如：50000">
+          <span class="cf-unit">元/店/月</span>
+        </div>
+        <div class="cf-row">
+          <label>外卖订单量</label>
+          <input type="number" id="cpOrderQty" placeholder="如：1000">
+          <span class="cf-unit">单/店/月</span>
+        </div>
+        <div class="cf-row">
+          <label>订货金额</label>
+          <input type="number" id="cpSupplyAmt" placeholder="如：30000">
+          <span class="cf-unit">元/店/月</span>
+        </div>
+      </div>
+
+      <div class="compare-actions">
+        <button class="compare-calc-btn" onclick="calcCompare()">计 算 对 比</button>
+      </div>
+
+      <!-- 结果区域 -->
+      <div class="compare-result" id="compareResult">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th class="row-header">费用项目</th>
+              <th id="thYoufang">友商</th>
+              <th>美团</th>
+              <th>差额（友商-美团）</th>
+            </tr>
+          </thead>
+          <tbody id="cmpTableBody"></tbody>
+        </table>
+        <div class="cmp-summary" id="cmpSummary"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openCompareModal() {
+  document.getElementById('compareOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeCompareModal() {
+  document.getElementById('compareOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function getVal(id) {
+  var v = document.getElementById(id).value;
+  return parseFloat(v) || 0;
+}
+
+function fmtMoney(n) {
+  return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function calcCompare() {
+  var storeCount = getVal('cpStore');
+  var tradeAmt = getVal('cpTrade');
+  var orderQty = getVal('cpOrderQty');
+  var supplyAmt = getVal('cpSupplyAmt');
+
+  // 友商计算
+  var yfPos = getVal('yfPos') * storeCount;
+  var yfSupply = getVal('yfSupply') * storeCount;
+  var yfSuper = getVal('yfSuper') * storeCount;
+  var yfWaimai = getVal('yfWaimai') * storeCount;
+  var yfPayFee = (getVal('yfPayRate') / 100) * tradeAmt * 12 * storeCount;
+  var yfOrderFee = (getVal('yfOrderFee') / 100) * orderQty * 12 * storeCount;
+  var yfSupplyFee = (getVal('yfOrderSupplyRate') / 100) * supplyAmt * 12 * storeCount;
+  var yfSplitFee = getVal('yfSplitFee') * (getVal('yfMgmtRate') / 100) * tradeAmt * 12 * storeCount;
+  var yfTotal = yfPos + yfSupply + yfSuper + yfWaimai + yfPayFee + yfOrderFee + yfSupplyFee + yfSplitFee;
+
+  // 美团计算
+  var mtPayFee = (getVal('mtPayRate') / 100) * tradeAmt * 12 * storeCount;
+  var mtTotal = mtPayFee; // 其余均为0
+
+  var yfName = document.getElementById('yfName').value || '友商';
+  document.getElementById('thYoufang').textContent = yfName;
+
+  var rows = [
+    { name: 'POS系统年费', yf: yfPos, mt: 0 },
+    { name: '供应链系统年费', yf: yfSupply, mt: 0 },
+    { name: '督导系统年费', yf: yfSuper, mt: 0 },
+    { name: '外卖管理系统年费', yf: yfWaimai, mt: 0 },
+    { name: '支付手续费', yf: yfPayFee, mt: mtPayFee },
+    { name: '外卖接单手续费', yf: yfOrderFee, mt: 0 },
+    { name: '订货手续费', yf: yfSupplyFee, mt: 0 },
+    { name: '分账管理费', yf: yfSplitFee, mt: 0 },
+  ];
+
+  var html = '';
+  rows.forEach(function(r) {
+    var diff = r.yf - r.mt;
+    var diffClass = diff > 0 ? 'saving' : (diff < 0 ? 'worse' : '');
+    var diffSign = diff > 0 ? '+' : '';
+    html += '<tr>';
+    html += '<td class="row-header">' + r.name + '</td>';
+    html += '<td class="col-youfang">¥' + fmtMoney(r.yf) + '</td>';
+    html += '<td class="col-meituan">¥' + fmtMoney(r.mt) + '</td>';
+    html += '<td class="' + diffClass + '">' + diffSign + '¥' + fmtMoney(Math.abs(diff)) + '</td>';
+    html += '</tr>';
+  });
+
+  // 合计行
+  var totalDiff = yfTotal - mtTotal;
+  var totalDiffClass = totalDiff > 0 ? 'saving' : (totalDiff < 0 ? 'worse' : '');
+  html += '<tr class="total-row">';
+  html += '<td class="row-header">合计年费</td>';
+  html += '<td class="col-youfang">¥' + fmtMoney(yfTotal) + '</td>';
+  html += '<td class="col-meituan">¥' + fmtMoney(mtTotal) + '</td>';
+  html += '<td class="' + totalDiffClass + '">' + (totalDiff > 0 ? '+' : '') + '¥' + fmtMoney(Math.abs(totalDiff)) + '</td>';
+  html += '</tr>';
+
+  document.getElementById('cmpTableBody').innerHTML = html;
+
+  // 总结
+  var summaryEl = document.getElementById('cmpSummary');
+  if (totalDiff > 0) {
+    var savePct = yfTotal > 0 ? (totalDiff / yfTotal * 100).toFixed(1) : 0;
+    summaryEl.className = 'cmp-summary';
+    summaryEl.innerHTML = '<div class="desc">选择美团，每年可节省</div><div class="big">¥' + fmtMoney(totalDiff) + '</div><div class="desc">比' + yfName + '低 ' + savePct + '%</div>';
+  } else if (totalDiff < 0) {
+    summaryEl.className = 'cmp-summary desc-worse';
+    summaryEl.innerHTML = '<div class="desc">美团年费高于' + yfName + '</div><div class="big">¥' + fmtMoney(Math.abs(totalDiff)) + '</div><div class="desc">需关注差异化价值</div>';
+  } else {
+    summaryEl.className = 'cmp-summary';
+    summaryEl.innerHTML = '<div class="desc">两者年费持平</div>';
+  }
+
+  document.getElementById('compareResult').classList.add('show');
+}
+
+// ESC关闭对比模态框
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeCompareModal();
+});
+</script>
+<!-- ===== /友商成本对比 ===== -->
+
 </body>
 </html>
