@@ -1082,11 +1082,6 @@ window.addEventListener('load', () => {
             <input type="number" id="yfSplitFee" step="0.01" placeholder="如：0.1">
             <span class="cf-unit">元/笔</span>
           </div>
-          <div class="cf-row">
-            <label>管理费提点</label>
-            <input type="number" id="yfMgmtRate" step="0.01" placeholder="如：0.5">
-            <span class="cf-unit">%</span>
-          </div>
         </div>
 
         <!-- 美团输入 -->
@@ -1137,11 +1132,7 @@ window.addEventListener('load', () => {
             <input type="text" value="0" disabled>
             <span class="cf-unit">元/笔</span>
           </div>
-          <div class="cf-row cf-disabled">
-            <label>管理费提点</label>
-            <input type="text" value="0" disabled>
-            <span class="cf-unit">%</span>
-          </div>
+
         </div>
       </div>
 
@@ -1167,6 +1158,11 @@ window.addEventListener('load', () => {
           <label>订货金额</label>
           <input type="number" id="cpSupplyAmt" placeholder="如：30000">
           <span class="cf-unit">元/店/月</span>
+        </div>
+        <div class="cf-row">
+          <label>管理费提点</label>
+          <input type="number" id="cpMgmtRate" step="0.01" placeholder="如：0.5">
+          <span class="cf-unit">%</span>
         </div>
       </div>
 
@@ -1226,7 +1222,7 @@ function calcCompare() {
   var yfPayFee = (getVal('yfPayRate') / 100) * tradeAmt * 12 * storeCount;
   var yfOrderFee = (getVal('yfOrderFee') / 100) * orderQty * 12 * storeCount;
   var yfSupplyFee = (getVal('yfOrderSupplyRate') / 100) * supplyAmt * 12 * storeCount;
-  var yfSplitFee = getVal('yfSplitFee') * (getVal('yfMgmtRate') / 100) * tradeAmt * 12 * storeCount;
+  var yfSplitFee = getVal('yfSplitFee') * (getVal('cpMgmtRate') / 100) * tradeAmt * 12 * storeCount;
   var yfTotal = yfPos + yfSupply + yfSuper + yfWaimai + yfPayFee + yfOrderFee + yfSupplyFee + yfSplitFee;
 
   // 美团计算
