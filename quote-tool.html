@@ -1038,7 +1038,7 @@ window.addEventListener('load', () => {
           <div class="compare-col-title">🔶 竞品友商</div>
           <div class="cf-row">
             <label>友商名称</label>
-            <input type="text" id="yfName" placeholder="如：客如云" style="flex:1">
+            <input type="text" id="yfName" placeholder="如：A（用字母代号）" style="flex:1">
           </div>
           <div class="cf-section-title">系统年费（元/店/年）</div>
           <div class="cf-row">
@@ -1092,24 +1092,28 @@ window.addEventListener('load', () => {
         <!-- 美团输入 -->
         <div class="compare-col col-meituan">
           <div class="compare-col-title">🔷 美团餐饮SaaS</div>
-          <div class="cf-row cf-disabled">
+          <div class="cf-row">
             <label>POS系统</label>
-            <input type="text" value="免费" disabled>
+            <input type="number" id="mtPos" placeholder="0">
+            <span class="cf-unit">元</span>
             <span class="cf-unit">元</span>
           </div>
-          <div class="cf-row cf-disabled">
+          <div class="cf-row">
             <label>供应链系统</label>
-            <input type="text" value="免费" disabled>
+            <input type="number" id="mtSupply" placeholder="0">
+            <span class="cf-unit">元</span>
             <span class="cf-unit">元</span>
           </div>
-          <div class="cf-row cf-disabled">
+          <div class="cf-row">
             <label>督导系统</label>
-            <input type="text" value="免费" disabled>
+            <input type="number" id="mtSuper" placeholder="0">
+            <span class="cf-unit">元</span>
             <span class="cf-unit">元</span>
           </div>
-          <div class="cf-row cf-disabled">
+          <div class="cf-row">
             <label>外卖管理系统</label>
-            <input type="text" value="免费" disabled>
+            <input type="number" id="mtWaimai" placeholder="0">
+            <span class="cf-unit">元</span>
             <span class="cf-unit">元</span>
           </div>
           <div class="cf-section-title">费率类</div>
@@ -1226,17 +1230,21 @@ function calcCompare() {
   var yfTotal = yfPos + yfSupply + yfSuper + yfWaimai + yfPayFee + yfOrderFee + yfSupplyFee + yfSplitFee;
 
   // 美团计算
+  var mtPos = getVal('mtPos') * storeCount;
+  var mtSupply = getVal('mtSupply') * storeCount;
+  var mtSuper = getVal('mtSuper') * storeCount;
+  var mtWaimai = getVal('mtWaimai') * storeCount;
   var mtPayFee = (getVal('mtPayRate') / 100) * tradeAmt * 12 * storeCount;
-  var mtTotal = mtPayFee; // 其余均为0
+  var mtTotal = mtPos + mtSupply + mtSuper + mtWaimai + mtPayFee;
 
   var yfName = document.getElementById('yfName').value || '友商';
   document.getElementById('thYoufang').textContent = yfName;
 
   var rows = [
-    { name: 'POS系统年费', yf: yfPos, mt: 0 },
-    { name: '供应链系统年费', yf: yfSupply, mt: 0 },
-    { name: '督导系统年费', yf: yfSuper, mt: 0 },
-    { name: '外卖管理系统年费', yf: yfWaimai, mt: 0 },
+    { name: 'POS系统年费', yf: yfPos, mt: mtPos },
+    { name: '供应链系统年费', yf: yfSupply, mt: mtSupply },
+    { name: '督导系统年费', yf: yfSuper, mt: mtSuper },
+    { name: '外卖管理系统年费', yf: yfWaimai, mt: mtWaimai },
     { name: '支付手续费', yf: yfPayFee, mt: mtPayFee },
     { name: '外卖接单手续费', yf: yfOrderFee, mt: 0 },
     { name: '订货手续费', yf: yfSupplyFee, mt: 0 },
