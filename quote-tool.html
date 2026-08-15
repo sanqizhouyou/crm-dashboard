@@ -1172,7 +1172,10 @@ window.addEventListener('load', () => {
 
       <!-- 结果区域 -->
       <div class="compare-result" id="compareResult">
-        <table class="cmp-table">
+        <div style="text-align:right;margin-bottom:12px;">
+          <button onclick="exportCompareImage()" style="padding:6px 16px;background:#fff;border:1px solid #1565c0;color:#1565c0;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;">📷 导出图片</button>
+        </div>
+        <table class="cmp-table" id="cmpTable">
           <thead>
             <tr>
               <th class="row-header">费用项目</th>
@@ -1287,6 +1290,187 @@ function calcCompare() {
   }
 
   document.getElementById('compareResult').classList.add('show');
+}
+
+function exportCompareImage() {
+  var resultEl = document.getElementById('compareResult');
+  if (!resultEl.classList.contains('show')) { alert('请先点击“计算对比”'); return; }
+  
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var scale = 2;
+  var pad = 24;
+  var colW = [180, 170, 170, 170];
+  var rowH = 42;
+  var tableW = colW.reduce(function(a,b){return a+b;}, 0);
+  var w = tableW + pad * 2;
+  
+  // Read table data
+  var rows = [];
+  var tbody = document.getElementById('cmpTableBody');
+  var trs = tbody.querySelectorAll('tr');
+  trs.forEach(function(tr) {
+    var tds = tr.querySelectorAll('td');
+    var cells = [];
+    tds.forEach(function(td) { cells.push(td.textContent); });
+    rows.push({ cells: cells, isTotal: tr.classList.contains('total-row') });
+  });
+  
+  // Read summary
+  var summaryEl = document.getElementById('cmpSummary');
+  var summaryText = summaryEl.innerText;
+  var summaryIsWorse = summaryEl.classList.contains('desc-worse');
+  
+  // Calculate height
+  var titleH = 56;
+  var headerH = rowH;
+  var tableH = rows.length * rowH;
+  var gap = 20;
+  var summaryH = summaryText ? 80 : 0;
+  var h = titleH + headerH + tableH + gap + summaryH + pad * 2;
+  
+  canvas.width = w * scale;
+  canvas.height = h * scale;
+  ctx.scale(scale, scale);
+  
+  // Background
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, w, h);
+  
+  // Title
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = 'bold 18px "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('友商成本对比分析', w/2, pad + 28);
+  
+  // Table start Y
+  var y = pad + titleH;
+  var x = pad;
+  
+  // Header
+  var headers = ['费用项目', document.getElementById('thYoufang').textContent, '美团', '差额'];
+  ctx.fillStyle = '#f8f9fa';
+  ctx.fillRect(x, y, tableW, rowH);
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, tableW, rowH);
+  ctx.fillStyle = '#333';
+  ctx.font = 'bold 13px "Noto Sans SC", "PingFang SC", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  var cx = x;
+  headers.forEach(function(h, i) {
+    ctx.fillText(h, cx + colW[i]/2, y + rowH/2);
+    cx += colW[i];
+  });
+  // Header bottom border
+  ctx.beginPath();
+  ctx.moveTo(x, y + rowH);
+  ctx.lineTo(x + tableW, y + rowH);
+  ctx.strokeStyle = '#d0d0d0';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  y += rowH;
+  
+  // Rows
+  rows.forEach(function(row, ri) {
+    var isTotal = row.isTotal;
+    if (isTotal) {
+      ctx.fillStyle = '#f0f7ff';
+      ctx.fillRect(x, y, tableW, rowH);
+    }
+    // Row border
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, tableW, rowH);
+    
+    ctx.font = isTotal ? 'bold 13px sans-serif' : '13px sans-serif';
+    ctx.textBaseline = 'middle';
+    var cx = x;
+    row.cells.forEach(function(cell, ci) {
+      ctx.textAlign = ci === 0 ? 'left' : 'center';
+      var tx = ci === 0 ? cx + 10 : cx + colW[ci]/2;
+      
+      // Color
+      if (ci === 1) ctx.fillStyle = '#e65100';
+      else if (ci === 2) ctx.fillStyle = '#1565c0';
+      else if (ci === 3 && cell.startsWith('+')) ctx.fillStyle = '#2e7d32';
+      else if (ci === 3 && cell.startsWith('-')) ctx.fillStyle = '#c62828';
+      else ctx.fillStyle = '#333';
+      
+      ctx.fillText(cell, tx, y + rowH/2);
+      
+      // Vertical line
+      if (ci < 3) {
+        ctx.beginPath();
+        ctx.moveTo(cx + colW[ci], y);
+        ctx.lineTo(cx + colW[ci], y + rowH);
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      cx += colW[ci];
+    });
+    y += rowH;
+  });
+  
+  // Summary
+  if (summaryText) {
+    y += gap;
+    var summaryW = tableW;
+    var summaryX = x;
+    ctx.fillStyle = summaryIsWorse ? '#fef2f2' : '#f0fdf4';
+    ctx.strokeStyle = summaryIsWorse ? '#fecaca' : '#bbf7d0';
+    ctx.lineWidth = 1;
+    roundRect(ctx, summaryX, y, summaryW, summaryH, 8);
+    ctx.fill();
+    ctx.stroke();
+    
+    ctx.fillStyle = summaryIsWorse ? '#991b1b' : '#166534';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Parse summary lines
+    var lines = summaryText.split('\n').filter(function(l){return l.trim();});
+    if (lines.length >= 2) {
+      ctx.font = '13px sans-serif';
+      ctx.fillStyle = '#555';
+      ctx.fillText(lines[0], summaryX + summaryW/2, y + 24);
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillStyle = summaryIsWorse ? '#991b1b' : '#166534';
+      ctx.fillText(lines[1], summaryX + summaryW/2, y + 50);
+      if (lines[2]) {
+        ctx.font = '12px sans-serif';
+        ctx.fillStyle = '#777';
+        ctx.fillText(lines[2], summaryX + summaryW/2, y + 72);
+      }
+    } else {
+      ctx.fillText(summaryText, summaryX + summaryW/2, y + summaryH/2);
+    }
+  }
+  
+  // Download
+  var link = document.createElement('a');
+  var yfName = document.getElementById('yfName').value || '友商';
+  link.download = '友商成本对比_' + yfName + '_' + new Date().toISOString().slice(0,10) + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 // ESC关闭对比模态框
