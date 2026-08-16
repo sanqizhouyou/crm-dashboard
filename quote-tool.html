@@ -15,18 +15,97 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: #0d1117;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: #0A0A0A;
   min-height: 100vh;
+  color: #e0e0e0;
+}
+
+/* ===== 顶部导航栏 ===== */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  background: rgba(10,10,10,0.95);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+.nav-logo {
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFC53D;
+  letter-spacing: 1px;
+}
+.nav-menu {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+.nav-item {
+  font-size: 14px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px 0;
+  position: relative;
+  transition: color 0.2s;
+}
+.nav-item:hover { color: #ccc; }
+.nav-item.active {
+  color: #FFC53D;
+  font-weight: 600;
+}
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #FFC53D;
+  border-radius: 1px;
+}
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFC53D, #F5A623);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
 }
-/* Loading 动画 */
+.nav-name { font-size: 13px; color: #ccc; }
+.nav-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #666;
+}
+.nav-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52C41A;
+}
+
+/* ===== Loading 动画 ===== */
 #appLoading {
   position: fixed;
   inset: 0;
-  background: #0d1117;
+  background: #0A0A0A;
   z-index: 99999;
   display: flex;
   flex-direction: column;
@@ -41,26 +120,26 @@ body {
 .loader-logo {
   width: 64px;
   height: 64px;
-  background: #ffd000;
+  background: #FFC53D;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36px;
   font-weight: 900;
-  color: #222;
+  color: #000;
   margin-bottom: 24px;
   animation: pulse 1.5s ease-in-out infinite;
-  box-shadow: 0 0 40px rgba(255,208,0,0.3);
+  box-shadow: 0 0 40px rgba(255,197,61,0.3);
 }
 @keyframes pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(255,208,0,0.3); }
-  50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(255,208,0,0.5); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(255,197,61,0.3); }
+  50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(255,197,61,0.5); }
 }
 .loader-bar-wrap {
   width: 180px;
   height: 3px;
-  background: #1e2530;
+  background: #1a1a1a;
   border-radius: 3px;
   overflow: hidden;
   margin-bottom: 16px;
@@ -68,7 +147,7 @@ body {
 .loader-bar {
   width: 30%;
   height: 100%;
-  background: linear-gradient(90deg, #ffd000, #ffaa00);
+  background: linear-gradient(90deg, #FFC53D, #F5A623);
   border-radius: 3px;
   animation: loading-slide 1.2s ease-in-out infinite;
 }
@@ -79,151 +158,368 @@ body {
 }
 .loader-text {
   font-size: 13px;
-  color: #5a5a7a;
+  color: #555;
   letter-spacing: 1px;
+}
+
+/* ===== 主体布局 ===== */
+#main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
 }
 #selector {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
+  gap: 20px;
   align-items: start;
-  padding: 40px 48px;
-  max-width: 1100px;
-  width: 100%;
 }
-.sel-left, .sel-right { display: flex; flex-direction: column; gap: 18px; }
-.logo-area {
-  text-align: center;
-}
-.logo-m {
-  width: 72px;
-  height: 72px;
-  background: #ffd000;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  font-weight: 900;
-  color: #222;
-  margin-bottom: 20px;
-  box-shadow: 0 0 40px rgba(255,208,0,0.3);
-}
-.title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 2px;
-}
-.subtitle {
-  font-size: 14px;
-  color: #7a7a9a;
-  margin-top: 8px;
-  letter-spacing: 1px;
-}
-.cards {
-  display: flex;
-  gap: 32px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.card {
-  width: 280px;
-  background: #161b24;
-  border: 1px solid #2a2a3a;
+
+/* ===== Hero 卡片 ===== */
+.hero-card {
+  background: linear-gradient(135deg, #141414 0%, #1A1A1A 50%, #111111 100%);
+  border: 1px solid rgba(255,197,61,0.1);
   border-radius: 16px;
-  padding: 36px 28px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-align: center;
+  padding: 32px 28px;
   position: relative;
   overflow: hidden;
 }
-.card:hover {
-  border-color: #ffd000;
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(255,208,0,0.15);
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,197,61,0.08) 0%, transparent 70%);
+  border-radius: 50%;
 }
-.card-badge {
+.hero-logo {
+  width: 48px;
+  height: 48px;
+  background: #FFC53D;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000;
+  margin-bottom: 16px;
+  box-shadow: 0 0 30px rgba(255,197,61,0.25);
+  position: relative;
+  z-index: 1;
+}
+.hero-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #FFC53D;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+.hero-sub {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+.htag {
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #aaa;
+}
+.htag.hot {
+  background: rgba(255,197,61,0.1);
+  border-color: rgba(255,197,61,0.25);
+  color: #FFC53D;
+}
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  z-index: 1;
+}
+.hs-num {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFC53D;
+}
+.hs-label {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 8px 20px;
+  background: #FFC53D;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s;
+}
+.hero-cta:hover {
+  background: #FFD666;
+  transform: translateY(-1px);
+}
+
+/* ===== 更新记录 ===== */
+.changelog {
+  background: #1A1A1A;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 20px 24px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.changelog-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.changelog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.changelog-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.changelog-date {
+  color: #555;
+  white-space: nowrap;
+  min-width: 72px;
+  font-size: 11px;
+}
+.changelog-tag {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.tag-new { background: rgba(255,197,61,0.15); color: #FFC53D; }
+.tag-feat { background: rgba(82,196,26,0.1); color: #52C41A; }
+.tag-fix { background: rgba(24,144,255,0.1); color: #1890FF; }
+.changelog-text {
+  color: #999;
+  flex: 1;
+}
+
+/* ===== 工具卡片 ===== */
+.tool-card {
+  background: #1A1A1A;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.tool-card:hover {
+  border-color: rgba(255,197,61,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+.tool-badge {
   position: absolute;
   top: 14px;
   right: 14px;
   font-size: 10px;
-  padding: 3px 8px;
+  padding: 3px 10px;
   border-radius: 20px;
   font-weight: 600;
   letter-spacing: 0.5px;
+  background: rgba(255,197,61,0.1);
+  color: #FFC53D;
+  border: 1px solid rgba(255,197,61,0.2);
 }
-.badge-basic {
-  background: #1e2a1e;
-  color: #5cb85c;
-  border: 1px solid #3a5a3a;
-}
-.badge-pro {
-  background: #2a1e10;
-  color: #ffd000;
-  border: 1px solid #5a3a10;
-}
-.card-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
+.tool-icon {
+  font-size: 40px;
+  margin-bottom: 14px;
   display: block;
 }
-.card-title {
-  font-size: 22px;
+.tool-title {
+  font-size: 20px;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
-.card-desc {
-  font-size: 13px;
-  color: #6a6a8a;
-  line-height: 1.8;
-}
-.card-features {
-  margin-top: 20px;
-  text-align: left;
+.tool-desc {
   font-size: 12px;
-  color: #5a7a9a;
-  line-height: 2;
+  color: #777;
+  line-height: 1.6;
+  margin-bottom: 16px;
 }
-.card-features li {
+.tool-feat {
+  text-align: left;
+  font-size: 11px;
+  color: #777;
+  line-height: 1.9;
+  padding-left: 4px;
+  margin: 0 0 16px;
   list-style: none;
-  padding-left: 0;
 }
-.card-features li::before {
+.tool-feat li::before {
   content: '✓ ';
-  color: #ffd000;
+  color: #FFC53D;
   font-weight: bold;
 }
-.card-btn {
-  margin-top: 24px;
+.tool-btn {
   display: inline-block;
-  padding: 10px 28px;
+  padding: 10px 32px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  background: #FFC53D;
+  color: #000;
+  border: none;
+  cursor: pointer;
   transition: all 0.2s;
 }
-.btn-basic {
-  background: #1e3a1e;
-  color: #5cb85c;
-  border: 1px solid #3a5a3a;
+.tool-card:hover .tool-btn {
+  background: #FFD666;
 }
-.card:hover .btn-basic {
-  background: #5cb85c;
+
+/* ===== 友商对比入口 ===== */
+.compare-entry {
+  background: linear-gradient(135deg, #141414, #1A1A1A);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.compare-entry:hover {
+  border-color: rgba(255,197,61,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.compare-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.compare-icon {
+  font-size: 28px;
+}
+.compare-title {
+  font-size: 15px;
+  font-weight: 700;
   color: #fff;
 }
-.btn-pro {
-  background: #3a2800;
-  color: #ffd000;
-  border: 1px solid #5a4000;
+.compare-desc {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
 }
-.card:hover .btn-pro {
-  background: #ffd000;
-  color: #222;
+.compare-arrow {
+  font-size: 20px;
+  color: #444;
+  transition: all 0.2s;
 }
+.compare-entry:hover .compare-arrow {
+  transform: translateX(4px);
+  color: #FFC53D;
+}
+
+/* ===== 打赏按钮 ===== */
+.reward-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 8px 18px;
+  background: rgba(255,255,255,0.05);
+  color: #888;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+.reward-btn:hover {
+  background: rgba(255,197,61,0.1);
+  border-color: rgba(255,197,61,0.2);
+  color: #FFC53D;
+}
+
+/* ===== 打赏模态框 ===== */
+.reward-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.reward-modal.open { display: flex; }
+.reward-card {
+  background: #1A1A1A;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 32px 36px;
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+.reward-card h3 { font-size: 17px; color: #fff; margin-bottom: 6px; }
+.reward-card p { font-size: 13px; color: #888; margin-bottom: 16px; line-height: 1.6; }
+.reward-card .sub { font-size: 12px; color: #555; }
+.reward-close {
+  position: absolute; top: 12px; right: 16px;
+  font-size: 22px; color: #555; cursor: pointer; line-height: 1;
+}
+.reward-close:hover { color: #fff; }
+
+/* ===== 观看器 ===== */
 #viewer {
   display: none;
   position: fixed;
@@ -241,8 +537,8 @@ body {
   left: 12px;
   z-index: 200;
   background: rgba(0,0,0,0.7);
-  color: #ffd000;
-  border: 1px solid #ffd000;
+  color: #FFC53D;
+  border: 1px solid #FFC53D;
   border-radius: 6px;
   padding: 6px 14px;
   font-size: 12px;
@@ -250,146 +546,14 @@ body {
   display: none;
   font-family: inherit;
 }
-#backBtn:hover { background: #ffd000; color: #222; }
-.tip-line {
-  font-size: 12px;
-  color: #5a5a7a;
-  letter-spacing: 0.5px;
-  margin-top: -20px;
-}
+#backBtn:hover { background: #FFC53D; color: #000; }
 
-/* 打赏功能 */
-.reward-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 14px;
-  padding: 8px 18px;
-  background: linear-gradient(135deg, #07c160, #05a050);
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: opacity 0.2s, transform 0.1s;
-  box-shadow: 0 2px 8px rgba(7,193,96,0.3);
-}
-.reward-btn:hover { opacity: 0.88; transform: scale(1.04); }
-
-/* 更新记录 */
-.changelog {
-  margin-top: 28px;
-  padding: 18px 22px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,215,0,0.15);
-  border-radius: 10px;
-  max-width: 480px;
-  width: 100%;
-  max-height: 240px;
-  overflow-y: auto;
-}
-.changelog-title {
-  font-size: 13px;
-  font-weight: bold;
-  color: #ffd700;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-}
-.changelog-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.changelog-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  line-height: 1.6;
-}
-.changelog-date {
-  color: #6a6a8a;
-  white-space: nowrap;
-  min-width: 72px;
-}
-.changelog-tag {
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-size: 9px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-.tag-new { background: #ff9800; color: #000; }
-.tag-feat { background: #0f3460; color: #7ab3ef; }
-.changelog-text {
-  color: #c8c8d8;
-  flex: 1;
-}
-
-.reward-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-}
-.reward-modal.open { display: flex; }
-.reward-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 28px 32px;
-  text-align: center;
-  max-width: 340px;
-  width: 90%;
-  position: relative;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-}
-.reward-card h3 { font-size: 17px; color: #111; margin-bottom: 6px; }
-.reward-card p { font-size: 13px; color: #666; margin-bottom: 16px; line-height: 1.6; }
-.reward-card img { width: 220px; border-radius: 8px; display: block; margin: 0 auto 12px; }
-.reward-card .sub { font-size: 12px; color: #999; }
-.reward-close {
-  position: absolute; top: 12px; right: 16px;
-  font-size: 22px; color: #999; cursor: pointer; line-height: 1;
-}
-.reward-close:hover { color: #333; }
-
-/* ===== 友商成本对比 ===== */
-.compare-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 20px;
-  padding: 12px 28px;
-  background: linear-gradient(135deg, #0f3460, #16213e);
-  color: #7ab3ef;
-  border: 1px solid #1e4a7a;
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: inherit;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: all 0.2s;
-  box-shadow: 0 2px 12px rgba(15,52,96,0.3);
-}
-.compare-btn:hover {
-  background: linear-gradient(135deg, #1e4a7a, #0f3460);
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(15,52,96,0.4);
-}
-.compare-btn .icon { font-size: 18px; }
-
+/* ===== 友商对比模态框 ===== */
 .compare-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0,0,0,0.75);
   z-index: 9990;
   align-items: flex-start;
   justify-content: center;
@@ -398,11 +562,12 @@ body {
 }
 .compare-overlay.show { display: flex; }
 .compare-modal {
-  background: #fff;
+  background: #1A1A1A;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
   width: 100%;
   max-width: 1100px;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 48px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 60px);
@@ -413,22 +578,22 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   flex-shrink: 0;
 }
 .compare-header h2 {
   font-size: 17px;
-  color: #1a1a1a;
+  color: #fff;
   font-weight: 700;
 }
 .compare-close {
   width: 34px; height: 34px;
-  border: none; background: #f0f0f0;
+  border: none; background: rgba(255,255,255,0.05);
   border-radius: 50%; cursor: pointer;
-  font-size: 20px; color: #666;
+  font-size: 20px; color: #888;
   display: flex; align-items: center; justify-content: center;
 }
-.compare-close:hover { background: #e0e0e0; }
+.compare-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
 .compare-body {
   overflow-y: auto;
   padding: 20px 24px;
@@ -441,9 +606,10 @@ body {
   margin-bottom: 20px;
 }
 .compare-col {
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
   padding: 16px;
+  background: rgba(255,255,255,0.02);
 }
 .compare-col-title {
   font-size: 14px;
@@ -452,8 +618,8 @@ body {
   padding-bottom: 8px;
   border-bottom: 2px solid;
 }
-.col-youfang .compare-col-title { color: #e65100; border-color: #ffe0b2; }
-.col-meituan .compare-col-title { color: #1565c0; border-color: #bbdefb; }
+.col-youfang .compare-col-title { color: #FF8C42; border-color: rgba(255,140,66,0.2); }
+.col-meituan .compare-col-title { color: #FFC53D; border-color: rgba(255,197,61,0.2); }
 .cf-row {
   display: flex;
   align-items: center;
@@ -462,54 +628,56 @@ body {
 }
 .cf-row label {
   font-size: 12px;
-  color: #555;
+  color: #888;
   min-width: 130px;
   flex-shrink: 0;
   text-align: right;
 }
 .cf-row input {
   flex: 1;
-  padding: 6px 10px;
-  border: 1px solid #d0d0d0;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 6px;
   font-size: 13px;
   font-family: inherit;
   min-width: 0;
+  background: rgba(255,255,255,0.03);
+  color: #e0e0e0;
 }
 .cf-row input:focus {
   outline: none;
-  border-color: #1976d2;
-  box-shadow: 0 0 0 2px rgba(25,118,210,0.1);
+  border-color: #FFC53D;
+  box-shadow: 0 0 0 2px rgba(255,197,61,0.1);
 }
 .cf-unit {
   font-size: 11px;
-  color: #999;
+  color: #555;
   min-width: 40px;
   flex-shrink: 0;
 }
 .cf-section-title {
   font-size: 12px;
   font-weight: 600;
-  color: #888;
+  color: #666;
   margin: 14px 0 8px;
   padding-left: 4px;
-  border-left: 3px solid #ccc;
+  border-left: 3px solid #444;
   padding-bottom: 0;
 }
 .cf-disabled input {
-  background: #f5f5f5;
-  color: #999;
+  background: rgba(255,255,255,0.02);
+  color: #555;
 }
-.col-meituan .cf-disabled input::placeholder { color: #bbb; }
+.col-meituan .cf-disabled input::placeholder { color: #444; }
 
 .compare-actions {
   text-align: center;
   margin: 20px 0;
 }
 .compare-calc-btn {
-  padding: 10px 40px;
-  background: linear-gradient(135deg, #1565c0, #0d47a1);
-  color: #fff;
+  padding: 12px 48px;
+  background: #FFC53D;
+  color: #000;
   border: none;
   border-radius: 8px;
   font-size: 15px;
@@ -518,11 +686,10 @@ body {
   letter-spacing: 2px;
   font-family: inherit;
   transition: all 0.2s;
-  box-shadow: 0 4px 16px rgba(13,71,161,0.3);
 }
 .compare-calc-btn:hover {
+  background: #FFD666;
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(13,71,161,0.4);
 }
 
 /* 结果表格 */
@@ -537,86 +704,169 @@ body {
 .cmp-table th, .cmp-table td {
   padding: 10px 12px;
   text-align: center;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 .cmp-table th {
-  background: #f8f9fa;
+  background: rgba(255,255,255,0.03);
   font-weight: 600;
-  color: #333;
+  color: #ccc;
 }
 .cmp-table .row-header {
   text-align: left;
   font-weight: 600;
-  background: #fafafa;
-  color: #444;
+  background: rgba(255,255,255,0.02);
+  color: #bbb;
   min-width: 140px;
 }
-.cmp-table td.col-youfang { color: #e65100; }
-.cmp-table td.col-meituan { color: #1565c0; }
+.cmp-table td.col-youfang { color: #FF8C42; }
+.cmp-table td.col-meituan { color: #FFC53D; }
 .cmp-table tr.total-row td {
   font-weight: 700;
   font-size: 14px;
-  background: #f0f7ff;
+  background: rgba(255,197,61,0.05);
 }
-.cmp-table .saving { color: #2e7d32; font-weight: 700; }
-.cmp-table .worse { color: #c62828; font-weight: 700; }
+.cmp-table .saving { color: #52C41A; font-weight: 700; }
+.cmp-table .worse { color: #FF4D4F; font-weight: 700; }
 .cmp-summary {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background: rgba(82,196,26,0.05);
+  border: 1px solid rgba(82,196,26,0.15);
   border-radius: 10px;
   padding: 16px 20px;
   text-align: center;
 }
 .cmp-summary .big {
-  font-size: 24px;
-  font-weight: 700;
-  color: #166534;
+  font-size: 28px;
+  font-weight: 800;
+  color: #52C41A;
   margin: 4px 0;
 }
 .cmp-summary .desc {
   font-size: 13px;
-  color: #555;
+  color: #888;
 }
-.cmp-summary .desc-worse {
-  background: #fef2f2;
-  border-color: #fecaca;
+.cmp-summary.desc-worse {
+  background: rgba(255,77,79,0.05);
+  border-color: rgba(255,77,79,0.15);
 }
-.cmp-summary .desc-worse .big { color: #991b1b; }
+.cmp-summary.desc-worse .big { color: #FF4D4F; }
 
-/* 海报 */
-.poster{background:linear-gradient(135deg,#0f3460 0%,#16213e 50%,#1a1a2e 100%);border-radius:16px;padding:28px 24px;text-align:center;border:1px solid rgba(255,215,0,0.2);position:relative;overflow:hidden}
-.poster::before{content:'';position:absolute;top:-50%;right:-30%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,208,0,0.12) 0%,transparent 70%);border-radius:50%}
-.poster-m{width:56px;height:56px;background:#ffd000;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#222;margin-bottom:14px;box-shadow:0 0 30px rgba(255,208,0,0.35)}
-.poster-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px}
-.poster-sub{font-size:12px;color:#8a8aaa;letter-spacing:1px;margin-bottom:14px}
-.poster-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px}
-.ptag{font-size:10px;padding:3px 9px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#c8c8d8}
-.ptag.hot{background:rgba(255,208,0,0.12);border-color:rgba(255,208,0,0.3);color:#ffd700}
-.poster-stats{display:flex;justify-content:center;gap:24px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08)}
-.ps-num{font-size:20px;font-weight:800;color:#ffd700}
-.ps-label{font-size:9px;color:#6a6a8a;margin-top:2px;letter-spacing:1px}
-/* 工具卡片 */
-.tcard{background:#161b24;border:1px solid #2a2a3a;border-radius:14px;padding:22px 20px;text-align:center;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
-.tcard:hover{border-color:#ffd000;transform:translateY(-3px);box-shadow:0 10px 30px rgba(255,208,0,0.15)}
-.tcard-badge{position:absolute;top:10px;right:10px;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:600;letter-spacing:.5px}
-.tcard-icon{font-size:32px;margin-bottom:10px;display:block}
-.tcard-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:4px}
-.tcard-desc{font-size:11px;color:#6a6a8a;line-height:1.6;margin-bottom:12px}
-.tcard-feat{text-align:left;font-size:10.5px;color:#5a7a9a;line-height:1.8;padding-left:4px;margin:0 0 12px;list-style:none}
-.tcard-feat li::before{content:'✓ ';color:#ffd000;font-weight:bold}
-.tcard-btn{display:inline-block;padding:7px 20px;border-radius:8px;font-size:12px;font-weight:600;letter-spacing:.5px;transition:all .2s}
-/* 友商对比紧凑入口*/
-.cmp-entry{background:linear-gradient(135deg,#0f3460,#16213e);border:1px solid rgba(100,180,255,0.15);border-radius:14px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;transition:all .25s ease}
-.cmp-entry:hover{border-color:rgba(100,180,255,0.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,52,96,0.3)}
-.cmp-info{display:flex;align-items:center;gap:10px}
-.cmp-icon{font-size:24px}
-.cmp-title{font-size:14px;font-weight:700;color:#bbdefb}
-.cmp-desc{font-size:10px;color:#6a8aaa;margin-top:1px}
-.cmp-arrow{font-size:18px;color:#4a7aaa;transition:transform .2s}
-.cmp-entry:hover .cmp-arrow{transform:translateX(3px);color:#bbdefb}
-@media(max-width:760px){
-  #selector{grid-template-columns:1fr;padding:24px 16px;gap:20px}
-}</style>
+/* ===== 产品功能清单 ===== */
+#featurePanelOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9998;
+  align-items: center;
+  justify-content: center;
+}
+#featurePanelOverlay.show { display: flex; }
+#featurePanel {
+  background: #1A1A1A;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 860px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+#featurePanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+#featurePanelTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+#featurePanelClose {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+}
+#featurePanelClose:hover { background: rgba(255,255,255,0.1); color: #fff; }
+#featurePanelBody {
+  overflow-y: auto;
+  padding: 20px;
+  flex: 1;
+}
+.fp-module { margin-bottom: 18px; }
+.fp-module-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFC53D;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,197,61,0.15);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.fp-module-title::before {
+  content: '';
+  width: 4px;
+  height: 14px;
+  background: #FFC53D;
+  border-radius: 2px;
+  display: inline-block;
+}
+.fp-desc-list { padding-left: 4px; }
+.fp-desc-item {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 2;
+  padding: 2px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.04);
+}
+.fp-no-data {
+  color: #666;
+  font-size: 13px;
+  text-align: center;
+  padding: 40px;
+}
+.feature-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border: 1px solid #FFC53D;
+  border-radius: 20px;
+  font-size: 11px;
+  color: #FFC53D;
+  background: transparent;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.feature-btn:hover {
+  background: #FFC53D;
+  color: #000;
+}
+
+/* ===== 响应式 ===== */
+@media(max-width:900px){
+  #selector{grid-template-columns:1fr;gap:16px}
+  .top-nav{padding:0 16px}
+  #main-container{padding:16px}
+  .hero-title{font-size:24px}
+}
+</style>
 </head>
 <body>
 
@@ -627,290 +877,145 @@ body {
   <div class="loader-text">报价工具加载中…</div>
 </div>
 
+
+<!-- 顶部导航栏 -->
+<nav class="top-nav">
+  <div class="nav-logo">AI报价</div>
+  <div class="nav-menu">
+    <span class="nav-item active">首页</span>
+    <span class="nav-item">报价工具</span>
+    <span class="nav-item">产品中心</span>
+    <span class="nav-item">帮助中心</span>
+  </div>
+  <div class="nav-user">
+    <div class="nav-avatar">Z</div>
+    <span class="nav-name">周巍</span>
+    <div class="nav-status"><div class="nav-status-dot"></div>已登录</div>
+  </div>
+</nav>
+
+<div id="main-container">
 <div id="selector">
-  <div class="sel-left
-  <div class="sel-left">
-    <div class="poster">
-    <div class="poster-m">M</div>
-    <div class="poster-title">美团餐饮系统</div>
-    <div class="poster-sub">CKA 报价与竞品分析工具</div>
-    <div class="poster-tags">
-      <span class="ptag hot">阶梯定价</span>
-      <span class="ptag">全产品矩阵</span>
-      <span class="ptag hot">折扣管理</span>
-      <span class="ptag">竞品对比</span>
-      <span class="ptag">硬件报价</span>
+
+  <!-- 左上：Hero 品牌卡片 -->
+  <div class="hero-card">
+    <div class="hero-logo">M</div>
+    <div class="hero-title">智能报价 降本增效</div>
+    <div class="hero-sub">美团餐饮系统 · CKA 报价与竞品分析工具</div>
+    <div class="hero-tags">
+      <span class="htag hot">阶梯定价</span>
+      <span class="htag">全产品矩阵</span>
+      <span class="htag hot">折扣管理</span>
+      <span class="htag">竞品对比</span>
+      <span class="htag">硬件报价</span>
     </div>
-    <div class="poster-stats">
-      <div><div class="ps-num">4+</div><div class="ps-label">产品模块</div></div>
-      <div><div class="ps-num">9档</div><div class="ps-label">阶梯折扣</div></div>
-      <div><div class="ps-num">2</div><div class="ps-label">版本对比</div></div>
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);text-align:center">
-      <div style="font-size:10px;color:#4a4a6a;letter-spacing:.5px">仅供 CKA 内部团队使用 · 开发：周巍 mis:zhouwei96</div>
-      <button class="reward-btn" onclick="document.getElementById('rewardModal').classList.add('open')" style="margin-top:8px">☕ 请作者喝杯咖啡</button>
+    <div class="hero-stats">
+      <div><div class="hs-num">4+</div><div class="hs-label">产品模块</div></div>
+      <div><div class="hs-num">9档</div><div class="hs-label">阶梯折扣</div></div>
+      <div><div class="hs-num">2</div><div class="hs-label">版本对比</div></div>
     </div>
+    <button class="hero-cta" onclick="loadVersion('pro')">立即报价 →</button>
+    <button class="reward-btn" onclick="document.getElementById('rewardModal').classList.add('open')" style="margin-left:8px">☕ 请作者喝杯咖啡</button>
   </div>
 
-  <!-- 功能更新记录 -->
-  <div class="changelog">
-    <div class="changelog-title">📋 功能更新记录</div>
-  <div class="changelog-list">
-    <div class="changelog-item">
-      <span class="changelog-date">2026.08-16</span>
-      <span class="changelog-tag tag-feat">FEAT</span>
-      <span class="changelog-text">主页重新排版：左侧品牌海报+产品更新，右侧报价工具入口+友商对比，单页全展示</span>
-    </div>
-    <div class="changelog-item">
-      <span class="changelog-date">2026.08-15</span>
-      <span class="changelog-tag tag-new">NEW</span>
-      <span class="changelog-text">新增「友商成本对比」功能：输入友商各项年费/费率，一键对比美团vs友商年度综合成本，输出逐项对比表格和节省金额</span>
-    </div>
-    <div class="changelog-item">
-      <span class="changelog-date">2026.08.03</span>
-      <span class="changelog-tag tag-feat">FEAT</span>
-      <span class="changelog-text">硬件产品图片优化：选择硬件后，图片自动附加在报价方案末尾（不再仅悬停预览）</span>
-    </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.03</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「智能备餐」产品（标价¥2,088/店/年，底价¥1,088/店/年，无阶梯价），基于大数据算法精准规划备餐数量</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.03</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增硬件产品：80N（网口+USB，¥399）与 80NW（网口+USB+Wi-Fi，¥429），支持悬停查看产品图</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.29</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">P2平板收银配件底座价格调整（348→268）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.28</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">添加 loading 加载动画，优化大文件白屏等待体验</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.24</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">总部产品支持自定义数量：第三方配套对接点位、商圈选址城市包（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.24</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「分账管理（纯外卖）门店点位」+「门店万能码-连锁版」阶梯折扣（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.07</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">副收银支持自定义数量输入，报价表格新增数量和小计列（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.07</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">硬件价格调整：S5 Pro→1398、S5S Pro→1698、P2→1198</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.03</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">打包价低于成本价改为提醒确认（不再阻断录入）；阶梯对比模式新增打包价支持（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.06.30</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「战略合作政策」页面，支持自主编辑内容，生成报价单时作为独立一页展示（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.06.25</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">打包价模式：按模块原价占比等比例分摊，增加成本价底线校验（基础版+专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.05.26</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">多方案统一封面+大标题分隔导出、方案一键复制</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.05.18</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">v2.7：列宽拖拽调整、2/3档选择器、分梯度折扣设置</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.05.08</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「历史记录」功能，报价单自动保存，支持恢复/删除</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.05.08</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「云收银-门店账号」产品（v2.4）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.04.16</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">新增「阶梯对比模式」，支持最多3档门店数并排对比</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.04.13</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">v2.3：封面页自动生成、四类产品独立折扣设置</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.04.08</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">新增「可编辑模式」，报价单生成后支持自由编辑内容</span>
-      </div>
-    </div>
-  </div>
-
-  
-  </div>
-    <!-- 功能更新记录 -->
-  <div class="changelog">
-    <div class="changelog-title">📋 功能更新记录</div>
-  <div class="changelog-list">
-    <div class="changelog-item">
-      <span class="changelog-date">2026.08-16</span>
-      <span class="changelog-tag tag-feat">FEAT</span>
-      <span class="changelog-text">主页重新排版：左侧品牌海报+产品更新，右侧报价工具入口+友商对比，单页全展示</span>
-    </div>
-    <div class="changelog-item">
-      <span class="changelog-date">2026.08-15</span>
-      <span class="changelog-tag tag-new">NEW</span>
-      <span class="changelog-text">新增「友商成本对比」功能：输入友商各项年费/费率，一键对比美团vs友商年度综合成本，输出逐项对比表格和节省金额</span>
-    </div>
-    <div class="changelog-item">
-      <span class="changelog-date">2026.08.03</span>
-      <span class="changelog-tag tag-feat">FEAT</span>
-      <span class="changelog-text">硬件产品图片优化：选择硬件后，图片自动附加在报价方案末尾（不再仅悬停预览）</span>
-    </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.03</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「智能备餐」产品（标价¥2,088/店/年，底价¥1,088/店/年，无阶梯价），基于大数据算法精准规划备餐数量</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.03</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增硬件产品：80N（网口+USB，¥399）与 80NW（网口+USB+Wi-Fi，¥429），支持悬停查看产品图</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.29</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">P2平板收银配件底座价格调整（348→268）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.28</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">添加 loading 加载动画，优化大文件白屏等待体验</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.24</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">总部产品支持自定义数量：第三方配套对接点位、商圈选址城市包（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.24</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「分账管理（纯外卖）门店点位」+「门店万能码-连锁版」阶梯折扣（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.07</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">副收银支持自定义数量输入，报价表格新增数量和小计列（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.07</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">硬件价格调整：S5 Pro→1398、S5S Pro→1698、P2→1198</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.03</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">打包价低于成本价改为提醒确认（不再阻断录入）；阶梯对比模式新增打包价支持（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.06.30</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「战略合作政策」页面，支持自主编辑内容，生成报价单时作为独立一页展示（专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.06.25</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">打包价模式：按模块原价占比等比例分摊，增加成本价底线校验（基础版+专业版）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.05.26</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">多方案统一封面+大标题分隔导出、方案一键复制</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.05.18</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">v2.7：列宽拖拽调整、2/3档选择器、分梯度折扣设置</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.05.08</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「历史记录」功能，报价单自动保存，支持恢复/删除</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.05.08</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「云收银-门店账号」产品（v2.4）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.04.16</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">新增「阶梯对比模式」，支持最多3档门店数并排对比</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.04.13</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">v2.3：封面页自动生成、四类产品独立折扣设置</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2025.04.08</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">新增「可编辑模式」，报价单生成后支持自由编辑内容</span>
-      </div>
-    </div>
-  </div>
-  </div>
-  <div class="sel-right">
-    <div class="tcard" onclick="loadVersion('pro')">
-    <span class="tcard-badge badge-pro">PRO</span>
-    <span class="tcard-icon">⚡</span>
-    <div class="tcard-title">报价工具</div>
-    <div class="tcard-desc">美团餐饮SaaS全产品报价</div>
-    <ul class="tcard-feat">
+  <!-- 右上：报价工具卡片 -->
+  <div class="tool-card" onclick="loadVersion('pro')">
+    <span class="tool-badge">PRO</span>
+    <span class="tool-icon">⚡</span>
+    <div class="tool-title">AI智能报价工具</div>
+    <div class="tool-desc">输入参数，一键生成精准报价</div>
+    <ul class="tool-feat">
       <li>阶梯价格体系</li>
       <li>服务产品人天计费</li>
       <li>完整产品矩阵</li>
       <li>多维折扣管理</li>
       <li>硬件产品报价</li>
     </ul>
-    <span class="tcard-btn btn-pro">进入报价工具 →</span>
+    <span class="tool-btn">进入报价工具 →</span>
   </div>
-    <!-- 友商成本对比入口 -->
-  <div class="cmp-entry" onclick="openCompareModal()">
-    <div class="cmp-info">
-      <span class="cmp-icon">⚖️</span>
-      <div><div class="cmp-title">友商成本对比</div><div class="cmp-desc">一键对比美团 vs 友商年度综合成本</div></div>
+
+  <!-- 左下：功能更新记录 -->
+  <div class="changelog">
+    <div class="changelog-title">📋 功能更新记录</div>
+    <div class="changelog-list">
+      <div class="changelog-item">
+        <span class="changelog-date">2026.08.16</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">主页全新改版：深色仪表盘风格，2×2网格布局，顶部导航栏</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.08.15</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「友商成本对比」功能：输入友商各项年费/费率，一键对比年度综合成本</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.08.03</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「智能备餐」产品（标价¥2,088/店/年，底价¥1,088/店/年）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.08.03</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增硬件产品：80N（¥399）与 80NW（¥429），支持悬停查看产品图</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.29</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">P2平板收银配件底座价格调整（348→268）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.28</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">添加 loading 加载动画，优化大文件白屏等待体验</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.24</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">总部产品支持自定义数量：第三方配套对接点位、商圈选址城市包</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.07</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">副收银支持自定义数量输入，报价表格新增数量和小计列</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.03</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">打包价低于成本价改为提醒确认；阶梯对比模式新增打包价支持</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.06.30</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「战略合作政策」页面，支持自主编辑内容</span>
+      </div>
     </div>
-    <span class="cmp-arrow">→</span>
   </div>
-  </div>
-  <!-- 打赏模态框 -->
-  <div class="reward-modal" id="rewardModal" onclick="if(event.target===this)this.classList.remove('open')">
-    <div class="reward-card">
-      <span class="reward-close" onclick="document.getElementById('rewardModal').classList.remove('open')">&times;</span>
-      <h3>&#127881; 感谢你的认可！</h3>
-      <p>如果这个工具帮到了你<br>欢迎请作者喝杯咖啡 &#9749;<br>微信扫码即可</p>
-      <div style="font-size:48px;margin:12px 0">&#9749;</div>
-      <div class="sub">周巍 @美团 &middot; CKA团队</div>
+
+  <!-- 右下：友商成本对比入口 -->
+  <div class="compare-entry" onclick="openCompareModal()">
+    <div class="compare-info">
+      <span class="compare-icon">⚖️</span>
+      <div>
+        <div class="compare-title">友商成本对比分析</div>
+        <div class="compare-desc">输入友商数据，一键对比美团 vs 友商年度综合成本</div>
+      </div>
     </div>
+    <span class="compare-arrow">→</span>
   </div>
+
+</div>
+</div>
+
+<!-- 打赏模态框 -->
+<div class="reward-modal" id="rewardModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="reward-card">
+    <span class="reward-close" onclick="document.getElementById('rewardModal').classList.remove('open')">&times;</span>
+    <h3>🎉 感谢你的认可！</h3>
+    <p>如果这个工具帮到了你<br>欢迎请作者喝杯咖啡 ☕<br>微信扫码即可</p>
+    <div style="font-size:48px;margin:12px 0">☕</div>
+    <div class="sub">周巍 @美团 · CKA团队</div>
+  </div>
+</div>
 <div id="viewer">
   <iframe id="frame"></iframe>
 </div>
