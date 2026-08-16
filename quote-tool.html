@@ -15,8 +15,8 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
-  background: #0A0A0A;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #0a0a0a;
   min-height: 100vh;
   color: #e0e0e0;
 }
@@ -29,7 +29,7 @@ body {
   padding: 0 32px;
   height: 64px;
   background: rgba(10,10,10,0.95);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid #1f1f1f;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -37,8 +37,8 @@ body {
 }
 .nav-logo {
   font-size: 20px;
-  font-weight: 800;
-  color: #FFC53D;
+  font-weight: 700;
+  color: #f5c518;
   letter-spacing: 1px;
 }
 .nav-menu {
@@ -48,15 +48,16 @@ body {
 }
 .nav-item {
   font-size: 14px;
-  color: #999;
+  font-weight: 500;
+  color: #a3a3a3;
   cursor: pointer;
   padding: 4px 0;
   position: relative;
   transition: color 0.2s;
 }
-.nav-item:hover { color: #ccc; }
+.nav-item:hover { color: #fff; }
 .nav-item.active {
-  color: #FFC53D;
+  color: #f5c518;
   font-weight: 600;
 }
 .nav-item.active::after {
@@ -66,7 +67,7 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: #FFC53D;
+  background: #f5c518;
   border-radius: 1px;
 }
 .nav-user {
@@ -78,7 +79,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FFC53D, #F5A623);
+  background: linear-gradient(135deg, #f5c518, #e6b800);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,26 +87,26 @@ body {
   font-weight: 700;
   color: #000;
 }
-.nav-name { font-size: 13px; color: #ccc; }
+.nav-name { font-size: 14px; color: #fff; }
 .nav-status {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
-  color: #666;
+  font-size: 12px;
+  color: #737373;
 }
 .nav-status-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #52C41A;
+  background: #22c55e;
 }
 
 /* ===== Loading 动画 ===== */
 #appLoading {
   position: fixed;
   inset: 0;
-  background: #0A0A0A;
+  background: #0a0a0a;
   z-index: 99999;
   display: flex;
   flex-direction: column;
@@ -120,7 +121,7 @@ body {
 .loader-logo {
   width: 64px;
   height: 64px;
-  background: #FFC53D;
+  background: #f5c518;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -130,11 +131,11 @@ body {
   color: #000;
   margin-bottom: 24px;
   animation: pulse 1.5s ease-in-out infinite;
-  box-shadow: 0 0 40px rgba(255,197,61,0.3);
+  box-shadow: 0 0 40px rgba(245,197,24,0.3);
 }
 @keyframes pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(255,197,61,0.3); }
-  50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(255,197,61,0.5); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(245,197,24,0.3); }
+  50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(245,197,24,0.5); }
 }
 .loader-bar-wrap {
   width: 180px;
@@ -147,7 +148,7 @@ body {
 .loader-bar {
   width: 30%;
   height: 100%;
-  background: linear-gradient(90deg, #FFC53D, #F5A623);
+  background: linear-gradient(90deg, #f5c518, #e6b800);
   border-radius: 3px;
   animation: loading-slide 1.2s ease-in-out infinite;
 }
@@ -166,303 +167,371 @@ body {
 #main-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 32px 40px;
+  padding: 32px;
 }
 #selector {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 5fr 7fr;
+  gap: 24px;
   align-items: start;
 }
 
-/* ===== Hero 卡片 ===== */
+/* ===== 左右列 ===== */
+.col-left, .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===== Hero 品牌卡片 ===== */
 .hero-card {
-  background: linear-gradient(135deg, #141414 0%, #1A1A1A 50%, #111111 100%);
-  border: 1px solid rgba(255,197,61,0.1);
+  background: #141414;
+  border: 1px solid #262626;
   border-radius: 16px;
-  padding: 32px 28px;
+  padding: 28px;
   position: relative;
   overflow: hidden;
+  min-height: 280px;
 }
-.hero-card::before {
+.hero-card::after {
   content: '';
   position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(255,197,61,0.08) 0%, transparent 70%);
+  top: -60px;
+  right: -60px;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(245,197,24,0.12) 0%, transparent 70%);
   border-radius: 50%;
+  pointer-events: none;
 }
-.hero-logo {
-  width: 48px;
-  height: 48px;
-  background: #FFC53D;
-  border-radius: 12px;
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+.hero-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 900;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
   color: #000;
+  background: #f5c518;
+  padding: 3px 10px;
+  border-radius: 4px;
   margin-bottom: 16px;
-  box-shadow: 0 0 30px rgba(255,197,61,0.25);
-  position: relative;
-  z-index: 1;
-}
-.hero-title {
-  font-size: 32px;
-  font-weight: 800;
-  color: #FFC53D;
-  line-height: 1.2;
-  margin-bottom: 6px;
-  position: relative;
-  z-index: 1;
-}
-.hero-sub {
-  font-size: 14px;
-  color: #888;
-  margin-bottom: 20px;
-  position: relative;
-  z-index: 1;
-}
-.hero-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 24px;
-  position: relative;
-  z-index: 1;
-}
-.htag {
-  font-size: 11px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #aaa;
-}
-.htag.hot {
-  background: rgba(255,197,61,0.1);
-  border-color: rgba(255,197,61,0.25);
-  color: #FFC53D;
-}
-.hero-stats {
-  display: flex;
-  gap: 32px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  position: relative;
-  z-index: 1;
-}
-.hs-num {
-  font-size: 24px;
-  font-weight: 800;
-  color: #FFC53D;
-}
-.hs-label {
-  font-size: 11px;
-  color: #666;
-  margin-top: 2px;
   letter-spacing: 0.5px;
 }
+.hero-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #f5c518;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #ffd700, #f5c518);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 12px;
+  color: #a3a3a3;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.hero-metrics {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.metric-card {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid #262626;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.metric-icon {
+  font-size: 18px;
+  margin-bottom: 6px;
+  display: block;
+}
+.metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5c518;
+  margin-bottom: 2px;
+}
+.metric-label {
+  font-size: 10px;
+  color: #737373;
+  line-height: 1.3;
+}
+.metric-chart {
+  margin-top: 8px;
+  height: 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+}
+.chart-bar {
+  width: 4px;
+  background: #f5c518;
+  border-radius: 1px;
+  opacity: 0.6;
+}
+.chart-bar:nth-child(1) { height: 40%; }
+.chart-bar:nth-child(2) { height: 60%; }
+.chart-bar:nth-child(3) { height: 80%; }
+.chart-bar:nth-child(4) { height: 100%; }
+.chart-bar:nth-child(5) { height: 70%; }
 .hero-cta {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 20px;
-  padding: 8px 20px;
-  background: #FFC53D;
+  padding: 10px 20px;
+  background: #f5c518;
   color: #000;
   border: none;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.5px;
-  position: relative;
-  z-index: 1;
   transition: all 0.2s;
 }
 .hero-cta:hover {
-  background: #FFD666;
+  background: #e6b800;
+  transform: translateY(-1px);
+}
+
+/* ===== 报价工具卡片 ===== */
+.tool-card {
+  background: #141414;
+  border: 1px solid #262626;
+  border-radius: 16px;
+  padding: 24px;
+}
+.tool-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.tool-title-group { flex: 1; }
+.tool-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.tool-subtitle {
+  font-size: 14px;
+  color: #737373;
+}
+.tool-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #000;
+  background: #f5c518;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.tool-form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #a3a3a3;
+}
+.form-input {
+  padding: 8px 12px;
+  background: #1a1a1a;
+  border: 1px solid #262626;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #e0e0e0;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus {
+  border-color: #f5c518;
+  box-shadow: 0 0 0 2px rgba(245,197,24,0.1);
+}
+.form-input::placeholder { color: #555; }
+.tool-btn {
+  width: 100%;
+  padding: 12px;
+  background: #f5c518;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.2s;
+}
+.tool-btn:hover {
+  background: #e6b800;
   transform: translateY(-1px);
 }
 
 /* ===== 更新记录 ===== */
 .changelog {
-  background: #1A1A1A;
-  border: 1px solid rgba(255,255,255,0.06);
+  background: #141414;
+  border: 1px solid #262626;
   border-radius: 16px;
   padding: 20px 24px;
   max-height: 320px;
   overflow-y: auto;
 }
+.changelog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
 .changelog-title {
   font-size: 14px;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+}
+.changelog-count {
+  font-size: 11px;
+  color: #737373;
+  background: #1a1a1a;
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 .changelog-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .changelog-item {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  font-size: 12px;
-  line-height: 1.6;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1f1f1f;
 }
+.changelog-item:last-child { border-bottom: none; }
 .changelog-date {
-  color: #555;
+  font-size: 11px;
+  color: #737373;
   white-space: nowrap;
   min-width: 72px;
-  font-size: 11px;
+  padding-top: 1px;
 }
 .changelog-tag {
   padding: 1px 6px;
   border-radius: 4px;
   font-size: 9px;
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: 0.5px;
   white-space: nowrap;
 }
-.tag-new { background: rgba(255,197,61,0.15); color: #FFC53D; }
-.tag-feat { background: rgba(82,196,26,0.1); color: #52C41A; }
-.tag-fix { background: rgba(24,144,255,0.1); color: #1890FF; }
+.tag-new { background: rgba(245,197,24,0.15); color: #f5c518; }
+.tag-feat { background: rgba(74,222,128,0.1); color: #4ade80; }
 .changelog-text {
-  color: #999;
-  flex: 1;
-}
-
-/* ===== 工具卡片 ===== */
-.tool-card {
-  background: #1A1A1A;
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 16px;
-  padding: 28px 24px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  position: relative;
-  overflow: hidden;
-}
-.tool-card:hover {
-  border-color: rgba(255,197,61,0.2);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-}
-.tool-badge {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  font-size: 10px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  background: rgba(255,197,61,0.1);
-  color: #FFC53D;
-  border: 1px solid rgba(255,197,61,0.2);
-}
-.tool-icon {
-  font-size: 40px;
-  margin-bottom: 14px;
-  display: block;
-}
-.tool-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 6px;
-}
-.tool-desc {
   font-size: 12px;
-  color: #777;
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-.tool-feat {
-  text-align: left;
-  font-size: 11px;
-  color: #777;
-  line-height: 1.9;
-  padding-left: 4px;
-  margin: 0 0 16px;
-  list-style: none;
-}
-.tool-feat li::before {
-  content: '✓ ';
-  color: #FFC53D;
-  font-weight: bold;
-}
-.tool-btn {
-  display: inline-block;
-  padding: 10px 32px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  background: #FFC53D;
-  color: #000;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.tool-card:hover .tool-btn {
-  background: #FFD666;
+  color: #a3a3a3;
+  flex: 1;
+  line-height: 1.5;
 }
 
-/* ===== 友商对比入口 ===== */
-.compare-entry {
-  background: linear-gradient(135deg, #141414, #1A1A1A);
-  border: 1px solid rgba(255,255,255,0.06);
+/* ===== 友商对比卡片 ===== */
+.compare-card {
+  background: #141414;
+  border: 1px solid #262626;
   border-radius: 16px;
-  padding: 20px 24px;
+  padding: 24px;
+}
+.compare-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.compare-entry:hover {
-  border-color: rgba(255,197,61,0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-.compare-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.compare-icon {
-  font-size: 28px;
+  margin-bottom: 20px;
 }
 .compare-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: #fff;
 }
-.compare-desc {
+.compare-action {
+  font-size: 12px;
+  color: #f5c518;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.compare-action:hover { color: #e6b800; }
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.compare-table th {
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #a3a3a3;
+  border-bottom: 1px solid #262626;
   font-size: 11px;
-  color: #666;
-  margin-top: 2px;
 }
-.compare-arrow {
-  font-size: 20px;
-  color: #444;
-  transition: all 0.2s;
+.compare-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #1f1f1f;
+  color: #fff;
 }
-.compare-entry:hover .compare-arrow {
-  transform: translateX(4px);
-  color: #FFC53D;
+.compare-table .highlight {
+  color: #f5c518;
+  font-weight: 600;
+}
+.compare-table .saving {
+  color: #4ade80;
+  font-weight: 600;
+}
+.compare-chart {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #262626;
+  align-items: flex-end;
+  justify-content: center;
+}
+.chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.chart-bar-group {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  height: 60px;
+}
+.cbar {
+  width: 12px;
+  border-radius: 2px 2px 0 0;
+}
+.cbar-youfang { background: #6b7280; }
+.cbar-meituan { background: #f5c518; }
+.chart-label {
+  font-size: 11px;
+  color: #737373;
 }
 
 /* ===== 打赏按钮 ===== */
@@ -471,10 +540,10 @@ body {
   align-items: center;
   gap: 6px;
   margin-top: 16px;
-  padding: 8px 18px;
+  padding: 8px 16px;
   background: rgba(255,255,255,0.05);
-  color: #888;
-  border: 1px solid rgba(255,255,255,0.08);
+  color: #737373;
+  border: 1px solid #262626;
   border-radius: 20px;
   font-size: 12px;
   font-family: inherit;
@@ -483,9 +552,9 @@ body {
   transition: all 0.2s;
 }
 .reward-btn:hover {
-  background: rgba(255,197,61,0.1);
-  border-color: rgba(255,197,61,0.2);
-  color: #FFC53D;
+  background: rgba(245,197,24,0.1);
+  border-color: rgba(245,197,24,0.2);
+  color: #f5c518;
 }
 
 /* ===== 打赏模态框 ===== */
@@ -500,8 +569,8 @@ body {
 }
 .reward-modal.open { display: flex; }
 .reward-card {
-  background: #1A1A1A;
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #1a1a1a;
+  border: 1px solid #262626;
   border-radius: 16px;
   padding: 32px 36px;
   text-align: center;
@@ -511,8 +580,7 @@ body {
   box-shadow: 0 8px 40px rgba(0,0,0,0.5);
 }
 .reward-card h3 { font-size: 17px; color: #fff; margin-bottom: 6px; }
-.reward-card p { font-size: 13px; color: #888; margin-bottom: 16px; line-height: 1.6; }
-.reward-card .sub { font-size: 12px; color: #555; }
+.reward-card p { font-size: 13px; color: #737373; margin-bottom: 16px; line-height: 1.6; }
 .reward-close {
   position: absolute; top: 12px; right: 16px;
   font-size: 22px; color: #555; cursor: pointer; line-height: 1;
@@ -537,8 +605,8 @@ body {
   left: 12px;
   z-index: 200;
   background: rgba(0,0,0,0.7);
-  color: #FFC53D;
-  border: 1px solid #FFC53D;
+  color: #f5c518;
+  border: 1px solid #f5c518;
   border-radius: 6px;
   padding: 6px 14px;
   font-size: 12px;
@@ -546,7 +614,7 @@ body {
   display: none;
   font-family: inherit;
 }
-#backBtn:hover { background: #FFC53D; color: #000; }
+#backBtn:hover { background: #f5c518; color: #000; }
 
 /* ===== 友商对比模态框 ===== */
 .compare-overlay {
@@ -562,8 +630,8 @@ body {
 }
 .compare-overlay.show { display: flex; }
 .compare-modal {
-  background: #1A1A1A;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #141414;
+  border: 1px solid #262626;
   border-radius: 16px;
   width: 100%;
   max-width: 1100px;
@@ -573,15 +641,15 @@ body {
   max-height: calc(100vh - 60px);
   overflow: hidden;
 }
-.compare-header {
+.compare-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid #262626;
   flex-shrink: 0;
 }
-.compare-header h2 {
+.compare-modal-header h2 {
   font-size: 17px;
   color: #fff;
   font-weight: 700;
@@ -606,10 +674,10 @@ body {
   margin-bottom: 20px;
 }
 .compare-col {
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid #262626;
   border-radius: 12px;
   padding: 16px;
-  background: rgba(255,255,255,0.02);
+  background: #1a1a1a;
 }
 .compare-col-title {
   font-size: 14px;
@@ -619,7 +687,7 @@ body {
   border-bottom: 2px solid;
 }
 .col-youfang .compare-col-title { color: #FF8C42; border-color: rgba(255,140,66,0.2); }
-.col-meituan .compare-col-title { color: #FFC53D; border-color: rgba(255,197,61,0.2); }
+.col-meituan .compare-col-title { color: #f5c518; border-color: rgba(245,197,24,0.2); }
 .cf-row {
   display: flex;
   align-items: center;
@@ -636,7 +704,7 @@ body {
 .cf-row input {
   flex: 1;
   padding: 7px 10px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid #262626;
   border-radius: 6px;
   font-size: 13px;
   font-family: inherit;
@@ -646,8 +714,8 @@ body {
 }
 .cf-row input:focus {
   outline: none;
-  border-color: #FFC53D;
-  box-shadow: 0 0 0 2px rgba(255,197,61,0.1);
+  border-color: #f5c518;
+  box-shadow: 0 0 0 2px rgba(245,197,24,0.1);
 }
 .cf-unit {
   font-size: 11px;
@@ -676,7 +744,7 @@ body {
 }
 .compare-calc-btn {
   padding: 12px 48px;
-  background: #FFC53D;
+  background: #f5c518;
   color: #000;
   border: none;
   border-radius: 8px;
@@ -688,7 +756,7 @@ body {
   transition: all 0.2s;
 }
 .compare-calc-btn:hover {
-  background: #FFD666;
+  background: #e6b800;
   transform: translateY(-1px);
 }
 
@@ -704,32 +772,32 @@ body {
 .cmp-table th, .cmp-table td {
   padding: 10px 12px;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid #262626;
 }
 .cmp-table th {
-  background: rgba(255,255,255,0.03);
+  background: #1a1a1a;
   font-weight: 600;
   color: #ccc;
 }
 .cmp-table .row-header {
   text-align: left;
   font-weight: 600;
-  background: rgba(255,255,255,0.02);
+  background: #1a1a1a;
   color: #bbb;
   min-width: 140px;
 }
 .cmp-table td.col-youfang { color: #FF8C42; }
-.cmp-table td.col-meituan { color: #FFC53D; }
+.cmp-table td.col-meituan { color: #f5c518; }
 .cmp-table tr.total-row td {
   font-weight: 700;
   font-size: 14px;
-  background: rgba(255,197,61,0.05);
+  background: rgba(245,197,24,0.05);
 }
-.cmp-table .saving { color: #52C41A; font-weight: 700; }
+.cmp-table .saving { color: #4ade80; font-weight: 700; }
 .cmp-table .worse { color: #FF4D4F; font-weight: 700; }
 .cmp-summary {
-  background: rgba(82,196,26,0.05);
-  border: 1px solid rgba(82,196,26,0.15);
+  background: rgba(74,222,128,0.05);
+  border: 1px solid rgba(74,222,128,0.15);
   border-radius: 10px;
   padding: 16px 20px;
   text-align: center;
@@ -737,7 +805,7 @@ body {
 .cmp-summary .big {
   font-size: 28px;
   font-weight: 800;
-  color: #52C41A;
+  color: #4ade80;
   margin: 4px 0;
 }
 .cmp-summary .desc {
@@ -762,8 +830,8 @@ body {
 }
 #featurePanelOverlay.show { display: flex; }
 #featurePanel {
-  background: #1A1A1A;
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #141414;
+  border: 1px solid #262626;
   border-radius: 16px;
   width: 90%;
   max-width: 860px;
@@ -778,7 +846,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid #262626;
   flex-shrink: 0;
 }
 #featurePanelTitle {
@@ -809,10 +877,10 @@ body {
 .fp-module-title {
   font-size: 13px;
   font-weight: 700;
-  color: #FFC53D;
+  color: #f5c518;
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(255,197,61,0.15);
+  border-bottom: 1px solid rgba(245,197,24,0.15);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -821,7 +889,7 @@ body {
   content: '';
   width: 4px;
   height: 14px;
-  background: #FFC53D;
+  background: #f5c518;
   border-radius: 2px;
   display: inline-block;
 }
@@ -831,7 +899,7 @@ body {
   color: #aaa;
   line-height: 2;
   padding: 2px 0;
-  border-bottom: 1px dashed rgba(255,255,255,0.04);
+  border-bottom: 1px dashed #1f1f1f;
 }
 .fp-no-data {
   color: #666;
@@ -844,10 +912,10 @@ body {
   align-items: center;
   gap: 4px;
   padding: 3px 10px;
-  border: 1px solid #FFC53D;
+  border: 1px solid #f5c518;
   border-radius: 20px;
   font-size: 11px;
-  color: #FFC53D;
+  color: #f5c518;
   background: transparent;
   cursor: pointer;
   margin-top: 4px;
@@ -855,7 +923,7 @@ body {
   white-space: nowrap;
 }
 .feature-btn:hover {
-  background: #FFC53D;
+  background: #f5c518;
   color: #000;
 }
 
@@ -864,7 +932,8 @@ body {
   #selector{grid-template-columns:1fr;gap:16px}
   .top-nav{padding:0 16px}
   #main-container{padding:16px}
-  .hero-title{font-size:24px}
+  .hero-title{font-size:28px}
+  .tool-form{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -895,114 +964,233 @@ body {
 </nav>
 
 <div id="main-container">
+
+<!-- 顶部导航栏 -->
+<nav class="top-nav">
+  <div class="nav-logo">AI报价</div>
+  <div class="nav-menu">
+    <span class="nav-item active">首页</span>
+    <span class="nav-item">报价工具</span>
+    <span class="nav-item">产品中心</span>
+    <span class="nav-item">帮助中心</span>
+  </div>
+  <div class="nav-user">
+    <div class="nav-avatar">Z</div>
+    <span class="nav-name">周巍</span>
+    <div class="nav-status"><div class="nav-status-dot"></div>已登录</div>
+  </div>
+</nav>
+
+<div id="main-container">
 <div id="selector">
-
-  <!-- 左上：Hero 品牌卡片 -->
-  <div class="hero-card">
-    <div class="hero-logo">M</div>
-    <div class="hero-title">智能报价 降本增效</div>
-    <div class="hero-sub">美团餐饮系统 · CKA 报价与竞品分析工具</div>
-    <div class="hero-tags">
-      <span class="htag hot">阶梯定价</span>
-      <span class="htag">全产品矩阵</span>
-      <span class="htag hot">折扣管理</span>
-      <span class="htag">竞品对比</span>
-      <span class="htag">硬件报价</span>
-    </div>
-    <div class="hero-stats">
-      <div><div class="hs-num">4+</div><div class="hs-label">产品模块</div></div>
-      <div><div class="hs-num">9档</div><div class="hs-label">阶梯折扣</div></div>
-      <div><div class="hs-num">2</div><div class="hs-label">版本对比</div></div>
-    </div>
-    <button class="hero-cta" onclick="loadVersion('pro')">立即报价 →</button>
-    <button class="reward-btn" onclick="document.getElementById('rewardModal').classList.add('open')" style="margin-left:8px">☕ 请作者喝杯咖啡</button>
-  </div>
-
-  <!-- 右上：报价工具卡片 -->
-  <div class="tool-card" onclick="loadVersion('pro')">
-    <span class="tool-badge">PRO</span>
-    <span class="tool-icon">⚡</span>
-    <div class="tool-title">AI智能报价工具</div>
-    <div class="tool-desc">输入参数，一键生成精准报价</div>
-    <ul class="tool-feat">
-      <li>阶梯价格体系</li>
-      <li>服务产品人天计费</li>
-      <li>完整产品矩阵</li>
-      <li>多维折扣管理</li>
-      <li>硬件产品报价</li>
-    </ul>
-    <span class="tool-btn">进入报价工具 →</span>
-  </div>
-
-  <!-- 左下：功能更新记录 -->
-  <div class="changelog">
-    <div class="changelog-title">📋 功能更新记录</div>
-    <div class="changelog-list">
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.16</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">主页全新改版：深色仪表盘风格，2×2网格布局，顶部导航栏</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.15</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「友商成本对比」功能：输入友商各项年费/费率，一键对比年度综合成本</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.03</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「智能备餐」产品（标价¥2,088/店/年，底价¥1,088/店/年）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.08.03</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增硬件产品：80N（¥399）与 80NW（¥429），支持悬停查看产品图</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.29</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">P2平板收银配件底座价格调整（348→268）</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.28</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">添加 loading 加载动画，优化大文件白屏等待体验</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.24</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">总部产品支持自定义数量：第三方配套对接点位、商圈选址城市包</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.07</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">副收银支持自定义数量输入，报价表格新增数量和小计列</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.07.03</span>
-        <span class="changelog-tag tag-feat">FEAT</span>
-        <span class="changelog-text">打包价低于成本价改为提醒确认；阶梯对比模式新增打包价支持</span>
-      </div>
-      <div class="changelog-item">
-        <span class="changelog-date">2026.06.30</span>
-        <span class="changelog-tag tag-new">NEW</span>
-        <span class="changelog-text">新增「战略合作政策」页面，支持自主编辑内容</span>
+  <div class="col-left">
+    <!-- 左上：Hero 品牌卡片 -->
+    <div class="hero-card">
+      <div class="hero-content">
+        <span class="hero-badge">NEW</span>
+        <div class="hero-title">智能报价<br>降本增效</div>
+        <div class="hero-sub">AI驱动 · 精准报价 · 降本增效 · 赢得商机</div>
+        <div class="hero-metrics">
+          <div class="metric-card">
+            <span class="metric-icon">📉</span>
+            <div class="metric-value">28.6%</div>
+            <div class="metric-label">成本降低</div>
+            <div class="metric-chart">
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-icon">⚡</span>
+            <div class="metric-value">60%</div>
+            <div class="metric-label">报价效率提升</div>
+            <div class="metric-chart">
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <span class="metric-icon">🎯</span>
+            <div class="metric-value">35%</div>
+            <div class="metric-label">中标率提升</div>
+            <div class="metric-chart">
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+              <div class="chart-bar"></div>
+            </div>
+          </div>
+        </div>
+        <button class="hero-cta" onclick="loadVersion('pro')">立即报价 →</button>
+        <button class="reward-btn" onclick="document.getElementById('rewardModal').classList.add('open')">☕ 请作者喝杯咖啡</button>
       </div>
     </div>
-  </div>
 
-  <!-- 右下：友商成本对比入口 -->
-  <div class="compare-entry" onclick="openCompareModal()">
-    <div class="compare-info">
-      <span class="compare-icon">⚖️</span>
-      <div>
-        <div class="compare-title">友商成本对比分析</div>
-        <div class="compare-desc">输入友商数据，一键对比美团 vs 友商年度综合成本</div>
+    <!-- 左下：更新记录 -->
+    <div class="changelog">
+      <div class="changelog-header">
+        <span class="changelog-title">📋 功能更新记录</span>
+        <span class="changelog-count">10 条</span>
+      </div>
+      <div class="changelog-list">
+        <div class="changelog-item">
+          <span class="changelog-date">2026.08.16</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">主页全新改版：深色仪表盘风格，5:7非对称网格布局</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.08.15</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">新增「友商成本对比」功能：一键对比美团vs友商年度综合成本</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.08.03</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">新增「智能备餐」产品（标价¥2,088/店/年）</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.08.03</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">新增硬件产品：80N（¥399）与 80NW（¥429）</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.07.29</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">P2平板收银配件底座价格调整（348→268）</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.07.28</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">添加 loading 加载动画，优化白屏等待体验</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.07.24</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">总部产品支持自定义数量：第三方配套对接点位</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.07.07</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">副收银支持自定义数量输入，报价表格新增数量列</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.07.03</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">打包价低于成本价改为提醒确认；阶梯对比模式新增打包价</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.06.30</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">新增「战略合作政策」页面，支持自主编辑内容</span>
+        </div>
       </div>
     </div>
-    <span class="compare-arrow">→</span>
   </div>
+  <div class="col-right">
+    <!-- 右上：AI智能报价工具 -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-title-group">
+          <div class="tool-title">AI智能报价工具</div>
+          <div class="tool-subtitle">输入参数，一键生成精准报价</div>
+        </div>
+        <span class="tool-badge">PRO</span>
+      </div>
+      <div class="tool-form">
+        <div class="form-group">
+          <label class="form-label">产品名称</label>
+          <input class="form-input" type="text" placeholder="如：主收银">
+        </div>
+        <div class="form-group">
+          <label class="form-label">数量</label>
+          <input class="form-input" type="number" placeholder="如：50">
+        </div>
+        <div class="form-group">
+          <label class="form-label">规格</label>
+          <input class="form-input" type="text" placeholder="如：连锁版">
+        </div>
+        <div class="form-group">
+          <label class="form-label">材料</label>
+          <input class="form-input" type="text" placeholder="如：标准">
+        </div>
+      </div>
+      <button class="tool-btn" onclick="loadVersion('pro')">立 即 报 价</button>
+    </div>
 
+    <!-- 右下：友商成本对比 -->
+    <div class="compare-card">
+      <div class="compare-header">
+        <span class="compare-title">�️ 友商成本对比分析</span>
+        <span class="compare-action" onclick="openCompareModal()">查看详情 →</span>
+      </div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>费用项目</th>
+            <th>友商A</th>
+            <th>美团</th>
+            <th>差额</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>POS系统年费</td>
+            <td>¥3,600,000</td>
+            <td class="highlight">¥2,880,000</td>
+            <td class="saving">节省 ¥720,000</td>
+          </tr>
+          <tr>
+            <td>供应链年费</td>
+            <td>¥1,200,000</td>
+            <td class="highlight">¥960,000</td>
+            <td class="saving">节省 ¥240,000</td>
+          </tr>
+          <tr>
+            <td>支付手续费</td>
+            <td>¥360,000</td>
+            <td class="highlight">¥228,000</td>
+            <td class="saving">节省 ¥132,000</td>
+          </tr>
+          <tr>
+            <td>合计</td>
+            <td>¥5,160,000</td>
+            <td class="highlight">¥4,068,000</td>
+            <td class="saving">节省 ¥1,092,000</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="compare-chart">
+        <div class="chart-col">
+          <div class="chart-bar-group">
+            <div class="cbar cbar-youfang" style="height:50%"></div>
+            <div class="cbar cbar-meituan" style="height:40%"></div>
+          </div>
+          <span class="chart-label">POS系统</span>
+        </div>
+        <div class="chart-col">
+          <div class="chart-bar-group">
+            <div class="cbar cbar-youfang" style="height:60%"></div>
+            <div class="cbar cbar-meituan" style="height:48%"></div>
+          </div>
+          <span class="chart-label">供应链</span>
+        </div>
+        <div class="chart-col">
+          <div class="chart-bar-group">
+            <div class="cbar cbar-youfang" style="height:35%"></div>
+            <div class="cbar cbar-meituan" style="height:22%"></div>
+          </div>
+          <span class="chart-label">支付费率</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -1012,8 +1200,8 @@ body {
     <span class="reward-close" onclick="document.getElementById('rewardModal').classList.remove('open')">&times;</span>
     <h3>🎉 感谢你的认可！</h3>
     <p>如果这个工具帮到了你<br>欢迎请作者喝杯咖啡 ☕<br>微信扫码即可</p>
-    <div style="font-size:48px;margin:12px 0">☕</div>
-    <div class="sub">周巍 @美团 · CKA团队</div>
+    <div style="font-size:48px;margin:12px 0">�</div>
+    <div class="sub" style="font-size:12px;color:#555">周巍 @美团 · CKA团队</div>
   </div>
 </div>
 <div id="viewer">
