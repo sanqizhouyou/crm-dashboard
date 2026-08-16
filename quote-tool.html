@@ -188,139 +188,286 @@ body {
   min-height: calc(100vh - 88px);
 }
 
-/* ===== Hero 品牌卡片 ===== */
-.hero-card {
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  border-radius: 16px;
-  padding: 20px;
+/* ===== 智能报价海报卡片 ===== */
+.poster-card {
   position: relative;
+  background:
+    radial-gradient(circle at 78% 28%, rgba(255, 184, 0, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(255, 184, 0, 0.03) 0%, transparent 50%),
+    #1a1a1a;
+  border-radius: 16px;
+  border: 1px solid #2a2a2a;
   overflow: hidden;
-  min-height: 280px;
+  padding: 24px;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
 }
-.hero-card::after {
-  content: '';
+.poster-bg-decoration {
   position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 240px;
-  height: 240px;
-  background: radial-gradient(circle, rgba(245,197,24,0.12) 0%, transparent 70%);
-  border-radius: 50%;
+  top: 0;
+  right: 0;
+  width: 55%;
+  height: 65%;
   pointer-events: none;
 }
-.hero-content {
-  position: relative;
-  z-index: 1;
+.poster-bg-bars {
+  position: absolute;
+  bottom: 80px;
+  right: 60px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  opacity: 0.3;
 }
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #000;
+.pbar {
+  width: 5px;
+  background: linear-gradient(to top, #FFCD00, transparent);
+  border-radius: 3px;
+}
+.pbar-1 { height: 30px; }
+.pbar-2 { height: 55px; }
+.pbar-3 { height: 40px; }
+.pbar-4 { height: 70px; }
+.pbar-5 { height: 45px; }
+.poster-particle {
+  position: absolute;
   background: #FFCD00;
-  padding: 3px 10px;
-  border-radius: 4px;
-  margin-bottom: 16px;
-  letter-spacing: 0.5px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
 }
-.hero-title {
+.pp1 { width: 3px; height: 3px; top: 15%; right: 25%; }
+.pp2 { width: 5px; height: 5px; top: 25%; right: 15%; opacity: 0.7; }
+.pp3 { width: 3px; height: 3px; top: 40%; right: 30%; opacity: 0.5; }
+.pp4 { width: 4px; height: 4px; top: 10%; right: 10%; opacity: 0.8; }
+.poster-techline {
+  position: absolute;
+  background: linear-gradient(to bottom, rgba(255, 204, 0, 0.25), transparent);
+  width: 1px;
+}
+.ptl1 { height: 60px; top: 10%; right: 20%; }
+.ptl2 { height: 45px; top: 22%; right: 12%; }
+.poster-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  gap: 20px;
+}
+.poster-text { flex: 1; max-width: 55%; }
+.poster-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #a3a3a3;
+  font-weight: 500;
+}
+.poster-tag-icon {
+  width: 16px;
+  height: 16px;
+  color: #FFCD00;
+}
+.poster-title {
+  margin: 0 0 12px 0;
+  line-height: 1.1;
+}
+.poster-title-line {
+  display: block;
   font-size: 36px;
-  font-weight: 800;
-  color: #f5c518;
-  line-height: 1.2;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, #FFCD00, #FFB800);
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(180deg, #FFF3C4 0%, #FFCD00 40%, #D4A017 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(212, 160, 23, 0.3));
 }
-.hero-sub {
-  font-size: 12px;
-  color: #a3a3a3;
-  margin-bottom: 24px;
+.poster-subtitle {
+  font-size: 13px;
+  color: #737373;
   line-height: 1.6;
+  max-width: 90%;
+  margin: 0;
 }
-.hero-metrics {
+.poster-visual {
+  width: 45%;
+  min-height: 200px;
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
-.metric-card {
-  flex: 1;
-  background: #141414;
-  border: 1px solid #2a2a2a;
+.poster-scene {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  transform-style: preserve-3d;
+}
+.poster-platform {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 40px;
+}
+.p-ring {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 204, 0, 0.35);
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.1), inset 0 0 8px rgba(255, 204, 0, 0.08);
+}
+.pr1 {
+  width: 130px; height: 32px; bottom: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 204, 0, 0.12) 0%, transparent 70%);
+  border-color: rgba(255, 204, 0, 0.4);
+}
+.pr2 { width: 105px; height: 26px; bottom: 10px; border-color: rgba(255, 204, 0, 0.25); }
+.pr3 {
+  width: 80px; height: 20px; bottom: 20px;
+  background: radial-gradient(ellipse at center, rgba(255, 204, 0, 0.15) 0%, transparent 70%);
+}
+.poster-pillar {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55px;
+  height: 45px;
+  background: linear-gradient(to bottom, rgba(255, 204, 0, 0.25), rgba(255, 184, 0, 0.08));
+  border-radius: 3px;
+  border: 1px solid rgba(255, 204, 0, 0.25);
+  box-shadow: 0 0 25px rgba(255, 184, 0, 0.15);
+}
+.poster-pillar-top {
+  position: absolute;
+  bottom: 62px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55px;
+  height: 16px;
+  background: radial-gradient(ellipse at center, #FFD700, #FFB800);
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(255, 204, 0, 0.5);
+}
+.poster-cube {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  margin-left: -32px;
+  width: 64px;
+  height: 64px;
+  transform-style: preserve-3d;
+  transform: rotateX(-15deg) rotateY(30deg);
+  animation: posterFloat 5s ease-in-out infinite;
+}
+@keyframes posterFloat {
+  0%, 100% { transform: rotateX(-15deg) rotateY(30deg) translateY(0); }
+  50% { transform: rotateX(-15deg) rotateY(30deg) translateY(-8px); }
+}
+.pc-face {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 22px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  backface-visibility: visible;
+}
+.pc-front { transform: translateZ(32px); background: linear-gradient(135deg, #FFD700, #FFB800); }
+.pc-top { transform: rotateX(90deg) translateZ(32px); background: linear-gradient(135deg, #FFF3C4, #FFD700); }
+.pc-right { transform: rotateY(90deg) translateZ(32px); background: linear-gradient(135deg, #FFB800, #D4A017); }
+.pc-left { transform: rotateY(-90deg) translateZ(32px); background: #B8860B; }
+.pc-back { transform: rotateY(180deg) translateZ(32px); background: #B8860B; }
+.pc-bottom { transform: rotateX(-90deg) translateZ(32px); background: #8B6914; }
+.poster-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  position: relative;
+  z-index: 3;
+  margin-top: 20px;
+}
+.pstat-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 14px;
-  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
 }
-.metric-icon {
-  font-size: 18px;
+.pstat-card:hover {
+  transform: translateY(-2px);
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 204, 0, 0.1);
+}
+.pstat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 6px;
-  display: block;
 }
-.metric-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: #f5c518;
-  margin-bottom: 2px;
+.pstat-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 204, 0, 0.08);
+  border: 1px solid rgba(255, 204, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFCD00;
 }
-.metric-label {
-  font-size: 10px;
-  color: #737373;
-  line-height: 1.3;
+.pstat-icon svg { width: 14px; height: 14px; }
+.pstat-label { font-size: 12px; color: #a3a3a3; font-weight: 500; }
+.pstat-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFCD00;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  line-height: 1;
 }
-.metric-chart {
-  margin-top: 10px;
-  height: 32px;
+.pstat-chart {
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  gap: 3px;
+  gap: 4px;
+  height: 32px;
 }
-.chart-bar {
-  width: 5px;
-  background: linear-gradient(to top, #f5c518, #ffd700);
+.pstat-bar {
+  flex: 1;
+  background: linear-gradient(to top, #8B6914, #FFCD00);
   border-radius: 2px 2px 0 0;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  opacity: 0.9;
+  min-width: 3px;
 }
-.chart-bar:hover { opacity: 1; }
-.chart-bar:nth-child(1) { height: 35%; }
-.chart-bar:nth-child(2) { height: 50%; }
-.chart-bar:nth-child(3) { height: 70%; }
-.chart-bar:nth-child(4) { height: 100%; }
-.chart-bar:nth-child(5) { height: 80%; }
-.metric-trend {
-  font-size: 10px;
-  color: #00d672;
-  margin-top: 4px;
-  font-weight: 600;
-}
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 20px;
-  background: transparent;
-  color: #FFCD00;
-  border: 2px solid #FFCD00;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: all 0.2s;
-  box-shadow: 0 4px 16px rgba(255,204,0,0.08), 0 0 8px rgba(255,204,0,0.1);
-}
-.hero-cta:hover {
-  background: #FFCD00;
-  color: #000;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(255,204,0,0.2), 0 0 12px rgba(255,204,0,0.15);
-}
+.pstat-card:nth-child(1) .pstat-bar:nth-child(1) { height: 30%; opacity: 0.4; }
+.pstat-card:nth-child(1) .pstat-bar:nth-child(2) { height: 45%; opacity: 0.55; }
+.pstat-card:nth-child(1) .pstat-bar:nth-child(3) { height: 60%; opacity: 0.7; }
+.pstat-card:nth-child(1) .pstat-bar:nth-child(4) { height: 75%; opacity: 0.85; }
+.pstat-card:nth-child(1) .pstat-bar:nth-child(5) { height: 100%; opacity: 1; }
+.pstat-card:nth-child(2) .pstat-bar:nth-child(1) { height: 25%; opacity: 0.4; }
+.pstat-card:nth-child(2) .pstat-bar:nth-child(2) { height: 40%; opacity: 0.55; }
+.pstat-card:nth-child(2) .pstat-bar:nth-child(3) { height: 65%; opacity: 0.7; }
+.pstat-card:nth-child(2) .pstat-bar:nth-child(4) { height: 80%; opacity: 0.85; }
+.pstat-card:nth-child(2) .pstat-bar:nth-child(5) { height: 100%; opacity: 1; }
+.pstat-card:nth-child(3) .pstat-bar:nth-child(1) { height: 20%; opacity: 0.4; }
+.pstat-card:nth-child(3) .pstat-bar:nth-child(2) { height: 45%; opacity: 0.55; }
+.pstat-card:nth-child(3) .pstat-bar:nth-child(3) { height: 70%; opacity: 0.7; }
+.pstat-card:nth-child(3) .pstat-bar:nth-child(4) { height: 85%; opacity: 0.85; }
+.pstat-card:nth-child(3) .pstat-bar:nth-child(5) { height: 100%; opacity: 1; }
 
 /* ===== 报价工具卡片 ===== */
 .tool-card {
@@ -993,55 +1140,129 @@ body {
 <div id="main-container">
 <div id="selector">
   <div class="col-left">
-    <!-- 左上：Hero 品牌卡片 -->
-    <div class="hero-card">
-      <div class="hero-content">
-        <span class="hero-badge">NEW</span>
-        <div class="hero-title">智能报价<br>降本增效</div>
-        <div class="hero-sub">AI驱动 · 精准报价 · 降本增效 · 赢得商机</div>
-        <div class="hero-metrics">
-          <div class="metric-card">
-            <span class="metric-icon">📉</span>
-            <div class="metric-value">28.6%</div>
-            <div class="metric-label">成本降低</div>
-            <div class="metric-chart">
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-            </div>
-            <div class="metric-trend">↓ 同比 -12.5%</div>
+    <!-- 左上：智能报价海报卡片 -->
+    <div class="poster-card">
+      <!-- 背景装饰 -->
+      <div class="poster-bg-decoration">
+        <div class="poster-bg-bars">
+          <div class="pbar pbar-1"></div>
+          <div class="pbar pbar-2"></div>
+          <div class="pbar pbar-3"></div>
+          <div class="pbar pbar-4"></div>
+          <div class="pbar pbar-5"></div>
+        </div>
+        <div class="poster-particle pp1"></div>
+        <div class="poster-particle pp2"></div>
+        <div class="poster-particle pp3"></div>
+        <div class="poster-particle pp4"></div>
+        <div class="poster-techline ptl1"></div>
+        <div class="poster-techline ptl2"></div>
+      </div>
+
+      <!-- 主内容 -->
+      <div class="poster-main">
+        <!-- 左侧文字 -->
+        <div class="poster-text">
+          <div class="poster-tag">
+            <svg class="poster-tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"/>
+              <rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/>
+              <rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <span>智能看板</span>
           </div>
-          <div class="metric-card">
-            <span class="metric-icon">⚡</span>
-            <div class="metric-value">60%</div>
-            <div class="metric-label">报价效率提升</div>
-            <div class="metric-chart">
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
+          <h1 class="poster-title">
+            <span class="poster-title-line">智能报价</span>
+            <span class="poster-title-line">降本增效</span>
+          </h1>
+          <p class="poster-subtitle">基于AI算法实时分析市场数据，智能优化报价策略</p>
+        </div>
+
+        <!-- 右侧3D视觉 -->
+        <div class="poster-visual">
+          <div class="poster-scene">
+            <!-- 发光平台 -->
+            <div class="poster-platform">
+              <div class="p-ring pr1"></div>
+              <div class="p-ring pr2"></div>
+              <div class="p-ring pr3"></div>
             </div>
-            <div class="metric-trend">↑ 同比 +18.3%</div>
-          </div>
-          <div class="metric-card">
-            <span class="metric-icon">🎯</span>
-            <div class="metric-value">35%</div>
-            <div class="metric-label">中标率提升</div>
-            <div class="metric-chart">
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
-              <div class="chart-bar"></div>
+            <!-- 圆柱底座 -->
+            <div class="poster-pillar"></div>
+            <div class="poster-pillar-top"></div>
+            <!-- 3D立方体 -->
+            <div class="poster-cube">
+              <div class="pc-face pc-front">AI</div>
+              <div class="pc-face pc-top"></div>
+              <div class="pc-face pc-right"></div>
+              <div class="pc-face pc-left"></div>
+              <div class="pc-face pc-back"></div>
+              <div class="pc-face pc-bottom"></div>
             </div>
-            <div class="metric-trend">↑ 同比 +8.7%</div>
           </div>
         </div>
-        <button class="hero-cta" onclick="loadVersion('pro')">立即报价 →</button>
-        <button class="reward-btn" onclick="document.getElementById('rewardModal').classList.add('open')">☕ 请作者喝杯咖啡</button>
+      </div>
+
+      <!-- 底部指标卡片 -->
+      <div class="poster-stats">
+        <div class="pstat-card">
+          <div class="pstat-header">
+            <div class="pstat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                <polyline points="17 6 23 6 23 12"/>
+              </svg>
+            </div>
+            <span class="pstat-label">成本降低</span>
+          </div>
+          <div class="pstat-value">28.6%</div>
+          <div class="pstat-chart">
+            <div class="pstat-bar psb1"></div>
+            <div class="pstat-bar psb2"></div>
+            <div class="pstat-bar psb3"></div>
+            <div class="pstat-bar psb4"></div>
+            <div class="pstat-bar psb5"></div>
+          </div>
+        </div>
+        <div class="pstat-card">
+          <div class="pstat-header">
+            <div class="pstat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <span class="pstat-label">效率提升</span>
+          </div>
+          <div class="pstat-value">60%</div>
+          <div class="pstat-chart">
+            <div class="pstat-bar psb1"></div>
+            <div class="pstat-bar psb2"></div>
+            <div class="pstat-bar psb3"></div>
+            <div class="pstat-bar psb4"></div>
+            <div class="pstat-bar psb5"></div>
+          </div>
+        </div>
+        <div class="pstat-card">
+          <div class="pstat-header">
+            <div class="pstat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <span class="pstat-label">中标率提升</span>
+          </div>
+          <div class="pstat-value">35%</div>
+          <div class="pstat-chart">
+            <div class="pstat-bar psb1"></div>
+            <div class="pstat-bar psb2"></div>
+            <div class="pstat-bar psb3"></div>
+            <div class="pstat-bar psb4"></div>
+            <div class="pstat-bar psb5"></div>
+          </div>
+        </div>
       </div>
     </div>
 
