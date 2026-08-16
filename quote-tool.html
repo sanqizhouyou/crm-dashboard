@@ -168,12 +168,14 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px;
+  min-height: calc(100vh - 64px);
 }
 #selector {
   display: grid;
   grid-template-columns: 5fr 7fr;
   gap: 24px;
   align-items: start;
+  min-height: calc(100vh - 128px);
 }
 
 /* ===== 左右列 ===== */
@@ -181,6 +183,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-height: calc(100vh - 128px);
 }
 
 /* ===== Hero 品牌卡片 ===== */
