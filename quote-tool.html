@@ -175,14 +175,14 @@ body {
 }
 #selector {
   display: grid;
-  grid-template-columns: 60% 1fr;
+  grid-template-columns: 60% 40%;
   gap: 0;
   align-items: stretch;
   min-height: calc(100vh - 80px);
   flex: 1;
 }
-.col-left { padding-right: 8px; }
-.col-right { padding-left: 8px; }
+.col-left { padding-right: 8px; min-width: 0; }
+.col-right { padding-left: 8px; min-width: 0; }
 
 /* ===== 左右列 ===== */
 .col-left, .col-right {
