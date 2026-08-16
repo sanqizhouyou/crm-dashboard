@@ -271,24 +271,32 @@ body {
   line-height: 1.3;
 }
 .metric-chart {
-  margin-top: 8px;
-  height: 24px;
+  margin-top: 10px;
+  height: 32px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
 }
 .chart-bar {
-  width: 4px;
-  background: #f5c518;
-  border-radius: 1px;
-  opacity: 0.6;
+  width: 5px;
+  background: linear-gradient(to top, #f5c518, #ffd700);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
 }
-.chart-bar:nth-child(1) { height: 40%; }
-.chart-bar:nth-child(2) { height: 60%; }
-.chart-bar:nth-child(3) { height: 80%; }
+.chart-bar:hover { opacity: 1; }
+.chart-bar:nth-child(1) { height: 35%; }
+.chart-bar:nth-child(2) { height: 50%; }
+.chart-bar:nth-child(3) { height: 70%; }
 .chart-bar:nth-child(4) { height: 100%; }
-.chart-bar:nth-child(5) { height: 70%; }
+.chart-bar:nth-child(5) { height: 80%; }
+.metric-trend {
+  font-size: 10px;
+  color: #4ade80;
+  margin-top: 4px;
+  font-weight: 600;
+}
 .hero-cta {
   display: inline-flex;
   align-items: center;
@@ -369,7 +377,7 @@ body {
   border-color: #f5c518;
   box-shadow: 0 0 0 2px rgba(245,197,24,0.1);
 }
-.form-input::placeholder { color: #555; }
+.form-input::placeholder { color: #777; }
 .tool-btn {
   width: 100%;
   padding: 12px;
@@ -535,6 +543,11 @@ body {
 .chart-label {
   font-size: 11px;
   color: #737373;
+}
+.chart-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #a3a3a3;
 }
 
 /* ===== 打赏按钮 ===== */
@@ -987,6 +1000,7 @@ body {
               <div class="chart-bar"></div>
               <div class="chart-bar"></div>
             </div>
+            <div class="metric-trend">↓ 同比 -12.5%</div>
           </div>
           <div class="metric-card">
             <span class="metric-icon">⚡</span>
@@ -999,6 +1013,7 @@ body {
               <div class="chart-bar"></div>
               <div class="chart-bar"></div>
             </div>
+            <div class="metric-trend">↑ 同比 +18.3%</div>
           </div>
           <div class="metric-card">
             <span class="metric-icon">🎯</span>
@@ -1011,6 +1026,7 @@ body {
               <div class="chart-bar"></div>
               <div class="chart-bar"></div>
             </div>
+            <div class="metric-trend">↑ 同比 +8.7%</div>
           </div>
         </div>
         <button class="hero-cta" onclick="loadVersion('pro')">立即报价 →</button>
@@ -1157,6 +1173,7 @@ body {
             <div class="cbar cbar-youfang" style="height:50%"></div>
             <div class="cbar cbar-meituan" style="height:40%"></div>
           </div>
+          <span class="chart-value">¥360万</span>
           <span class="chart-label">POS系统</span>
         </div>
         <div class="chart-col">
@@ -1164,6 +1181,7 @@ body {
             <div class="cbar cbar-youfang" style="height:60%"></div>
             <div class="cbar cbar-meituan" style="height:48%"></div>
           </div>
+          <span class="chart-value">¥120万</span>
           <span class="chart-label">供应链</span>
         </div>
         <div class="chart-col">
@@ -1171,6 +1189,7 @@ body {
             <div class="cbar cbar-youfang" style="height:35%"></div>
             <div class="cbar cbar-meituan" style="height:22%"></div>
           </div>
+          <span class="chart-value">¥36万</span>
           <span class="chart-label">支付费率</span>
         </div>
       </div>
