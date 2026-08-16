@@ -628,7 +628,9 @@ body {
 </div>
 
 <div id="selector">
-  <div class="sel-left"><div class="poster">
+  <div class="sel-left
+  <div class="sel-left">
+    <div class="poster">
     <div class="poster-m">M</div>
     <div class="poster-title">美团餐饮系统</div>
     <div class="poster-sub">CKA 报价与竞品分析工具</div>
@@ -763,17 +765,120 @@ body {
 
   
   </div>
-  <!-- 打赏模态框 -->
-  <div class="reward-modal" id="rewardModal" onclick="if(event.target===this)this.classList.remove('open')">
-    <div class="reward-card">
-      <span class="reward-close" onclick="document.getElementById('rewardModal').classList.remove('open')">&times;</span>
-      <h3>&#127881; 感谢你的认可！</h3>
-      <p>如果这个工具帮到了你<br>欢迎请作者喝杯咖啡 &#9749;<br>微信扫码即可</p>
-      <div style="font-size:48px;margin:12px 0">&#9749;</div>
-      <div class="sub">周巍 @美团 &middot; CKA团队</div>
+    <!-- 功能更新记录 -->
+  <div class="changelog">
+    <div class="changelog-title">📋 功能更新记录</div>
+  <div class="changelog-list">
+    <div class="changelog-item">
+      <span class="changelog-date">2026.08-16</span>
+      <span class="changelog-tag tag-feat">FEAT</span>
+      <span class="changelog-text">主页重新排版：左侧品牌海报+产品更新，右侧报价工具入口+友商对比，单页全展示</span>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-date">2026.08-15</span>
+      <span class="changelog-tag tag-new">NEW</span>
+      <span class="changelog-text">新增「友商成本对比」功能：输入友商各项年费/费率，一键对比美团vs友商年度综合成本，输出逐项对比表格和节省金额</span>
+    </div>
+    <div class="changelog-item">
+      <span class="changelog-date">2026.08.03</span>
+      <span class="changelog-tag tag-feat">FEAT</span>
+      <span class="changelog-text">硬件产品图片优化：选择硬件后，图片自动附加在报价方案末尾（不再仅悬停预览）</span>
+    </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.08.03</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「智能备餐」产品（标价¥2,088/店/年，底价¥1,088/店/年，无阶梯价），基于大数据算法精准规划备餐数量</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.08.03</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增硬件产品：80N（网口+USB，¥399）与 80NW（网口+USB+Wi-Fi，¥429），支持悬停查看产品图</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.29</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">P2平板收银配件底座价格调整（348→268）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.28</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">添加 loading 加载动画，优化大文件白屏等待体验</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.24</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">总部产品支持自定义数量：第三方配套对接点位、商圈选址城市包（专业版）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.24</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「分账管理（纯外卖）门店点位」+「门店万能码-连锁版」阶梯折扣（专业版）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.07</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">副收银支持自定义数量输入，报价表格新增数量和小计列（专业版）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.07</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">硬件价格调整：S5 Pro→1398、S5S Pro→1698、P2→1198</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.07.03</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">打包价低于成本价改为提醒确认（不再阻断录入）；阶梯对比模式新增打包价支持（专业版）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.06.30</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「战略合作政策」页面，支持自主编辑内容，生成报价单时作为独立一页展示（专业版）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.06.25</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">打包价模式：按模块原价占比等比例分摊，增加成本价底线校验（基础版+专业版）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2026.05.26</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">多方案统一封面+大标题分隔导出、方案一键复制</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2025.05.18</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">v2.7：列宽拖拽调整、2/3档选择器、分梯度折扣设置</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2025.05.08</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「历史记录」功能，报价单自动保存，支持恢复/删除</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2025.05.08</span>
+        <span class="changelog-tag tag-new">NEW</span>
+        <span class="changelog-text">新增「云收银-门店账号」产品（v2.4）</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2025.04.16</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">新增「阶梯对比模式」，支持最多3档门店数并排对比</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2025.04.13</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">v2.3：封面页自动生成、四类产品独立折扣设置</span>
+      </div>
+      <div class="changelog-item">
+        <span class="changelog-date">2025.04.08</span>
+        <span class="changelog-tag tag-feat">FEAT</span>
+        <span class="changelog-text">新增「可编辑模式」，报价单生成后支持自由编辑内容</span>
+      </div>
     </div>
   </div>
-  <div class="sel-right"><div class="tcard" onclick="loadVersion('pro')">
+  </div>
+  <div class="sel-right">
+    <div class="tcard" onclick="loadVersion('pro')">
     <span class="tcard-badge badge-pro">PRO</span>
     <span class="tcard-icon">⚡</span>
     <div class="tcard-title">报价工具</div>
@@ -787,9 +892,7 @@ body {
     </ul>
     <span class="tcard-btn btn-pro">进入报价工具 →</span>
   </div>
-</div>
-
-<!-- 友商成本对比入口 -->
+    <!-- 友商成本对比入口 -->
   <div class="cmp-entry" onclick="openCompareModal()">
     <div class="cmp-info">
       <span class="cmp-icon">⚖️</span>
@@ -797,8 +900,16 @@ body {
     </div>
     <span class="cmp-arrow">→</span>
   </div>
-
-  
+  </div>
+  <!-- 打赏模态框 -->
+  <div class="reward-modal" id="rewardModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="reward-card">
+      <span class="reward-close" onclick="document.getElementById('rewardModal').classList.remove('open')">&times;</span>
+      <h3>&#127881; 感谢你的认可！</h3>
+      <p>如果这个工具帮到了你<br>欢迎请作者喝杯咖啡 &#9749;<br>微信扫码即可</p>
+      <div style="font-size:48px;margin:12px 0">&#9749;</div>
+      <div class="sub">周巍 @美团 &middot; CKA团队</div>
+    </div>
   </div>
 <div id="viewer">
   <iframe id="frame"></iframe>
