@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能看板 - AI智能报价降本增效</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #000;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+
+.poster {
+  position: relative;
+  width: 960px;
+  height: 640px;
+  background: radial-gradient(ellipse at 70% 25%, #1a1528 0%, #0c0c14 40%, #06060a 100%);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.9);
+}
+
+/* ===== 背景光晕 ===== */
+.bg-glow {
+  position: absolute;
+  top: 5%;
+  right: 10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, rgba(180,120,30,0.05) 40%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+/* ===== 右侧装饰网络 ===== */
+.decor-network {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 55%;
+  height: 75%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.net-line {
+  position: absolute;
+  background: linear-gradient(to bottom, transparent, rgba(251,191,36,0.15), transparent);
+}
+.net-line:nth-child(1) { right: 180px; top: 15%; width: 1px; height: 120px; opacity: 0.3; }
+.net-line:nth-child(2) { right: 140px; top: 10%; width: 1px; height: 160px; opacity: 0.25; }
+.net-line:nth-child(3) { right: 100px; top: 20%; width: 1px; height: 100px; opacity: 0.2; }
+.net-line:nth-child(4) { right: 220px; top: 25%; width: 1px; height: 80px; opacity: 0.15; }
+
+.net-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgba(251,191,36,0.6);
+}
+.net-dot:nth-child(5) { right: 178px; top: 15%; }
+.net-dot:nth-child(6) { right: 138px; top: 10%; }
+.net-dot:nth-child(7) { right: 98px; top: 20%; }
+
+/* 节点连线 */
+.node-connector {
+  position: absolute;
+  border-top: 1px dashed rgba(251,191,36,0.1);
+}
+.node-connector:nth-child(8) {
+  right: 100px; top: 30%; width: 120px; transform: rotate(-15deg);
+}
+
+/* ===== 左上角品牌 ===== */
+.brand {
+  position: absolute;
+  top: 36px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.icon-grid {
+  width: 22px;
+  height: 22px;
+  position: relative;
+}
+.icon-grid::before,
+.icon-grid::after {
+  content: '';
+  position: absolute;
+  background: #fbbf24;
+}
+.icon-grid::before {
+  width: 100%;
+  height: 1.5px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+.icon-grid::after {
+  width: 1.5px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.brand-text {
+  font-size: 15px;
+  color: #a1a1aa;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* ===== 主标题区 ===== */
+.header {
+  position: absolute;
+  top: 90px;
+  left: 40px;
+  z-index: 10;
+}
+
+.main-title {
+  font-size: 68px;
+  line-height: 1.12;
+  font-weight: 900;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+}
+
+.main-title span {
+  display: block;
+  background: linear-gradient(180deg, #fef3c7 0%, #fbbf24 35%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 0 rgba(180, 83, 9, 0.25));
+}
+
+.sub-title {
+  font-size: 17px;
+  color: #9ca3af;
+  line-height: 1.6;
+  max-width: 420px;
+  font-weight: 400;
+}
+
+/* ===== 右侧AI视觉中心 ===== */
+.ai-center {
+  position: absolute;
+  top: 48%;
+  right: 140px;
+  width: 280px;
+  height: 360px;
+  transform: translateY(-50%);
+  perspective: 1200px;
+  z-index: 5;
+}
+
+/* 环绕轨道 */
+.orbit {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(251,191,36,0.12);
+  transform: translate(-50%, -50%) rotateX(65deg);
+  pointer-events: none;
+}
+.orbit-1 {
+  width: 260px;
+  height: 260px;
+  animation: spin1 12s linear infinite;
+}
+.orbit-2 {
+  width: 320px;
+  height: 320px;
+  border-color: rgba(251,191,36,0.08);
+  animation: spin2 18s linear infinite reverse;
+  top: 38%;
+}
+
+@keyframes spin1 {
+  from { transform: translate(-50%, -50%) rotateX(65deg) rotateZ(0deg); }
+  to   { transform: translate(-50%, -50%) rotateX(65deg) rotateZ(360deg); }
+}
+@keyframes spin2 {
+  from { transform: translate(-50%, -50%) rotateX(65deg) rotateZ(0deg); }
+  to   { transform: translate(-50%, -50%) rotateX(65deg) rotateZ(-360deg); }
+}
+
+/* 粒子 */
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 6px #fbbf24, 0 0 12px rgba(251,191,36,0.4);
+}
+.particle:nth-child(3) { left: 20%; top: 20%; animation: blink 2s ease-in-out infinite; }
+.particle:nth-child(4) { left: 75%; top: 15%; animation: blink 2.5s ease-in-out infinite 0.5s; }
+.particle:nth-child(5) { left: 85%; top: 55%; animation: blink 3s ease-in-out infinite 1s; }
+.particle:nth-child(6) { left: 10%; top: 60%; animation: blink 2.2s ease-in-out infinite 0.3s; }
+.particle:nth-child(7) { left: 50%; top: 8%; animation: blink 2.8s ease-in-out infinite 0.8s; }
+
+@keyframes blink {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 3D立方体 */
+.cube-wrap {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  transform: translate(-50%, -50%);
+  width: 90px;
+  height: 90px;
+  perspective: 800px;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(-12deg) rotateY(38deg);
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: rotateX(-12deg) rotateY(38deg) translateY(0); }
+  50% { transform: rotateX(-12deg) rotateY(38deg) translateY(-12px); }
+}
+
+.face {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 0 12px rgba(251,191,36,0.7);
+  border: 1.5px solid rgba(251,191,36,0.5);
+}
+
+.face-front {
+  transform: translateZ(45px);
+  background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.05));
+  box-shadow: inset 0 0 20px rgba(251,191,36,0.15);
+}
+.face-back {
+  transform: rotateY(180deg) translateZ(45px);
+  background: rgba(251,191,36,0.03);
+}
+.face-right {
+  transform: rotateY(90deg) translateZ(45px);
+  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.02));
+}
+.face-left {
+  transform: rotateY(-90deg) translateZ(45px);
+  background: rgba(251,191,36,0.02);
+}
+.face-top {
+  transform: rotateX(90deg) translateZ(45px);
+  background: linear-gradient(135deg, rgba(251,191,36,0.35), rgba(251,191,36,0.1));
+}
+.face-bottom {
+  transform: rotateX(-90deg) translateZ(45px);
+  background: rgba(251,191,36,0.05);
+}
+
+/* 底座 */
+.platform {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 100px;
+}
+
+.platform-ring {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%) rotateX(70deg);
+  border-radius: 50%;
+  border: 1.5px solid rgba(251,191,36,0.3);
+  box-shadow: 0 0 25px rgba(251,191,36,0.15), inset 0 0 20px rgba(251,191,36,0.05);
+}
+.platform-ring:nth-child(1) { width: 200px; height: 200px; }
+.platform-ring:nth-child(2) { width: 160px; height: 160px; border-color: rgba(251,191,36,0.45); }
+.platform-ring:nth-child(3) { width: 120px; height: 120px; border-color: rgba(251,191,36,0.6); }
+
+.platform-glow {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(ellipse at center, rgba(251,191,36,0.35) 0%, rgba(251,191,36,0.1) 40%, transparent 70%);
+  filter: blur(15px);
+  border-radius: 50%;
+}
+
+/* ===== 底部数据卡片 ===== */
+.stats-grid {
+  position: absolute;
+  bottom: 28px;
+  left: 36px;
+  right: 36px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  z-index: 10;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 20px 22px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+.stat-card:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(251,191,36,0.15);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.card-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  stroke: #fbbf24;
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-label {
+  font-size: 14px;
+  color: #d4d4d8;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.card-value {
+  font-size: 34px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+}
+
+/* 迷你柱状图 */
+.mini-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 44px;
+  gap: 6px;
+}
+
+.bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  transform-origin: bottom;
+  animation: grow 1.2s ease-out backwards;
+}
+
+.bar:nth-child(1) { height: 25%; background: linear-gradient(to top, #5c3a0b, #92400e); animation-delay: 0.1s; opacity: 0.5; }
+.bar:nth-child(2) { height: 40%; background: linear-gradient(to top, #78350f, #b45309); animation-delay: 0.2s; opacity: 0.65; }
+.bar:nth-child(3) { height: 55%; background: linear-gradient(to top, #92400e, #d97706); animation-delay: 0.3s; opacity: 0.8; }
+.bar:nth-child(4) { height: 75%; background: linear-gradient(to top, #b45309, #f59e0b); animation-delay: 0.4s; opacity: 0.9; }
+.bar:nth-child(5) { height: 100%; background: linear-gradient(to top, #d97706, #fbbf24); animation-delay: 0.5s; }
+
+@keyframes grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* 响应式缩放 */
+@media (max-width: 1000px) {
+  .poster {
+    transform: scale(0.85);
+    transform-origin: center;
+  }
+}
+@media (max-width: 800px) {
+  .poster {
+    transform: scale(0.65);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="poster">
+  <!-- 背景光晕 -->
+  <div class="bg-glow"></div>
+
+  <!-- 右侧装饰网络 -->
+  <div class="decor-network">
+    <div class="net-line"></div>
+    <div class="net-line"></div>
+    <div class="net-line"></div>
+    <div class="net-line"></div>
+    <div class="net-dot"></div>
+    <div class="net-dot"></div>
+    <div class="net-dot"></div>
+    <div class="node-connector"></div>
+  </div>
+
+  <!-- 品牌 -->
+  <div class="brand">
+    <div class="icon-grid"></div>
+    <span class="brand-text">智能看板</span>
+  </div>
+
+  <!-- 标题区 -->
+  <div class="header">
+    <h1 class="main-title">
+      <span>智能报价</span>
+      <span>降本增效</span>
+    </h1>
+    <p class="sub-title">基于AI算法实时分析市场数据，智能优化报价策略</p>
+  </div>
+
+  <!-- AI视觉中心 -->
+  <div class="ai-center">
+    <div class="orbit orbit-1"></div>
+    <div class="orbit orbit-2"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+
+    <div class="cube-wrap">
+      <div class="cube">
+        <div class="face face-front">AI</div>
+        <div class="face face-back"></div>
+        <div class="face face-right"></div>
+        <div class="face face-left"></div>
+        <div class="face face-top"></div>
+        <div class="face face-bottom"></div>
+      </div>
+    </div>
+
+    <div class="platform">
+      <div class="platform-ring"></div>
+      <div class="platform-ring"></div>
+      <div class="platform-ring"></div>
+      <div class="platform-glow"></div>
+    </div>
+  </div>
+
+  <!-- 底部数据卡片 -->
+  <div class="stats-grid">
+    <!-- 成本降低 -->
+    <div class="stat-card">
+      <div class="card-header">
+        <svg class="card-icon" viewBox="0 0 24 24">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <div class="card-info">
+          <div class="card-label">成本降低</div>
+          <div class="card-value">28.6%</div>
+        </div>
+      </div>
+      <div class="mini-chart">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+
+    <!-- 效率提升 -->
+    <div class="stat-card">
+      <div class="card-header">
+        <svg class="card-icon" viewBox="0 0 24 24">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+        </svg>
+        <div class="card-info">
+          <div class="card-label">效率提升</div>
+          <div class="card-value">60%</div>
+        </div>
+      </div>
+      <div class="mini-chart">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+
+    <!-- 中标率提升 -->
+    <div class="stat-card">
+      <div class="card-header">
+        <svg class="card-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="6"/>
+          <circle cx="12" cy="12" r="2"/>
+          <line x1="12" y1="2" x2="12" y2="4"/>
+          <line x1="12" y1="20" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="4" y2="12"/>
+          <line x1="20" y1="12" x2="22" y2="12"/>
+          <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/>
+          <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
+          <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/>
+          <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>
+        </svg>
+        <div class="card-info">
+          <div class="card-label">中标率提升</div>
+          <div class="card-value">35%</div>
+        </div>
+      </div>
+      <div class="mini-chart">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
