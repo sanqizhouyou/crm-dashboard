@@ -175,12 +175,14 @@ body {
 }
 #selector {
   display: grid;
-  grid-template-columns: 6fr 4fr;
-  gap: 16px;
+  grid-template-columns: 60% 1fr;
+  gap: 0;
   align-items: stretch;
   min-height: calc(100vh - 80px);
   flex: 1;
 }
+.col-left { padding-right: 8px; }
+.col-right { padding-left: 8px; }
 
 /* ===== 左右列 ===== */
 .col-left, .col-right {
@@ -1117,6 +1119,7 @@ body {
 /* ===== 响应式 ===== */
 @media(max-width:900px){
   #selector{grid-template-columns:1fr;gap:12px}
+  .col-left,.col-right{padding:0}
   .top-nav{padding:0 16px}
   #main-container{padding:12px}
   .hero-title{font-size:28px}
