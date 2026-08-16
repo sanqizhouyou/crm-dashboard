@@ -135,6 +135,7 @@ body {
   font-size: 68px;
   line-height: 1.12;
   font-weight: 900;
+  font-style: italic;
   letter-spacing: 3px;
   margin-bottom: 16px;
 }
@@ -159,11 +160,10 @@ body {
 /* ===== 右侧AI视觉中心 ===== */
 .ai-center {
   position: absolute;
-  top: 48%;
-  right: 140px;
+  top: 16%;
+  right: 6%;
   width: 280px;
-  height: 360px;
-  transform: translateY(-50%);
+  height: 340px;
   perspective: 1200px;
   z-index: 5;
 }
@@ -179,16 +179,17 @@ body {
   pointer-events: none;
 }
 .orbit-1 {
-  width: 260px;
-  height: 260px;
+  width: 280px;
+  height: 280px;
   animation: spin1 12s linear infinite;
+  top: 32%;
 }
 .orbit-2 {
-  width: 320px;
-  height: 320px;
+  width: 340px;
+  height: 340px;
   border-color: rgba(251,191,36,0.08);
   animation: spin2 18s linear infinite reverse;
-  top: 38%;
+  top: 35%;
 }
 
 @keyframes spin1 {
@@ -224,10 +225,10 @@ body {
 .cube-wrap {
   position: absolute;
   left: 50%;
-  top: 28%;
+  top: 20%;
   transform: translate(-50%, -50%);
-  width: 90px;
-  height: 90px;
+  width: 110px;
+  height: 110px;
   perspective: 800px;
 }
 
@@ -236,63 +237,63 @@ body {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transform: rotateX(-12deg) rotateY(38deg);
+  transform: rotateX(-18deg) rotateY(28deg);
   animation: float 4s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: rotateX(-12deg) rotateY(38deg) translateY(0); }
-  50% { transform: rotateX(-12deg) rotateY(38deg) translateY(-12px); }
+  0%, 100% { transform: rotateX(-18deg) rotateY(28deg) translateY(0); }
+  50% { transform: rotateX(-18deg) rotateY(28deg) translateY(-14px); }
 }
 
 .face {
   position: absolute;
-  width: 90px;
-  height: 90px;
+  width: 110px;
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 56px;
   font-weight: 900;
-  color: rgba(255,255,255,0.95);
-  text-shadow: 0 0 12px rgba(251,191,36,0.7);
-  border: 1.5px solid rgba(251,191,36,0.5);
+  color: #ffffff;
+  text-shadow: 0 0 18px rgba(251,191,36,1), 0 0 36px rgba(251,191,36,0.5);
+  border: 2px solid rgba(251,191,36,0.8);
 }
 
 .face-front {
-  transform: translateZ(45px);
-  background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(251,191,36,0.05));
-  box-shadow: inset 0 0 20px rgba(251,191,36,0.15);
+  transform: translateZ(55px);
+  background: linear-gradient(135deg, rgba(251,191,36,0.4), rgba(251,191,36,0.1));
+  box-shadow: inset 0 0 30px rgba(251,191,36,0.25);
 }
 .face-back {
-  transform: rotateY(180deg) translateZ(45px);
+  transform: rotateY(180deg) translateZ(55px);
   background: rgba(251,191,36,0.03);
 }
 .face-right {
-  transform: rotateY(90deg) translateZ(45px);
+  transform: rotateY(90deg) translateZ(55px);
   background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.02));
 }
 .face-left {
-  transform: rotateY(-90deg) translateZ(45px);
+  transform: rotateY(-90deg) translateZ(55px);
   background: rgba(251,191,36,0.02);
 }
 .face-top {
-  transform: rotateX(90deg) translateZ(45px);
-  background: linear-gradient(135deg, rgba(251,191,36,0.35), rgba(251,191,36,0.1));
+  transform: rotateX(90deg) translateZ(55px);
+  background: linear-gradient(135deg, rgba(251,191,36,0.45), rgba(251,191,36,0.15));
 }
 .face-bottom {
-  transform: rotateX(-90deg) translateZ(45px);
+  transform: rotateX(-90deg) translateZ(55px);
   background: rgba(251,191,36,0.05);
 }
 
 /* 底座 */
 .platform {
   position: absolute;
-  bottom: 50px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 220px;
-  height: 100px;
+  width: 240px;
+  height: 120px;
 }
 
 .platform-ring {
