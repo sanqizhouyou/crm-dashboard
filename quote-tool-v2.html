@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI报价 - 智能报价系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0a;
+  color: #fff;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  min-height: 100vh;
+}
+
+/* ===== 导航栏 ===== */
+.navbar {
+  height: 64px;
+  background: #080808;
+  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: #f5b818;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-icon svg { width: 18px; height: 18px; }
+.logo-text { font-size: 20px; font-weight: 700; color: #f5b818; }
+
+.nav-menu {
+  display: flex; gap: 40px;
+  list-style: none;
+}
+.nav-menu li {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 15px; font-weight: 500; color: #a0a0a0;
+  cursor: pointer; padding: 20px 0; position: relative;
+}
+.nav-menu li.active {
+  color: #f5b818;
+}
+.nav-menu li.active::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: #f5b818; border-radius: 2px 2px 0 0;
+}
+.nav-menu li svg { width: 18px; height: 18px; }
+
+.user-area {
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #333; border: 2px solid #2a2a2a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #ccc;
+}
+.user-text { font-size: 14px; color: #cccccc; }
+.user-status {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #00d084;
+  box-shadow: 0 0 4px rgba(0, 208, 132, 0.6);
+}
+
+/* ===== 主体布局 ===== */
+.main-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  padding: 24px 32px;
+  min-height: calc(100vh - 64px);
+}
+
+/* ===== 左侧区域 ===== */
+.left-col {
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* 主视觉区 */
+.hero-section {
+  position: relative;
+  background: linear-gradient(135deg, #141414 0%, #0f0f0f 100%);
+  border-radius: 16px;
+  padding: 40px;
+  flex: 1;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  border: 1px solid #222;
+}
+.hero-bg {
+  position: absolute;
+  bottom: -20px; right: -20px;
+  width: 320px; height: 320px;
+  opacity: 0.15;
+  background: radial-gradient(circle, rgba(245,184,24,0.3) 0%, transparent 70%);
+}
+.hero-robot {
+  position: absolute;
+  bottom: 20px; right: 40px;
+  width: 200px; height: 200px;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.robot-body {
+  width: 80px; height: 100px;
+  background: linear-gradient(180deg, #f5b818, #d49b0a);
+  border-radius: 40px 40px 20px 20px;
+  position: relative;
+}
+.robot-head {
+  width: 60px; height: 50px;
+  background: #f5b818;
+  border-radius: 30px 30px 25px 25px;
+  position: absolute; top: -35px; left: 10px;
+}
+.robot-eye {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #000; position: absolute;
+}
+.robot-eye:nth-child(1) { top: 18px; left: 14px; }
+.robot-eye:nth-child(2) { top: 18px; right: 14px; }
+.robot-antenna {
+  width: 4px; height: 20px; background: #f5b818;
+  position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  border-radius: 2px;
+}
+.robot-antenna::after {
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: #f5b818; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  box-shadow: 0 0 8px rgba(245,184,24,0.6);
+}
+.chip {
+  position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 30px; background: #1a1a1a;
+  border: 1px solid #f5b818; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: #f5b818; letter-spacing: 2px;
+}
+.chip::before {
+  content: ''; position: absolute;
+  width: 140px; height: 40px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(245,184,24,0.2) 0%, transparent 70%);
+  bottom: -5px; left: 50%; transform: translateX(-50%);
+}
+
+.hero-title {
+  position: relative; z-index: 2;
+}
+.hero-title h1 {
+  font-size: 64px; font-weight: 800; line-height: 1.15;
+  letter-spacing: 2px;
+}
+.hero-title .white { color: #ffffff; }
+.hero-title .gold { color: #f5b818; }
+.hero-subtitle {
+  font-size: 16px; color: #888888; line-height: 1.6;
+  margin-top: 16px; max-width: 400px;
+}
+
+/* 特性卡片 */
+.feature-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+}
+.feature-card {
+  background: #1a1a1a; border: 1px solid #2a2a2a;
+  border-radius: 12px; padding: 20px; text-align: center;
+  transition: all 0.3s;
+}
+.feature-card:hover {
+  border-color: rgba(245,184,24,0.3);
+  transform: translateY(-2px);
+}
+.feature-icon {
+  width: 48px; height: 48px; margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.feature-icon svg { width: 32px; height: 32px; stroke: #f5b818; fill: none; stroke-width: 1.5; }
+.feature-title {
+  font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px;
+}
+.feature-desc {
+  font-size: 12px; color: #888;
+}
+
+/* 功能更新 */
+.update-section {
+  background: #141414; border: 1px solid #222;
+  border-radius: 12px; padding: 16px 20px;
+}
+.update-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+}
+.update-header svg { width: 16px; height: 16px; color: #f5b818; }
+.update-header span { font-size: 14px; font-weight: 600; color: #ccc; }
+.update-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid #222;
+}
+.update-item:last-child { border-bottom: none; }
+.update-text { font-size: 13px; color: #aaa; }
+.update-tag {
+  font-size: 11px; font-weight: 700; padding: 2px 8px;
+  border-radius: 4px;
+}
+.update-tag.feat { color: #f5b818; background: rgba(245,184,24,0.1); }
+.update-tag.new { color: #00d084; background: rgba(0,208,132,0.1); }
+
+/* ===== 右侧区域 ===== */
+.right-col {
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* 报价工具 */
+.quote-tool {
+  background: #141414; border: 1px solid #222;
+  border-radius: 16px; padding: 24px;
+}
+.quote-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+}
+.quote-header-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(245,184,24,0.1);
+  display: flex; align-items: center; justify-content: center;
+}
+.quote-header-icon svg { width: 24px; height: 24px; color: #f5b818; }
+.quote-title-group h3 {
+  font-size: 18px; font-weight: 700; color: #fff;
+}
+.quote-title-group p {
+  font-size: 13px; color: #888;
+}
+
+.quote-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.quote-form {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.form-row {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.form-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: #aaa;
+}
+.form-label svg { width: 14px; height: 14px; color: #666; }
+.form-input {
+  background: #1f1f1f; border: 1px solid #333;
+  border-radius: 8px; padding: 10px 12px;
+  color: #fff; font-size: 14px;
+  outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: #f5b818; }
+.form-input::placeholder { color: #555; }
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.quote-btn {
+  width: 100%; padding: 12px;
+  background: #f5b818; color: #000;
+  border: none; border-radius: 24px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; margin-top: 4px;
+  transition: all 0.2s;
+}
+.quote-btn:hover { background: #ffc233; transform: translateY(-1px); }
+
+/* 报价结果 */
+.quote-result {
+  background: #1a1a1a; border: 1px solid #2a2a2a;
+  border-radius: 12px; padding: 20px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+.result-title {
+  font-size: 13px; color: #aaa; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.result-title .star { color: #f5b818; font-size: 12px; }
+.result-amount {
+  font-size: 36px; font-weight: 800; color: #f5b818;
+  margin-bottom: 16px;
+}
+.result-breakdown {
+  width: 100%; margin-bottom: 12px;
+}
+.result-row {
+  display: flex; justify-content: space-between;
+  font-size: 12px; padding: 4px 0;
+}
+.result-row .label { color: #888; }
+.result-row .value { color: #fff; }
+.result-validity {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: #888;
+  background: #222; padding: 4px 10px;
+  border-radius: 12px;
+}
+.result-validity svg { width: 12px; height: 12px; }
+
+/* 友商对比 */
+.compare-section {
+  background: #141414; border: 1px solid #222;
+  border-radius: 16px; padding: 24px;
+  flex: 1;
+}
+.compare-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.compare-title-group {
+  display: flex; align-items: center; gap: 8px;
+}
+.compare-title-group svg { width: 20px; height: 20px; color: #f5b818; }
+.compare-title-group h3 { font-size: 16px; font-weight: 700; color: #fff; }
+.compare-link {
+  font-size: 13px; color: #f5b818; cursor: pointer;
+  display: flex; align-items: center; gap: 2px;
+}
+.compare-link:hover { color: #ffc233; }
+
+.compare-body {
+  display: grid; grid-template-columns: 1fr auto; gap: 20px;
+  align-items: center;
+}
+
+.compare-table {
+  width: 100%; border-collapse: collapse;
+}
+.compare-table th {
+  background: #222; color: #fff;
+  font-size: 12px; font-weight: 600;
+  padding: 10px 12px; text-align: left;
+}
+.compare-table td {
+  padding: 10px 12px; font-size: 13px;
+  border-bottom: 1px solid #222;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table .highlight-col {
+  background: rgba(245,184,24,0.15);
+  color: #f5b818; font-weight: 700;
+}
+.compare-table .saving {
+  color: #00d084; font-weight: 600;
+}
+
+/* 环形图 */
+.donut-chart {
+  width: 140px; height: 140px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.donut-svg {
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.donut-center {
+  position: absolute; text-align: center;
+}
+.donut-label { font-size: 11px; color: #888; }
+.donut-value { font-size: 22px; font-weight: 800; color: #f5b818; }
+.donut-icon { font-size: 20px; margin-top: 2px; }
+
+.compare-footer {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 16px; padding-top: 12px;
+  border-top: 1px solid #222;
+}
+.check-circle {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #00d084; display: flex;
+  align-items: center; justify-content: center;
+}
+.check-circle svg { width: 12px; height: 12px; color: #fff; }
+.compare-footer-text { font-size: 14px; color: #fff; font-weight: 600; }
+
+/* 响应式 */
+@media(max-width:1100px){
+  .main-container { grid-template-columns: 1fr; }
+  .hero-title h1 { font-size: 48px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2">
+        <rect x="2" y="2" width="20" height="20" rx="4"/>
+        <path d="M8 12h8M12 8v8"/>
+      </svg>
+    </div>
+    <span class="logo-text">AI报价</span>
+  </div>
+  <ul class="nav-menu">
+    <li class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      首页
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      报价工具
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      产品中心
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      帮助中心
+    </li>
+  </ul>
+  <div class="user-area">
+    <div class="user-avatar">Z</div>
+    <span class="user-text">已登录</span>
+    <div class="user-status"></div>
+  </div>
+</nav>
+
+<!-- 主体 -->
+<div class="main-container">
+
+  <!-- 左侧 -->
+  <div class="left-col">
+
+    <!-- 主视觉 -->
+    <div class="hero-section">
+      <div class="hero-bg"></div>
+      <div class="hero-robot">
+        <div class="robot-body">
+          <div class="robot-head">
+            <div class="robot-eye"></div>
+            <div class="robot-eye"></div>
+          </div>
+          <div class="robot-antenna"></div>
+        </div>
+        <div class="chip">AI CHIP</div>
+      </div>
+      <div class="hero-title">
+        <h1><span class="white">智能报价</span><br><span class="gold">降本增效</span></h1>
+        <p class="hero-subtitle">基于AI算法实时分析市场数据，智能优化报价策略</p>
+      </div>
+    </div>
+
+    <!-- 特性卡片 -->
+    <div class="feature-cards">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/><path d="M12 12v10"/><path d="M8 15l4 2 4-2"/></svg>
+        </div>
+        <div class="feature-title">显著降低成本</div>
+        <div class="feature-desc">AI智能优化报价策略</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="feature-title">大幅提升效率</div>
+        <div class="feature-desc">一键生成精准报价</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><path d="M3 20h18"/></svg>
+        </div>
+        <div class="feature-title">有效提升中标率</div>
+        <div class="feature-desc">数据驱动决策</div>
+      </div>
+    </div>
+
+    <!-- 功能更新 -->
+    <div class="update-section">
+      <div class="update-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>功能更新</span>
+      </div>
+      <div class="update-item">
+        <span class="update-text">新增AI报价算法模型升级</span>
+        <span class="update-tag feat">FEAT</span>
+      </div>
+      <div class="update-item">
+        <span class="update-text">友商成本对比功能优化</span>
+        <span class="update-tag new">NEW</span>
+      </div>
+      <div class="update-item">
+        <span class="update-text">数据安全与权限管理增强</span>
+        <span class="update-tag feat">FEAT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧 -->
+  <div class="right-col">
+
+    <!-- 报价工具 -->
+    <div class="quote-tool">
+      <div class="quote-header">
+        <div class="quote-header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 15h3"/><path d="M1 9h3"/><path d="M1 15h3"/></svg>
+        </div>
+        <div class="quote-title-group">
+          <h3>AI智能报价工具</h3>
+          <p>输入参数，一键生成精准报价</p>
+        </div>
+      </div>
+      <div class="quote-body">
+        <div class="quote-form">
+          <div class="form-row">
+            <label class="form-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              客户品牌
+            </label>
+            <input class="form-input" type="text" placeholder="请输入客户品牌名称">
+          </div>
+          <div class="form-row">
+            <label class="form-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              门店数量
+            </label>
+            <input class="form-input" type="text" placeholder="请输入门店数量">
+          </div>
+          <div class="form-row">
+            <label class="form-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              产品模块
+            </label>
+            <select class="form-input">
+              <option>请选择产品模块</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              报价
+            </label>
+            <input class="form-input" type="text" placeholder="请输入报价金额">
+          </div>
+          <button class="quote-btn">立即报价</button>
+        </div>
+        <div class="quote-result">
+          <div class="result-title"><span class="star">✦</span> 推荐报价金额 <span class="star">✦</span></div>
+          <div class="result-amount">¥238,000</div>
+          <div class="result-breakdown">
+            <div class="result-row"><span class="label">门店费用</span><span class="value">¥148,000</span></div>
+            <div class="result-row"><span class="label">总部费用</span><span class="value">¥60,000</span></div>
+            <div class="result-row"><span class="label">服务费用</span><span class="value">¥30,000</span></div>
+          </div>
+          <div class="result-validity">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            有效期：30天
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 友商成本对比 -->
+    <div class="compare-section">
+      <div class="compare-header">
+        <div class="compare-title-group">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <h3>友商成本对比</h3>
+        </div>
+        <div class="compare-link">查看详情 →</div>
+      </div>
+      <div class="compare-body">
+        <table class="compare-table">
+          <tr>
+            <th>费用项目</th>
+            <th>友商A</th>
+            <th class="highlight-col">美团</th>
+            <th>差额</th>
+          </tr>
+          <tr>
+            <td>门店费用</td>
+            <td>¥160,000</td>
+            <td class="highlight-col">¥148,000</td>
+            <td class="saving">节省¥12,000</td>
+          </tr>
+          <tr>
+            <td>总部费用</td>
+            <td>¥70,000</td>
+            <td class="highlight-col">¥60,000</td>
+            <td class="saving">节省¥10,000</td>
+          </tr>
+          <tr>
+            <td>服务费用</td>
+            <td>¥40,000</td>
+            <td class="highlight-col">¥30,000</td>
+            <td class="saving">节省¥10,000</td>
+          </tr>
+          <tr>
+            <td>其他费用</td>
+            <td>¥30,000</td>
+            <td class="highlight-col">¥20,000</td>
+            <td class="saving">节省¥10,000</td>
+          </tr>
+        </table>
+        <div class="donut-chart">
+          <svg class="donut-svg" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#333" stroke-width="12"/>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#f5b818" stroke-width="12"
+              stroke-dasharray="80 170" stroke-linecap="round"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-label">总节省金额</div>
+            <div class="donut-value">¥109,000</div>
+            <div class="donut-icon">💰</div>
+          </div>
+        </div>
+      </div>
+      <div class="compare-footer">
+        <div class="check-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="compare-footer-text">美团综合成本更低</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
