@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>小夏盐田 - 美团餐饮SaaS报价方案</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,205,0,0.15);
+            border-radius: 50%;
+        }
+        .brand-name {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .brand-tag {
+            display: inline-block;
+            background: #ffcd00;
+            color: #1a1a2e;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .brand-desc {
+            font-size: 15px;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title .icon {
+            width: 32px;
+            height: 32px;
+            background: #ffcd00;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .product-table th {
+            background: #f8f9fa;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eee;
+        }
+        .product-table td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        .product-table tr:last-child td {
+            border-bottom: none;
+        }
+        .product-name {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+        .product-desc {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.5;
+        }
+        .product-price {
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 18px;
+            white-space: nowrap;
+        }
+        .product-price .unit {
+            font-size: 13px;
+            color: #999;
+            font-weight: 400;
+        }
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .tag-basic { background: #e3f2fd; color: #1976d2; }
+        .tag-rec { background: #fff3e0; color: #f57c00; }
+        .tag-hw { background: #e8f5e9; color: #388e3c; }
+        .summary-box {
+            background: linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffcd00;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ddd, transparent);
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 13px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffcd00;
+            color: #1a1a2e;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .highlight-box {
+            background: #fff8e1;
+            border-left: 4px solid #ffcd00;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+        .highlight-box p {
+            font-size: 14px;
+            color: #666;
+        }
+        @media print {
+            body { background: white; }
+            .section { box-shadow: none; border: 1px solid #eee; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="badge">🏪 首尔夜市定制方案</div>
+            <h1 class="brand-name">小夏盐田</h1>
+            <div class="brand-tag">现象级先锋美学烘焙品牌</div>
+            <p class="brand-desc">韩国烘焙品牌 | 1店配置 | 基础产品 + 推荐产品 + 硬件套餐<br>全韩首创盐田概念空间，圣水洞/益善洞排队王地标</p>
+        </div>
+
+        <div class="highlight-box">
+            <p>💡 <strong>品牌洞察：</strong>小夏盐田以"排队王"著称，常年占据社交平台热搜第一。针对高频排队场景，本方案特别配置<strong>智能叫号系统</strong>，提升顾客等位体验，减少流失。</p>
+        </div>
+
+        <!-- Basic Products -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">⚙️</div>
+                基础产品
+            </div>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%">产品名称</th>
+                        <th style="width: 45%">产品说明</th>
+                        <th style="width: 15%">价格</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-name">门店管理系统（POS）</div>
+                            <span class="tag tag-basic">基础必选</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">一体化收银管理：支持堂食/扫码/外卖全场景点餐；内置美团外卖、大众点评一键接单；智能结账（现金/扫码/刷脸/会员卡）；经营数据报表实时看板</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥1,780<span class="unit">/年</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">商家小程序</div>
+                            <span class="tag tag-basic">基础必选</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">品牌专属微信小程序（连锁版）：堂食点餐/外带预点/桌位预约全场景；UI高度自定义（品牌色/Logo/主题风格）；内置营销玩法（拼团/满减/裂变优惠券/打卡活动）</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥600<span class="unit">/年</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">会员管理</div>
+                            <span class="tag tag-basic">基础必选</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">连锁品牌全链路会员运营平台：积分/储值/等级体系；会员热力分析（消费频次/偏好/流失预警）；智能储值营销（储值赠送/限时翻倍/消费返现）</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥1,440<span class="unit">/年</span></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 16px; font-size: 15px; color: #666;">
+                基础产品小计：<span style="font-weight: 700; color: #e74c3c; font-size: 18px;">¥3,820</span>
+            </div>
+        </div>
+
+        <!-- Recommended Products -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">⭐</div>
+                推荐产品
+            </div>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%">产品名称</th>
+                        <th style="width: 45%">产品说明</th>
+                        <th style="width: 15%">价格</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-name">外卖接单-三方聚合平台</div>
+                            <span class="tag tag-rec">推荐</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">多平台聚合外卖接单（含闪购/京东炒送等）：一屏管理多平台外卖订单；自动接收、智能分拣、统一打印小票；各平台营业状态同步管理；平台扩展灵活</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥290<span class="unit">/年</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">KDS智能厨房（备餐管理）</div>
+                            <span class="tag tag-rec">推荐</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">AI驱动智能厨房管理：在传统KDS上叠加AI出餐调度算法；根据历史数据智能预测备餐时间，优化出餐顺序；同桌多菜智能合并出餐；异常出餐自动预警</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥750<span class="unit">/年</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">数电发票</div>
+                            <span class="tag tag-rec">推荐</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">扫码开票系统：顾客扫码自助申请开票，无需人工干预；支持增值税普票/专票自动开具；票据数据实时同步税务端；降低门店票据管理成本</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥1,088<span class="unit">/年</span></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">智能叫号</div>
+                            <span class="tag tag-rec">推荐</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">智能排队叫号系统：顾客取号后实时查看排队进度；支持短信/微信提醒叫号；多窗口灵活配置；排队数据实时分析，优化高峰时段人力配置</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥888<span class="unit">/年</span></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 16px; font-size: 15px; color: #666;">
+                推荐产品小计：<span style="font-weight: 700; color: #e74c3c; font-size: 18px;">¥3,016</span>
+            </div>
+        </div>
+
+        <!-- Hardware -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">🔧</div>
+                硬件配置
+            </div>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%">产品名称</th>
+                        <th style="width: 45%">产品说明</th>
+                        <th style="width: 15%">价格</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-name">P2平板套装</div>
+                            <span class="tag tag-hw">硬件</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">美团P2智能收银平板：支持触屏点餐、扫码支付、会员识别；配专用充电底座，支持角度调节；轻巧便携，适合烘焙门店收银台使用</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥1,466</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">美团打印机-80N</div>
+                            <span class="tag tag-hw">硬件</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">美团80N热敏小票打印机：高速打印、自动切纸；支持多平台外卖订单打印；稳定耐用，适配烘焙门店高频打印需求</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥269</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">美团标签打印机（LP2）</div>
+                            <span class="tag tag-hw">硬件</span>
+                        </td>
+                        <td>
+                            <div class="product-desc">美团LP2标签打印机：支持商品标签、价格标签、生产日期标签打印；热敏打印，无需墨盒；适配烘焙产品标识管理</div>
+                        </td>
+                        <td>
+                            <div class="product-price">¥429</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 16px; font-size: 15px; color: #666;">
+                硬件小计：<span style="font-weight: 700; color: #e74c3c; font-size: 18px;">¥2,164</span>
+            </div>
+        </div>
+
+        <!-- Total Summary -->
+        <div class="summary-box">
+            <div class="summary-item">
+                <div class="summary-label">基础产品</div>
+                <div class="summary-value">¥3,820</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">推荐产品</div>
+                <div class="summary-value">¥3,016</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">硬件配置</div>
+                <div class="summary-value">¥2,164</div>
+            </div>
+            <div class="summary-item" style="border-left: 2px solid rgba(255,205,0,0.3); padding-left: 30px;">
+                <div class="summary-label">方案总价</div>
+                <div class="summary-value">¥9,000</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>美团餐饮SaaS | 报价方案仅供参考，最终以合同为准</p>
+            <p style="margin-top: 8px;">联系人：周巍 | 联系方式：经由首尔夜市项目组转接</p>
+        </div>
+    </div>
+</body>
+</html>
