@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>美团餐饮SaaS产品价目表</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,205,0,0.1);
+            border-radius: 50%;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .header p {
+            opacity: 0.8;
+            font-size: 14px;
+            position: relative;
+        }
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ffcd00;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title .icon {
+            width: 36px;
+            height: 36px;
+            background: #ffcd00;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .price-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .price-table th {
+            background: #f8f9fa;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eee;
+        }
+        .price-table th:last-child,
+        .price-table th:nth-last-child(2) {
+            text-align: right;
+        }
+        .price-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        .price-table td:nth-child(2) {
+            text-align: right;
+            font-weight: 600;
+            color: #999;
+            text-decoration: line-through;
+            font-size: 14px;
+        }
+        .price-table td:nth-child(3) {
+            text-align: right;
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        .price-table tr:last-child td {
+            border-bottom: none;
+        }
+        .product-name {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .product-desc {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.5;
+        }
+        .product-id {
+            font-size: 11px;
+            color: #bbb;
+            font-family: monospace;
+            margin-top: 4px;
+        }
+        .hw-table td:nth-child(2) {
+            text-align: right;
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 16px;
+            text-decoration: none;
+        }
+        .hq-table td:nth-child(2) {
+            text-align: right;
+            font-weight: 600;
+            color: #999;
+            text-decoration: line-through;
+            font-size: 14px;
+        }
+        .hq-table td:nth-child(3) {
+            text-align: right;
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        .note-box {
+            background: #fff8e1;
+            border-left: 4px solid #ffcd00;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #666;
+        }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .badge-new {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        .total-row {
+            background: #f8f9fa;
+            font-weight: 700;
+        }
+        .total-row td {
+            border-top: 2px solid #ddd;
+            border-bottom: none;
+        }
+        @media print {
+            body { background: white; padding: 20px; }
+            .section { box-shadow: none; border: 1px solid #eee; page-break-inside: avoid; }
+            .header { background: #1a1a2e !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>美团餐饮SaaS · 产品价目表</h1>
+            <p>门店端软件 | 硬件设备 | 总部端软件 | 2026年标准报价</p>
+        </div>
+
+        <!-- 门店端软件 -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">💻</div>
+                门店端软件
+                <span class="badge" style="margin-left: auto; font-size: 12px;">元/店/年</span>
+            </div>
+            <div class="note-box">
+                💡 门店软件按门店数量阶梯计价，下表<strong>划线价</strong>为标准市场价(1店原价)，<strong>红色价</strong>为1店实际成交价。多店享阶梯折扣。
+            </div>
+            <table class="price-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%">产品名称</th>
+                        <th style="width: 18%; text-align: right;">标准市场价</th>
+                        <th style="width: 18%; text-align: right;">1店成交价</th>
+                        <th style="width: 24%">产品说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-name">门店管理系统（POS）</div>
+                            <div class="product-id">s01</div>
+                        </td>
+                        <td>¥3,888</td>
+                        <td>¥1,780</td>
+                        <td>
+                            <div class="product-desc">一体化收银管理：堂食/扫码/外卖全场景点餐；美团外卖+大众点评一键接单；智能结账（现金/扫码/刷脸/会员卡）；经营数据实时看板</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">商家小程序</div>
+                            <div class="product-id">s22</div>
+                        </td>
+                        <td>¥1,888</td>
+                        <td>¥600</td>
+                        <td>
+                            <div class="product-desc">品牌专属小程序：堂食点餐/外带预点/桌位预约；UI自定义（品牌色/Logo/主题风格）；营销玩法（拼团/满减/裂变券/打卡）</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">会员管理</div>
+                            <div class="product-id">s21</div>
+                        </td>
+                        <td>¥4,888</td>
+                        <td>¥1,440</td>
+                        <td>
+                            <div class="product-desc">全链路会员运营：积分/储值/等级体系；会员热力分析（消费频次/偏好/流失预警）；智能储值营销</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">外卖接单-三方聚合平台</div>
+                            <div class="product-id">s09</div>
+                        </td>
+                        <td>¥368</td>
+                        <td>¥290</td>
+                        <td>
+                            <div class="product-desc">聚合美团/饿了么/京东到家等多平台外卖订单，统一接单统一管理，避免多设备切换</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">KDS智能厨房</div>
+                            <div class="product-id">s19</div>
+                        </td>
+                        <td>¥1,688</td>
+                        <td>¥750</td>
+                        <td>
+                            <div class="product-desc">厨房数字化管理：订单自动分区/优先级排序；菜品制作计时/超时预警；KDS屏/平板多终端展示</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">美团点评排队</div>
+                            <div class="product-id">s25</div>
+                        </td>
+                        <td>¥1,588</td>
+                        <td>¥520</td>
+                        <td>
+                            <div class="product-desc">美团/大众点评官方线上排队：顾客美团App预约取号；门店叫号管理；排队进度自动通知；等位数据分析</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">智能叫号</div>
+                            <div class="product-id">s15</div>
+                        </td>
+                        <td>¥888</td>
+                        <td>¥380</td>
+                        <td>
+                            <div class="product-desc">智能排队叫号：顾客扫码/前台取号；微信/小程序提前预约；自动短信/微信叫号通知；等位时间预估，减少流失</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">数电发票</div>
+                            <div class="product-id">s_inv</div>
+                        </td>
+                        <td>¥1,088</td>
+                        <td>¥1,088</td>
+                        <td>
+                            <div class="product-desc">扫码自助开票：顾客扫码申请开票，无需人工干预；增值税普票/专票自动开具；税务端数据实时同步</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">门店进销存</div>
+                            <div class="product-id">s28</div>
+                        </td>
+                        <td>¥1,688</td>
+                        <td>¥750</td>
+                        <td>
+                            <div class="product-desc">门店级进销存：商品入库/出库/盘点全流程；低库存/临期预警；原料消耗与销售数据关联；多仓管理</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">小程序装修包</div>
+                            <div class="product-id" style="color: #e74c3c;">暂未上线</div>
+                        </td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>
+                            <div class="product-desc" style="color: #e74c3c;">该产品暂未在产品清单中，如有需求可联系产品经理确认</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 硬件 -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">🔧</div>
+                硬件设备
+                <span class="badge badge-new" style="margin-left: auto; font-size: 12px;">元/台（一次性购买）</span>
+            </div>
+            <div class="note-box">
+                💡 硬件为一次性购买费用，不含年费。80N打印机、LP2标签机为通用型设备，适配所有餐饮业态。
+            </div>
+            <table class="price-table hw-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%">产品名称</th>
+                        <th style="width: 15%; text-align: right;">单价</th>
+                        <th style="width: 55%">产品说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-name">P2 平板</div>
+                            <div class="product-id">hw00f</div>
+                        </td>
+                        <td>¥1,198</td>
+                        <td><div class="product-desc">美团P2收银平板：便携轻巧，适合小型门店/档口；支持扫码/NFC/刷卡支付；可外接打印机、扫码枪等配件</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">S4mini Pro 一体机</div>
+                            <div class="product-id">hw00d</div>
+                        </td>
+                        <td>¥1,698</td>
+                        <td><div class="product-desc">紧凑型一体机：小体积高性能；适合空间有限的小店/档口；内置打印、扫码、刷卡全功能</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">S5 Pro 一体机</div>
+                            <div class="product-id">hw00b</div>
+                        </td>
+                        <td>¥1,398</td>
+                        <td><div class="product-desc">主流一体机：高性能处理器，适配全业态场景；大屏触屏操作流畅；内置多种支付方式与会员识别</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">S5S Pro 一体机</div>
+                            <div class="product-id">hw00c</div>
+                        </td>
+                        <td>¥1,698</td>
+                        <td><div class="product-desc">旗舰一体机：超高性能，适合高并发复杂场景（如全时段餐厅/酒吧）；多支付通道+会员识别+营销屏</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">80N打印机</div>
+                            <div class="product-id">hw19</div>
+                        </td>
+                        <td>¥269</td>
+                        <td><div class="product-desc">80mm热敏小票打印机：高速打印、自动切纸；支持多平台外卖订单打印；稳定耐用</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">LP2标签打印机</div>
+                            <div class="product-id">hw04</div>
+                        </td>
+                        <td>¥429</td>
+                        <td><div class="product-desc">标签打印：适用于价格标签/外卖封口贴/菜品标签；自动标签剥离；适配多种标签规格</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">后厨KDS显示终端</div>
+                            <div class="product-id">hw17（K1）</div>
+                        </td>
+                        <td>¥2,088</td>
+                        <td><div class="product-desc">后厨高清显示终端：10.1寸触控屏，挂墙/支架安装；展示菜品制作清单/优先级/计时；与KDS智能厨房软件联动（注：当前型号为K1）</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 总部端软件 -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">🏢</div>
+                总部端软件
+                <span class="badge" style="margin-left: auto; font-size: 12px;">元/总部/年</span>
+            </div>
+            <div class="note-box">
+                💡 总部软件按固定价格计费，不随门店数变化。<strong>划线价</strong>为标准市场价，<strong>红色价</strong>为建议成交价。
+            </div>
+            <table class="price-table hq-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%">产品名称</th>
+                        <th style="width: 15%; text-align: right;">标准市场价</th>
+                        <th style="width: 15%; text-align: right;">建议成交价</th>
+                        <th style="width: 35%">产品说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-name">供应链总部进销存</div>
+                            <div class="product-id">h02</div>
+                        </td>
+                        <td>¥20,000</td>
+                        <td>¥10,000</td>
+                        <td><div class="product-desc">总部级供应链管理：仓储管理、配送管理、订货管理、财务管理、预警管理、档案管理、报表管理</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">连锁管理系统</div>
+                            <div class="product-id">s03（门店点位）</div>
+                        </td>
+                        <td>¥688</td>
+                        <td>¥310</td>
+                        <td><div class="product-desc">连锁总部管控（门店侧授权）：多组织架构（品牌/区域/门店三级）；统一商品库与价格体系下发；门店数据实时上报</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">分账管理</div>
+                            <div class="product-id">s04</div>
+                        </td>
+                        <td>¥300</td>
+                        <td>¥140</td>
+                        <td><div class="product-desc">多门店资金自动分账：会员储值消费后自动分账至加盟商/品牌方；管理费自动划扣；分账规则灵活配置；全程可追溯</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 总部端扩展（可选） -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">📦</div>
+                总部端扩展模块（可选配）
+            </div>
+            <table class="price-table hq-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%">产品名称</th>
+                        <th style="width: 15%; text-align: right;">标准市场价</th>
+                        <th style="width: 15%; text-align: right;">建议成交价</th>
+                        <th style="width: 35%">产品说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="product-name">总部联营方案</div>
+                            <div class="product-id">h03</div>
+                        </td>
+                        <td>¥288,000</td>
+                        <td>¥100,000</td>
+                        <td><div class="product-desc">联营模式管理：联营结算、财务对账、多方分成</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">总部云仓管理</div>
+                            <div class="product-id">h04</div>
+                        </td>
+                        <td>¥88,888</td>
+                        <td>¥30,000</td>
+                        <td><div class="product-desc">云端仓储管理：云仓库存、调拨管理、盘点管理</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">总部分拣管理</div>
+                            <div class="product-id">h07</div>
+                        </td>
+                        <td>¥4,888</td>
+                        <td>¥2,500</td>
+                        <td><div class="product-desc">中央厨房分拣：称重分拣、扫码分拣、分拣效率统计</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">总部综合管理包</div>
+                            <div class="product-id">h11</div>
+                        </td>
+                        <td>¥288,800</td>
+                        <td>¥68,800</td>
+                        <td><div class="product-desc">含总部全模块综合授权（配送+采购+生产+分拣+成本+数据）</div></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="product-name">经营洞察-小连锁总部版</div>
+                            <div class="product-id">h23</div>
+                        </td>
+                        <td>¥16,888</td>
+                        <td>¥10,000</td>
+                        <td><div class="product-desc">全品牌经营数据洞察：经营分析/同环比/趋势预警/门店排名</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 硬件宣传册信息 -->
+        <div class="section">
+            <div class="section-title">
+                <div class="icon">📖</div>
+                硬件选型指南
+            </div>
+            <div class="note-box">
+                💡 以下为不同业态的硬件选型推荐方案，实际选型以门店场景为准。
+            </div>
+            <table class="price-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%">门店类型</th>
+                        <th style="width: 25%">推荐主机</th>
+                        <th style="width: 25%">推荐打印机</th>
+                        <th style="width: 30%">推荐理由</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>小店/档口</strong><br><span style="font-size:12px;color:#999;">小吃、烘焙、咖啡</span></td>
+                        <td>S4mini Pro<br><span style="color:#e74c3c;font-weight:700;">¥1,698</span></td>
+                        <td>80N打印机<br><span style="color:#e74c3c;font-weight:700;">¥269</span></td>
+                        <td><div class="product-desc">紧凑设计不占台面；功能全面满足小店需求；总价低性价比高</div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>标准门店</strong><br><span style="font-size:12px;color:#999;">韩餐、日料、正餐</span></td>
+                        <td>S5 Pro<br><span style="color:#e74c3c;font-weight:700;">¥1,398</span></td>
+                        <td>80N打印机<br><span style="color:#e74c3c;font-weight:700;">¥269</span></td>
+                        <td><div class="product-desc">性能与价格最佳平衡；大屏操作体验好；适配绝大多数餐饮场景</div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>旗舰门店</strong><br><span style="font-size:12px;color:#999;">全时段餐厅、酒吧</span></td>
+                        <td>S5S Pro<br><span style="color:#e74c3c;font-weight:700;">¥1,698</span></td>
+                        <td>80N打印机<br><span style="color:#e74c3c;font-weight:700;">¥269</span></td>
+                        <td><div class="product-desc">旗舰性能应对高并发；复杂业务场景（酒水分区/多支付/会员营销）游刃有余</div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>小型档口</strong><br><span style="font-size:12px;color:#999;">夜市摊位、快闪店</span></td>
+                        <td>P2平板<br><span style="color:#e74c3c;font-weight:700;">¥1,198</span></td>
+                        <td>80N打印机<br><span style="color:#e74c3c;font-weight:700;">¥269</span></td>
+                        <td><div class="product-desc">极致轻便、开机即用；支持手持移动收银；适合临时摊位、快速部署</div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>美团餐饮SaaS · 产品价目表 | 2026年8月</p>
+            <p style="margin-top: 8px;">价格仅供参考，最终以合同报价为准 | 联系人：周巍</p>
+        </div>
+    </div>
+</body>
+</html>
