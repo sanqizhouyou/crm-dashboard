@@ -1,4 +1,4 @@
-const CACHE_NAME = "seo-quote-v22";
+const CACHE_NAME = "seo-quote-v25";
 const URLS_TO_CACHE = [
   './quote-tool.html',
   './icon-192.png',
