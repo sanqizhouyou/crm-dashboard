@@ -1715,20 +1715,9 @@ function loadVersion(v) {
   document.body.appendChild(loader);
   // 用 setTimeout 让 loading 先渲染一帧，再执行重活
   setTimeout(function() {
-    var decoded;
-    if (v === 'pro') {
-      // PRO_B64是纯JS，需要注入到BASIC_B64的HTML模板中
-      var basicBytes = Uint8Array.from(atob(BASIC_B64), function(c) { return c.charCodeAt(0); });
-      var proBytes = Uint8Array.from(atob(PRO_B64), function(c) { return c.charCodeAt(0); });
-      var basicHtml = new TextDecoder('utf-8').decode(basicBytes);
-      var proJs = new TextDecoder('utf-8').decode(proBytes);
-      // 在 </body> 前注入JS
-      decoded = basicHtml.replace('</body>', '<script>' + proJs + '</' + 'script></' + 'body>');
-    } else {
-      var b64 = BASIC_B64;
-      var bytes = Uint8Array.from(atob(b64), function(c) { return c.charCodeAt(0); });
-      decoded = new TextDecoder('utf-8').decode(bytes);
-    }
+    var b64 = v === 'basic' ? BASIC_B64 : PRO_B64;
+    var bytes = Uint8Array.from(atob(b64), function(c) { return c.charCodeAt(0); });
+    var decoded = new TextDecoder('utf-8').decode(bytes);
     var frame = document.getElementById('frame');
     // 用 Blob URL 替代 srcdoc，避免 null origin 导致 localStorage/onclick 失效
     var blob = new Blob([decoded], {type: 'text/html;charset=utf-8'});
