@@ -26,21 +26,22 @@ td.prod-col .price { color: #e74c3c; font-weight: 600; margin-left: 8px; font-si
 tr.cat-row td { background: #fff8dd; color: #1a1a2e; font-weight: 700; text-align: left; padding-left: 14px; font-size: 13px; letter-spacing: 1px; }
 tbody tr:hover td { background: #fafafa; }
 tbody tr:hover td.cat-cell { background: #fff8dd; }
-td.cell { cursor: pointer; }
-td.cell:hover { background: #fff3b0 !important; }
-td.cell input { width: 16px; height: 16px; cursor: pointer; accent-color: #ffcd00; }
-.qty { display: block; font-size: 10px; color: #999; margin-top: 2px; }
+td.cell { cursor: pointer; -webkit-tap-highlight-color: #fff3b0; }
+td.cell:active { background: #fff3b0; }
+td.cell input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; accent-color: #ffcd00; vertical-align: middle; }
+.qty-select { display: inline-block; margin-left: 4px; vertical-align: middle; width: 44px; height: 24px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; color: #1a1a2e; background: white; cursor: pointer; }
+.qty-select:disabled { opacity: 0.25; }
 tfoot td { background: #1a1a2e; color: #ffcd00; font-weight: 700; font-size: 14px; }
 tfoot td.prod-col { color: white; }
 #output { display: none; margin-top: 20px; background: #1a1a2e; color: #d5d5d5; border-radius: 12px; padding: 20px; font-family: 'SF Mono', Consolas, monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; }
-.tip { margin-top: 14px; font-size: 12px; color: #999; }
+.tip { margin-top: 14px; font-size: 12px; color: #999; line-height: 1.8; }
 @media print { .toolbar, .tip { display: none; } body { background: white; padding: 0; } }
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>首尔夜市 · 品牌产品配置勾选表</h1>
-<div class="sub">勾选各品牌匹配的产品模块 → 点击「生成配置」复制结果发给周巍AI助理，自动更新报价方案</div>
+<div class="sub">勾选各品牌匹配的产品模块，硬件数量自选 → 点击「生成配置」复制结果发给周巍AI助理，自动更新报价方案</div>
 
 <div class="toolbar">
 <button class="btn" onclick="genOutput()">📋 生成配置</button>
@@ -74,7 +75,7 @@ tfoot td.prod-col { color: white; }
 </div>
 
 <div id="output"></div>
-<div class="tip">💡 点击单元格任意位置即可勾选/取消；硬件数量按原方案预填（80N打印机统一3台、孝道炸鸡2台）</div>
+<div class="tip">💡 点击单元格即可勾选/取消（点勾选框本身也可以）<br>🔧 硬件产品勾选后可自选数量（下拉框 1-10 台）</div>
 </div>
 
 <script>
@@ -100,7 +101,7 @@ var PRODUCTS = [
 {cat:"硬件设备", name:"LP2标签打印机", price:429}
 ];
 
-// 预填当前方案配置（qty为数量，0=未选）
+// 预填当前方案配置
 var sel = {
 "Standard Bread": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"外卖接单-三方聚合平台":1,"KDS智能厨房":1,"数电发票":1,"门店代运维":1,"P2平板":1,"80N打印机":3,"LP2标签打印机":1},
 "小夏盐田": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"外卖接单-三方聚合平台":1,"KDS智能厨房":1,"数电发票":1,"智能叫号":1,"门店代运维":1,"P2平板":1,"80N打印机":3,"LP2标签打印机":1},
@@ -122,35 +123,64 @@ PRODUCTS.forEach(function(p) {
         cr.innerHTML = '<td colspan="9">' + p.cat + '</td>';
         tbody.appendChild(cr);
     }
+    var isHW = p.cat === "硬件设备";
     var tr = document.createElement("tr");
     var tds = '<td class="prod-col">' + p.name + '<span class="price">¥' + p.price.toLocaleString() + '</span></td>';
     BRANDS.forEach(function(b) {
         var qty = (sel[b] && sel[b][p.name]) ? sel[b][p.name] : 0;
-        var qtyLabel = (qty > 1 && p.cat === "硬件设备") ? '<span class="qty">×' + qty + '</span>' : "";
-        var checked = qty > 0 ? "checked" : "";
-        tds += '<td class="cell" onclick="toggleBox(this)">' + qtyLabel + '<input type="checkbox" data-brand="' + b + '" data-prod="' + p.name + '" data-price="' + p.price + '" data-qty="' + qty + '" ' + checked + '></td>';
+        var checked = qty > 0 ? " checked" : "";
+        var cell = '<td class="cell" onclick="toggleBox(this)">';
+        cell += '<input type="checkbox" data-brand="' + b + '" data-prod="' + p.name + '" data-price="' + p.price + '"' + checked + ' onclick="event.stopPropagation()" onchange="onBoxChange(this)">';
+        if (isHW) {
+            cell += '<select class="qty-select" data-brand="' + b + '" data-prod="' + p.name + '" onclick="event.stopPropagation()" onchange="onQtyChange(this)"' + (qty === 0 ? " disabled" : "") + '>';
+            for (var q = 1; q <= 10; q++) {
+                cell += '<option value="' + q + '"' + (q === qty ? " selected" : "") + '>×' + q + '</option>';
+            }
+            cell += '</select>';
+        }
+        cell += '</td>';
+        tds += cell;
     });
     tr.innerHTML = tds;
     tbody.appendChild(tr);
 });
 
 function toggleBox(td) {
-    var cb = td.querySelector("input");
+    var cb = td.querySelector("input[type=checkbox]");
     cb.checked = !cb.checked;
-    cb.dataset.qty = cb.checked ? (parseInt(cb.dataset.qty) || 1) : 0;
+    syncQtySelect(cb);
+    updateTotals();
+}
+
+function onBoxChange(cb) {
+    syncQtySelect(cb);
+    updateTotals();
+}
+
+function syncQtySelect(cb) {
+    var sel = cb.parentElement.querySelector("select");
+    if (sel) {
+        sel.disabled = !cb.checked;
+        if (cb.checked && sel.value === "0") sel.value = "1";
+    }
+}
+
+function onQtyChange(selEl) {
     updateTotals();
 }
 
 function updateTotals() {
-    BRANDS.forEach(function(b) {
+    BRANDS.forEach(function(b, bi) {
         var total = 0;
-        document.querySelectorAll('input[data-brand="' + b + '"]').forEach(function(cb) {
+        document.querySelectorAll('input[type=checkbox][data-brand="' + b + '"]').forEach(function(cb) {
             if (cb.checked) {
-                total += parseInt(cb.dataset.price) * (parseInt(cb.dataset.qty) || 1);
+                var qty = 1;
+                var selEl = cb.parentElement.querySelector("select");
+                if (selEl) qty = parseInt(selEl.value) || 1;
+                total += parseInt(cb.dataset.price) * qty;
             }
         });
-        var cell = document.querySelector('.total[data-brand="' + BRANDS.indexOf(b) + '"]');
-        cell.textContent = "¥" + total.toLocaleString();
+        document.querySelector('.total[data-brand="' + bi + '"]').textContent = "¥" + total.toLocaleString();
     });
 }
 updateTotals();
@@ -160,7 +190,10 @@ function collect() {
     BRANDS.forEach(function(b) { result[b] = {}; });
     document.querySelectorAll("input[type=checkbox]").forEach(function(cb) {
         if (cb.checked) {
-            result[cb.dataset.brand][cb.dataset.prod] = parseInt(cb.dataset.qty) || 1;
+            var qty = 1;
+            var selEl = cb.parentElement.querySelector("select");
+            if (selEl) qty = parseInt(selEl.value) || 1;
+            result[cb.dataset.brand][cb.dataset.prod] = qty;
         }
     });
     return result;
@@ -188,11 +221,23 @@ function copyOutput() {
     var out = document.getElementById("output");
     if (out.style.display === "none") { genOutput(); }
     var text = out.dataset.text || out.textContent;
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(function() { alert("已复制，直接粘贴发给AI助理即可"); });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() { alert("已复制，直接粘贴发给AI助理即可"); }, function() { fallbackCopy(text); });
     } else {
-        alert("请手动全选复制");
+        fallbackCopy(text);
     }
+}
+
+function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); alert("已复制，直接粘贴发给AI助理即可"); }
+    catch(e) { alert("复制失败，请手动全选复制"); }
+    document.body.removeChild(ta);
 }
 </script>
 </body>
