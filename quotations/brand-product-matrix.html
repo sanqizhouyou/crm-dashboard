@@ -35,6 +35,13 @@ tfoot td { background: #1a1a2e; color: #ffcd00; font-weight: 700; font-size: 14p
 tfoot td.prod-col { color: white; }
 #output { display: none; margin-top: 20px; background: #1a1a2e; color: #d5d5d5; border-radius: 12px; padding: 20px; font-family: 'SF Mono', Consolas, monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; }
 .tip { margin-top: 14px; font-size: 12px; color: #999; line-height: 1.8; }
+/* 导出图片弹窗 */
+#imgModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; overflow-y: auto; padding: 20px 10px; }
+#imgModal .modal-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+#imgModal img { max-width: 100%; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+#imgModal .modal-bar { margin-bottom: 14px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+#imgModal .modal-tip { color: #bbb; font-size: 13px; margin-top: 14px; }
+#imgModal .btn { padding: 8px 18px; }
 @media print { .toolbar, .tip { display: none; } body { background: white; padding: 0; } }
 </style>
 </head>
@@ -46,9 +53,10 @@ tfoot td.prod-col { color: white; }
 <div class="toolbar">
 <button class="btn" onclick="genOutput()">📋 生成配置</button>
 <button class="btn ghost" onclick="copyOutput()">复制结果</button>
+<button class="btn ghost" onclick="exportImage(this)">📸 导出图片</button>
 </div>
 
-<div class="table-wrap">
+<div class="table-wrap" id="tableWrap">
 <table id="matrix">
 <thead>
 <tr>
@@ -78,6 +86,18 @@ tfoot td.prod-col { color: white; }
 <div class="tip">💡 点击单元格即可勾选/取消（点勾选框本身也可以）<br>🔧 硬件产品勾选后可自选数量（下拉框 1-10 台）</div>
 </div>
 
+<div id="imgModal">
+<div class="modal-inner">
+<div class="modal-bar">
+<button class="btn" onclick="downloadImage()">⬇️ 下载图片</button>
+<button class="btn ghost" onclick="closeImgModal()">✕ 关闭</button>
+</div>
+<img id="exportImg" alt="品牌产品配置表">
+<div class="modal-tip">📱 手机端：长按上方图片可保存到相册 / 转发</div>
+</div>
+</div>
+
+<script src="assets/html2canvas.min.js"></script>
 <script>
 var BRANDS = ["Standard Bread","小夏盐田","La brick","酒神堂","火花불티","孝道炸鸡","Twozzim","Farm Market"];
 
@@ -229,6 +249,53 @@ function fallbackCopy(text) {
     try { document.execCommand("copy"); alert("已复制，直接粘贴发给AI助理即可"); }
     catch(e) { alert("复制失败，请手动全选复制"); }
     document.body.removeChild(ta);
+}
+
+// ===== 导出图片 =====
+var _exportDataUrl = null;
+function exportImage(btn) {
+    var orig = btn ? btn.textContent : "";
+    if (btn) { btn.disabled = true; btn.textContent = "⏳ 生成中..."; }
+    var now = new Date();
+    var stamp = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,"0") + "-" + String(now.getDate()).padStart(2,"0");
+    html2canvas(document.querySelector(".wrap"), {
+        scale: 2,
+        backgroundColor: "#f5f6f8",
+        windowWidth: 1280,
+        onclone: function(doc) {
+            var t = doc.querySelector(".toolbar"); if (t) t.style.display = "none";
+            var tp = doc.querySelector(".tip"); if (tp) tp.style.display = "none";
+            var op = doc.getElementById("output"); if (op) op.style.display = "none";
+            var m = doc.getElementById("imgModal"); if (m) m.style.display = "none";
+            var tw = doc.getElementById("tableWrap"); if (tw) tw.style.overflow = "visible";
+            var foot = doc.createElement("div");
+            foot.style.cssText = "text-align:center;color:#999;font-size:12px;margin-top:10px;";
+            foot.textContent = "美团餐饮SaaS · 首尔夜市项目 | 生成日期 " + stamp + " | 联系人：周巍";
+            doc.querySelector(".wrap").appendChild(foot);
+        }
+    }).then(function(canvas) {
+        _exportDataUrl = canvas.toDataURL("image/png");
+        document.getElementById("exportImg").src = _exportDataUrl;
+        document.getElementById("imgModal").style.display = "block";
+        if (btn) { btn.disabled = false; btn.textContent = orig; }
+    }).catch(function(e) {
+        alert("导出失败：" + (e && e.message ? e.message : e));
+        if (btn) { btn.disabled = false; btn.textContent = orig; }
+    });
+}
+
+function downloadImage() {
+    if (!_exportDataUrl) { alert("请先点击「📸 导出图片」生成"); return; }
+    var a = document.createElement("a");
+    a.href = _exportDataUrl;
+    a.download = "首尔夜市品牌产品配置表.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+function closeImgModal() {
+    document.getElementById("imgModal").style.display = "none";
 }
 </script>
 </body>
