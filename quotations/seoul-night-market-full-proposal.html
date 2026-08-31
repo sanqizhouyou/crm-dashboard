@@ -33,6 +33,9 @@
             font-size: 28px; font-weight: 700; color: #1a1a2e;
             margin-bottom: 30px; padding-bottom: 12px; border-bottom: 3px solid #ffcd00;
         }
+        .brand-page { page-break-after: always; }
+        .brand-img-wrap { border-radius: 16px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-height: 260px; }
+        .brand-img-wrap img { width: 100%; height: 240px; object-fit: cover; display: block; }
         .brand-section {
             background: #f8f9fa; border-radius: 16px; padding: 30px;
             margin-bottom: 30px; border-left: 5px solid #ffcd00;
@@ -52,12 +55,12 @@
         .price-table th { background: #1a1a2e; color: white; padding: 12px 14px; text-align: left; font-weight: 600; }
         .price-table th:last-child, .price-table th:nth-last-child(2) { text-align: right; }
         .price-table td { padding: 10px 14px; border-bottom: 1px solid #eee; vertical-align: top; }
-        .price-table td:nth-child(2), .price-table td:nth-child(3) { text-align: right; white-space: nowrap; }
-        .price-table td:nth-child(2) { color: #999; text-decoration: line-through; }
-        .price-table td:nth-child(3) { color: #e74c3c; font-weight: 700; }
+        .price-table:not(.feature-table) td:nth-child(2), .price-table:not(.feature-table) td:nth-child(3) { text-align: right; white-space: nowrap; }
+        .price-table:not(.feature-table) td:nth-child(2) { color: #999; text-decoration: line-through; }
+        .price-table:not(.feature-table) td:nth-child(3) { color: #e74c3c; font-weight: 700; }
         .price-table tr:nth-child(even) { background: #fafafa; }
         .feature-table td:nth-child(1) { font-weight: 600; color: #1a1a2e; width: 150px; }
-        .feature-table td:nth-child(2) { color: #555; font-size: 13px; }
+        .feature-table td:nth-child(2) { color: #555; font-size: 13px; text-align: left; white-space: normal; }
         .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .service-card { background: #f8f9fa; border-radius: 12px; padding: 24px; border-top: 3px solid #ffcd00; }
         .service-card h4 { font-size: 16px; margin-bottom: 10px; color: #1a1a2e; }
@@ -104,22 +107,24 @@
 <div class="page">
     <h2 class="section-title">目录</h2>
     <div style="font-size: 16px; line-height: 2.5; padding-left: 20px;">
-        <div>一、8个品牌定制报价方案 ———————————— 第3-7页</div>
-        <div>二、产品价目表 ———————————— 第8页</div>
-        <div>三、产品功能清单 ———————————— 第9-10页</div>
-        <div>四、售后基础服务范围 ———————————— 第11页</div>
-        <div>五、硬件宣传册 ———————————— 第12-13页</div>
-        <div>六、费用汇总 ———————————— 第14页</div>
+        <div>一、8个品牌定制报价方案（每品牌1页） ———————————— 第3-10页</div>
+        <div>二、产品价目表 ———————————— 第11页</div>
+        <div>三、产品功能清单 ———————————— 第12-13页</div>
+        <div>四、售后基础服务范围 ———————————— 第14页</div>
+        <div>五、硬件宣传册 ———————————— 第15-16页</div>
+        <div>六、费用汇总 ———————————— 第17页</div>
     </div>
 </div>
 
 <div class="page-break"></div>
 
 <!-- BRAND QUOTES -->
-<div class="page">
-    <h2 class="section-title">一、8个品牌定制报价方案</h2>
+
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（1/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/standard-bread.jpg" alt="Standard Bread"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">1. Standard Bread</span><span class="brand-tag">英伦复古风高端手工生吐司工坊</span></div>
+        <div class="brand-header"><span class="brand-name">Standard Bread</span><span class="brand-tag">英伦复古风高端手工生吐司工坊</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">外卖接单-三方聚合平台</span><span class="price">¥290</span></div><div class="product-item"><span class="name">KDS智能厨房</span><span class="price">¥750</span></div><div class="product-item"><span class="name">数电发票</span><span class="price">¥1,088</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
@@ -128,8 +133,15 @@
         <div class="product-cols"><div class="product-col"><div class="product-item"><span class="name">P2平板</span><span class="price">¥1,398</span></div></div><div class="product-col"><div class="product-item"><span class="name">80N打印机</span><span class="price">¥269</span></div><div class="product-item"><span class="name">LP2标签机</span><span class="price">¥429</span></div></div></div>
         <div class="brand-total"><span class="label">方案总价（1店）</span><span class="amount">¥9,912</span></div>
     </div>
+</div>
+
+<div class="page-break"></div>
+
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（2/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/xiaoxia-yantian.jpg" alt="小夏盐田"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">2. 小夏盐田</span><span class="brand-tag">现象级先锋美学烘焙品牌</span></div>
+        <div class="brand-header"><span class="brand-name">小夏盐田</span><span class="brand-tag">现象级先锋美学烘焙品牌</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">外卖接单-三方聚合平台</span><span class="price">¥290</span></div><div class="product-item"><span class="name">KDS智能厨房</span><span class="price">¥750</span></div><div class="product-item"><span class="name">数电发票</span><span class="price">¥1,088</span></div><div class="product-item"><span class="name">智能叫号</span><span class="price">¥888</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
@@ -138,8 +150,15 @@
         <div class="product-cols"><div class="product-col"><div class="product-item"><span class="name">P2平板</span><span class="price">¥1,398</span></div></div><div class="product-col"><div class="product-item"><span class="name">80N打印机</span><span class="price">¥269</span></div><div class="product-item"><span class="name">LP2标签机</span><span class="price">¥429</span></div></div></div>
         <div class="brand-total"><span class="label">方案总价（1店）</span><span class="amount">¥10,800</span></div>
     </div>
+</div>
+
+<div class="page-break"></div>
+
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（3/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/la-brick.jpg" alt="La brick"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">3. La brick</span><span class="brand-tag">全时段复式Brunch与微醺酒馆</span></div>
+        <div class="brand-header"><span class="brand-name">La brick</span><span class="brand-tag">全时段复式Brunch与微醺酒馆</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">KDS智能厨房</span><span class="price">¥750</span></div><div class="product-item"><span class="name">数电发票</span><span class="price">¥1,088</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
@@ -152,10 +171,11 @@
 
 <div class="page-break"></div>
 
-<div class="page">
-    <h2 class="section-title">一、8个品牌定制报价方案（续）</h2>
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（4/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/jiushentang.jpg" alt="酒神堂"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">4. 酒神堂</span><span class="brand-tag">首尔年轻人必打卡的主题酒吧</span></div>
+        <div class="brand-header"><span class="brand-name">酒神堂</span><span class="brand-tag">首尔年轻人必打卡的主题酒吧</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">KDS智能厨房</span><span class="price">¥750</span></div><div class="product-item"><span class="name">数电发票</span><span class="price">¥1,088</span></div><div class="product-item"><span class="name">门店进销存</span><span class="price">¥750</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
@@ -164,8 +184,15 @@
         <div class="product-cols"><div class="product-col"><div class="product-item"><span class="name">S5S Pro一体机</span><span class="price">¥1,698</span></div></div><div class="product-col"><div class="product-item"><span class="name">80N打印机</span><span class="price">¥269</span></div></div></div>
         <div class="brand-total"><span class="label">方案总价（1店）</span><span class="amount">¥9,975</span></div>
     </div>
+</div>
+
+<div class="page-break"></div>
+
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（5/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/hwahwa-bulti.jpg" alt="火花"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">5. 火花불티</span><span class="brand-tag">朝鲜时代原班团队专属打造</span></div>
+        <div class="brand-header"><span class="brand-name">火花불티</span><span class="brand-tag">朝鲜时代原班团队专属打造</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">副收银系统</span><span class="price">¥660</span></div><div class="product-item"><span class="name">数电发票</span><span class="price">¥1,088</span></div><div class="product-item"><span class="name">门店进销存</span><span class="price">¥750</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
@@ -174,8 +201,15 @@
         <div class="product-cols"><div class="product-col"><div class="product-item"><span class="name">S5S Pro一体机</span><span class="price">¥1,698</span></div></div><div class="product-col"><div class="product-item"><span class="name">80N打印机</span><span class="price">¥269</span></div></div></div>
         <div class="brand-total"><span class="label">方案总价（1店）</span><span class="amount">¥9,885</span></div>
     </div>
+</div>
+
+<div class="page-break"></div>
+
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（6/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/hyodo-chicken.jpg" alt="孝道炸鸡"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">6. 孝道炸鸡</span><span class="brand-tag">米其林星级主厨跨界研发</span></div>
+        <div class="brand-header"><span class="brand-name">孝道炸鸡</span><span class="brand-tag">米其林星级主厨跨界研发</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">智能叫号</span><span class="price">¥380</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
@@ -188,10 +222,11 @@
 
 <div class="page-break"></div>
 
-<div class="page">
-    <h2 class="section-title">一、8个品牌定制报价方案（续）</h2>
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（7/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/twozzim.jpg" alt="Twozzim"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">7. Twozzim</span><span class="brand-tag">全韩销量第一韩式炖鸡</span></div>
+        <div class="brand-header"><span class="brand-name">Twozzim</span><span class="brand-tag">全韩销量第一韩式炖鸡</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">美团点评排队</span><span class="price">¥520</span></div><div class="product-item"><span class="name">数电发票</span><span class="price">¥1,088</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
@@ -200,8 +235,15 @@
         <div class="product-cols"><div class="product-col"><div class="product-item"><span class="name">S5S Pro一体机</span><span class="price">¥1,698</span></div></div><div class="product-col"><div class="product-item"><span class="name">80N打印机</span><span class="price">¥269</span></div></div></div>
         <div class="brand-total"><span class="label">方案总价（1店）</span><span class="amount">¥8,995</span></div>
     </div>
+</div>
+
+<div class="page-break"></div>
+
+<div class="page brand-page">
+    <h2 class="section-title">一、品牌定制报价方案（8/8）</h2>
+    <div class="brand-img-wrap"><img src="assets/farm-market.jpg" alt="Farm Market"></div>
     <div class="brand-section">
-        <div class="brand-header"><span class="brand-name">8. Farm Market</span><span class="brand-tag">国产高端和牛的韩式顶流表达</span></div>
+        <div class="brand-header"><span class="brand-name">Farm Market</span><span class="brand-tag">国产高端和牛的韩式顶流表达</span></div>
         <div class="product-cols">
             <div class="product-col"><h4>⚙️ 基础产品</h4><div class="product-item"><span class="name">门店管理系统（POS）</span><span class="price">¥1,780</span></div><div class="product-item"><span class="name">商家小程序</span><span class="price">¥600</span></div><div class="product-item"><span class="name">会员管理</span><span class="price">¥1,440</span></div></div>
             <div class="product-col"><h4>⭐ 推荐产品</h4><div class="product-item"><span class="name">美团点评排队</span><span class="price">¥520</span></div><div class="product-item"><span class="name">数电发票</span><span class="price">¥1,088</span></div><div class="product-item"><span class="name">门店代运维</span><span class="price">¥1,600</span></div></div>
