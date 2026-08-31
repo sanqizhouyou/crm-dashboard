@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首尔夜市 · 品牌产品配置勾选表</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f5f6f8; color: #333; padding: 30px 20px; }
+.wrap { max-width: 1200px; margin: 0 auto; }
+h1 { font-size: 26px; color: #1a1a2e; margin-bottom: 6px; }
+.sub { color: #888; font-size: 13px; margin-bottom: 24px; }
+.toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.btn { background: #ffcd00; color: #1a1a2e; border: none; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn:hover { background: #f5c518; }
+.btn.ghost { background: white; border: 1px solid #ddd; color: #555; }
+.table-wrap { background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow-x: auto; padding: 8px; }
+table { border-collapse: collapse; width: 100%; min-width: 1000px; }
+th, td { border: 1px solid #eee; padding: 8px 6px; text-align: center; font-size: 13px; }
+thead th { background: #1a1a2e; color: white; font-weight: 600; }
+thead .brand-cell { min-width: 110px; padding: 10px 6px; }
+thead .brand-name { font-size: 14px; display: block; }
+thead .brand-cat { font-size: 11px; color: #ffcd00; font-weight: 400; display: block; margin-top: 2px; }
+th.prod-col, td.prod-col { text-align: left; padding-left: 14px; min-width: 190px; }
+td.prod-col .price { color: #e74c3c; font-weight: 600; margin-left: 8px; font-size: 12px; }
+tr.cat-row td { background: #fff8dd; color: #1a1a2e; font-weight: 700; text-align: left; padding-left: 14px; font-size: 13px; letter-spacing: 1px; }
+tbody tr:hover td { background: #fafafa; }
+tbody tr:hover td.cat-cell { background: #fff8dd; }
+td.cell { cursor: pointer; }
+td.cell:hover { background: #fff3b0 !important; }
+td.cell input { width: 16px; height: 16px; cursor: pointer; accent-color: #ffcd00; }
+.qty { display: block; font-size: 10px; color: #999; margin-top: 2px; }
+tfoot td { background: #1a1a2e; color: #ffcd00; font-weight: 700; font-size: 14px; }
+tfoot td.prod-col { color: white; }
+#output { display: none; margin-top: 20px; background: #1a1a2e; color: #d5d5d5; border-radius: 12px; padding: 20px; font-family: 'SF Mono', Consolas, monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; }
+.tip { margin-top: 14px; font-size: 12px; color: #999; }
+@media print { .toolbar, .tip { display: none; } body { background: white; padding: 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>首尔夜市 · 品牌产品配置勾选表</h1>
+<div class="sub">勾选各品牌匹配的产品模块 → 点击「生成配置」复制结果发给周巍AI助理，自动更新报价方案</div>
+
+<div class="toolbar">
+<button class="btn" onclick="genOutput()">📋 生成配置</button>
+<button class="btn ghost" onclick="copyOutput()">复制结果</button>
+</div>
+
+<div class="table-wrap">
+<table id="matrix">
+<thead>
+<tr>
+<th class="prod-col">产品模块</th>
+<th class="brand-cell"><span class="brand-name">Standard Bread</span><span class="brand-cat">烘焙</span></th>
+<th class="brand-cell"><span class="brand-name">小夏盐田</span><span class="brand-cat">烘焙</span></th>
+<th class="brand-cell"><span class="brand-name">La brick</span><span class="brand-cat">Brunch/酒馆</span></th>
+<th class="brand-cell"><span class="brand-name">酒神堂</span><span class="brand-cat">主题酒吧</span></th>
+<th class="brand-cell"><span class="brand-name">火花불티</span><span class="brand-cat">文旅地标</span></th>
+<th class="brand-cell"><span class="brand-name">孝道炸鸡</span><span class="brand-cat">精品小吃</span></th>
+<th class="brand-cell"><span class="brand-name">Twozzim</span><span class="brand-cat">韩餐</span></th>
+<th class="brand-cell"><span class="brand-name">Farm Market</span><span class="brand-cat">高端韩餐</span></th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+<tfoot>
+<tr>
+<td class="prod-col">当前勾选合计</td>
+<td class="total" data-brand="0">-</td><td class="total" data-brand="1">-</td><td class="total" data-brand="2">-</td><td class="total" data-brand="3">-</td>
+<td class="total" data-brand="4">-</td><td class="total" data-brand="5">-</td><td class="total" data-brand="6">-</td><td class="total" data-brand="7">-</td>
+</tr>
+</tfoot>
+</table>
+</div>
+
+<div id="output"></div>
+<div class="tip">💡 点击单元格任意位置即可勾选/取消；硬件数量按原方案预填（80N打印机统一3台、孝道炸鸡2台）</div>
+</div>
+
+<script>
+var BRANDS = ["Standard Bread","小夏盐田","La brick","酒神堂","火花불티","孝道炸鸡","Twozzim","Farm Market"];
+
+var PRODUCTS = [
+{cat:"基础产品", name:"门店管理系统（POS）", price:1780},
+{cat:"基础产品", name:"商家小程序", price:600},
+{cat:"基础产品", name:"会员管理", price:1440},
+{cat:"推荐产品", name:"外卖接单-三方聚合平台", price:290},
+{cat:"推荐产品", name:"KDS智能厨房", price:750},
+{cat:"推荐产品", name:"美团点评排队", price:520},
+{cat:"推荐产品", name:"智能叫号", price:380},
+{cat:"推荐产品", name:"数电发票", price:1088},
+{cat:"推荐产品", name:"门店进销存", price:750},
+{cat:"推荐产品", name:"副收银系统", price:660},
+{cat:"推荐产品", name:"门店代运维", price:1600},
+{cat:"硬件设备", name:"P2平板", price:1398},
+{cat:"硬件设备", name:"S4mini Pro一体机", price:1698},
+{cat:"硬件设备", name:"S5 Pro一体机", price:1398},
+{cat:"硬件设备", name:"S5S Pro一体机", price:1698},
+{cat:"硬件设备", name:"80N打印机", price:269},
+{cat:"硬件设备", name:"LP2标签打印机", price:429}
+];
+
+// 预填当前方案配置（qty为数量，0=未选）
+var sel = {
+"Standard Bread": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"外卖接单-三方聚合平台":1,"KDS智能厨房":1,"数电发票":1,"门店代运维":1,"P2平板":1,"80N打印机":3,"LP2标签打印机":1},
+"小夏盐田": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"外卖接单-三方聚合平台":1,"KDS智能厨房":1,"数电发票":1,"智能叫号":1,"门店代运维":1,"P2平板":1,"80N打印机":3,"LP2标签打印机":1},
+"La brick": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"KDS智能厨房":1,"数电发票":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3},
+"酒神堂": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"KDS智能厨房":1,"数电发票":1,"门店进销存":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3},
+"火花불티": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"副收银系统":1,"数电发票":1,"门店进销存":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3},
+"孝道炸鸡": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"智能叫号":1,"门店代运维":1,"S4mini Pro一体机":1,"80N打印机":2,"LP2标签打印机":1},
+"Twozzim": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"美团点评排队":1,"数电发票":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3},
+"Farm Market": {"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"美团点评排队":1,"数电发票":1,"门店代运维":1,"S5 Pro一体机":1,"80N打印机":3}
+};
+
+var tbody = document.getElementById("tbody");
+var lastCat = "";
+PRODUCTS.forEach(function(p) {
+    if (p.cat !== lastCat) {
+        lastCat = p.cat;
+        var cr = document.createElement("tr");
+        cr.className = "cat-row";
+        cr.innerHTML = '<td colspan="9">' + p.cat + '</td>';
+        tbody.appendChild(cr);
+    }
+    var tr = document.createElement("tr");
+    var tds = '<td class="prod-col">' + p.name + '<span class="price">¥' + p.price.toLocaleString() + '</span></td>';
+    BRANDS.forEach(function(b) {
+        var qty = (sel[b] && sel[b][p.name]) ? sel[b][p.name] : 0;
+        var qtyLabel = (qty > 1 && p.cat === "硬件设备") ? '<span class="qty">×' + qty + '</span>' : "";
+        var checked = qty > 0 ? "checked" : "";
+        tds += '<td class="cell" onclick="toggleBox(this)">' + qtyLabel + '<input type="checkbox" data-brand="' + b + '" data-prod="' + p.name + '" data-price="' + p.price + '" data-qty="' + qty + '" ' + checked + '></td>';
+    });
+    tr.innerHTML = tds;
+    tbody.appendChild(tr);
+});
+
+function toggleBox(td) {
+    var cb = td.querySelector("input");
+    cb.checked = !cb.checked;
+    cb.dataset.qty = cb.checked ? (parseInt(cb.dataset.qty) || 1) : 0;
+    updateTotals();
+}
+
+function updateTotals() {
+    BRANDS.forEach(function(b) {
+        var total = 0;
+        document.querySelectorAll('input[data-brand="' + b + '"]').forEach(function(cb) {
+            if (cb.checked) {
+                total += parseInt(cb.dataset.price) * (parseInt(cb.dataset.qty) || 1);
+            }
+        });
+        var cell = document.querySelector('.total[data-brand="' + BRANDS.indexOf(b) + '"]');
+        cell.textContent = "¥" + total.toLocaleString();
+    });
+}
+updateTotals();
+
+function collect() {
+    var result = {};
+    BRANDS.forEach(function(b) { result[b] = {}; });
+    document.querySelectorAll("input[type=checkbox]").forEach(function(cb) {
+        if (cb.checked) {
+            result[cb.dataset.brand][cb.dataset.prod] = parseInt(cb.dataset.qty) || 1;
+        }
+    });
+    return result;
+}
+
+function genOutput() {
+    var data = collect();
+    var lines = ["【首尔夜市品牌产品配置】", ""];
+    BRANDS.forEach(function(b) {
+        lines.push("■ " + b);
+        var prods = data[b];
+        var items = Object.keys(prods).map(function(k) {
+            return prods[k] > 1 ? k + "×" + prods[k] : k;
+        });
+        lines.push("  " + (items.length ? items.join("、") : "（未勾选任何产品）"));
+        lines.push("");
+    });
+    var out = document.getElementById("output");
+    out.textContent = lines.join("\n");
+    out.style.display = "block";
+    out.dataset.text = lines.join("\n");
+}
+
+function copyOutput() {
+    var out = document.getElementById("output");
+    if (out.style.display === "none") { genOutput(); }
+    var text = out.dataset.text || out.textContent;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function() { alert("已复制，直接粘贴发给AI助理即可"); });
+    } else {
+        alert("请手动全选复制");
+    }
+}
+</script>
+</body>
+</html>
