@@ -23,6 +23,8 @@ thead .brand-name { font-size: 14px; display: block; }
 thead .brand-cat { font-size: 11px; color: #ffcd00; font-weight: 400; display: block; margin-top: 2px; }
 th.prod-col, td.prod-col { text-align: left; padding-left: 14px; min-width: 190px; }
 td.prod-col .price { color: #e74c3c; font-weight: 600; margin-left: 8px; font-size: 12px; }
+.price-old { color: #b0b0b0; font-weight: 400; margin-left: 8px; font-size: 11px; text-decoration: line-through; }
+.disc-badge { display: inline-block; margin-left: 10px; padding: 1px 10px; border-radius: 10px; background: #e74c3c; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0; }
 tr.cat-row td { background: #fff8dd; color: #1a1a2e; font-weight: 700; text-align: left; padding-left: 14px; font-size: 13px; letter-spacing: 1px; }
 tbody tr:hover td { background: #fafafa; }
 tbody tr:hover td.cat-cell { background: #fff8dd; }
@@ -100,7 +102,7 @@ tfoot tr.sub-row td.prod-col { color: #9a9ac2; }
 </div>
 
 <div id="output"></div>
-<div class="tip">💡 点击单元格即可勾选/取消（点勾选框本身也可以）<br>🔧 硬件产品勾选后可自选数量（下拉框 1-10 台）</div>
+<div class="tip">💡 点击单元格即可勾选/取消（点勾选框本身也可以）<br>🔧 硬件产品勾选后可自选数量（下拉框 1-10 台）<br>🏷️ 推荐产品统一9折优惠，折后价四舍五入取整（如数电发票 ¥1,088 → ¥979）</div>
 </div>
 
 <div id="imgModal">
@@ -141,6 +143,10 @@ var PRODUCTS = [
 // 预填当前方案配置
 var sel = {"Standard Bread":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"外卖接单-三方聚合平台":1,"KDS智能厨房":1,"数电发票":1,"门店代运维":1,"P2平板":1,"80N打印机":3,"LP2标签打印机":1},"小夏盐田":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"外卖接单-三方聚合平台":1,"KDS智能厨房":1,"数电发票":1,"智能叫号":1,"门店代运维":1,"P2平板":1,"80N打印机":3,"LP2标签打印机":1},"La brick":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"KDS智能厨房":1,"数电发票":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3,"门店进销存":1},"酒神堂":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"KDS智能厨房":1,"数电发票":1,"门店进销存":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3},"火花불티":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"副收银系统":1,"数电发票":1,"门店进销存":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3,"美团点评排队":1},"孝道炸鸡":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"智能叫号":1,"门店代运维":1,"S4mini Pro一体机":1,"80N打印机":2,"LP2标签打印机":1,"外卖接单-三方聚合平台":1},"Twozzim":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"美团点评排队":1,"数电发票":1,"门店代运维":1,"S5S Pro一体机":1,"80N打印机":3},"Farm Market":{"门店管理系统（POS）":1,"商家小程序":1,"会员管理":1,"美团点评排队":1,"数电发票":1,"门店代运维":1,"S5 Pro一体机":1,"80N打印机":3,"副收银系统":1}};
 
+// 分类折扣：推荐产品统一9折（折后价四舍五入取整）
+var CAT_DISC = { "推荐产品": 0.9 };
+function effPrice(p) { return CAT_DISC[p.cat] ? Math.round(p.price * CAT_DISC[p.cat]) : p.price; }
+
 var tbody = document.getElementById("tbody");
 var lastCat = "";
 PRODUCTS.forEach(function(p) {
@@ -148,17 +154,24 @@ PRODUCTS.forEach(function(p) {
         lastCat = p.cat;
         var cr = document.createElement("tr");
         cr.className = "cat-row";
-        cr.innerHTML = '<td colspan="9">' + p.cat + '</td>';
+        var badge = CAT_DISC[p.cat] ? ' <span class="disc-badge">' + (CAT_DISC[p.cat] * 10) + '折优惠</span>' : "";
+        cr.innerHTML = '<td colspan="9">' + p.cat + badge + '</td>';
         tbody.appendChild(cr);
     }
     var isHW = p.cat === "硬件设备";
+    var ep = effPrice(p);
     var tr = document.createElement("tr");
-    var tds = '<td class="prod-col">' + p.name + '<span class="price">¥' + p.price.toLocaleString() + '</span></td>';
+    var tds;
+    if (CAT_DISC[p.cat]) {
+        tds = '<td class="prod-col">' + p.name + '<span class="price-old">¥' + p.price.toLocaleString() + '</span><span class="price">¥' + ep.toLocaleString() + '</span></td>';
+    } else {
+        tds = '<td class="prod-col">' + p.name + '<span class="price">¥' + p.price.toLocaleString() + '</span></td>';
+    }
     BRANDS.forEach(function(b) {
         var qty = (sel[b] && sel[b][p.name]) ? sel[b][p.name] : 0;
         var checked = qty > 0 ? " checked" : "";
         var cell = '<td class="cell" onclick="toggleBox(this)">';
-        cell += '<input type="checkbox" data-brand="' + b + '" data-prod="' + p.name + '" data-price="' + p.price + '"' + checked + ' onclick="event.stopPropagation()" onchange="onBoxChange(this)">';
+        cell += '<input type="checkbox" data-brand="' + b + '" data-prod="' + p.name + '" data-price="' + ep + '"' + checked + ' onclick="event.stopPropagation()" onchange="onBoxChange(this)">';
         if (isHW) {
             cell += '<select class="qty-select" data-brand="' + b + '" data-prod="' + p.name + '" onclick="event.stopPropagation()" onchange="onQtyChange(this)"' + (qty === 0 ? " disabled" : "") + '>';
             for (var q = 1; q <= 10; q++) {
