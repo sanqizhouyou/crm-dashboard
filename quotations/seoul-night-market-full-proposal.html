@@ -34,8 +34,8 @@
             margin-bottom: 30px; padding-bottom: 12px; border-bottom: 3px solid #ffcd00;
         }
         .brand-page { page-break-after: always; }
-        .brand-img-wrap { border-radius: 16px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-height: 260px; }
-        .brand-img-wrap img { width: 100%; height: 240px; object-fit: cover; display: block; }
+        .brand-img-wrap { border-radius: 16px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .brand-img-wrap img { width: 100%; height: auto; object-fit: contain; display: block; }
         .brand-section {
             background: #f8f9fa; border-radius: 16px; padding: 30px;
             margin-bottom: 30px; border-left: 5px solid #ffcd00;
@@ -88,6 +88,8 @@
             .page-break { page-break-after: always; }
             body { font-size: 12px; }
             .cover { min-height: auto; padding: 80px 40px; }
+            .brand-img-wrap img { max-height: 310px; }
+            .brand-section { padding: 20px; margin-bottom: 16px; }
         }
     
 .name .kr{display:block;font-size:10px;color:#8a8a8a;font-weight:400;line-height:1.4;}
@@ -99,7 +101,7 @@
 <div class="cover">
     <h1>首尔夜市项目</h1>
     <h2>美团餐饮SaaS综合解决方案</h2>
-    <div class="meta">8家品牌定制报价方案<br>产品功能清单 · 价目表 · 售后服务 · 硬件宣传册<br>联系人：周巍 | 美团餐饮SaaS上海一区</div>
+    <div class="meta">8家品牌定制报价方案<br>产品功能清单 · 价目表 · 售后服务<br>联系人：周巍 | 美团餐饮SaaS上海一区</div>
     <div class="date">2026年8月</div>
 </div>
 
@@ -113,8 +115,7 @@
         <div>二、产品价目表 ———————————— 第11页</div>
         <div>三、产品功能清单 ———————————— 第12-13页</div>
         <div>四、售后基础服务范围 ———————————— 第14页</div>
-        <div>五、硬件宣传册 ———————————— 第15-16页</div>
-        <div>六、费用汇总 ———————————— 第17页</div>
+        <div>五、费用汇总 ———————————— 第15页</div>
     </div>
 </div>
 
@@ -246,36 +247,35 @@
 <div class="page">
     <h2 class="section-title">二、产品价目表</h2>
     <h3 style="margin-bottom:16px;color:#1a1a2e;">门店端软件（元/店/年）</h3>
-    <table class="price-table"><thead><tr><th>产品名称</th><th>产品ID</th><th>标准市场价</th><th>1店成交价</th><th>说明</th></tr></thead><tbody>
-    <tr><td>门店管理系统（POS）</td><td>s01</td><td>¥3,888</td><td>¥1,780</td><td>堂食/扫码/外卖全场景点餐，经营数据看板</td></tr>
-    <tr><td>商家小程序</td><td>s22</td><td>¥1,888</td><td>¥600</td><td>堂食点餐/外带预点/桌位预约，营销玩法</td></tr>
-    <tr><td>会员管理</td><td>s21</td><td>¥4,888</td><td>¥1,440</td><td>积分/储值/等级体系，智能储值营销</td></tr>
-    <tr><td>外卖接单-三方聚合平台</td><td>s09</td><td>¥368</td><td>¥290</td><td>聚合美团/饿了么/京东到家等多平台</td></tr>
-    <tr><td>KDS智能厨房</td><td>s19</td><td>¥1,688</td><td>¥750</td><td>厨房数字化：订单分区/优先级/制作计时</td></tr>
-    <tr><td>美团点评排队</td><td>s25</td><td>¥1,588</td><td>¥520</td><td>美团App预约取号，叫号管理，数据分析</td></tr>
-    <tr><td>智能叫号</td><td>s15</td><td>¥888</td><td>¥380</td><td>扫码/前台取号，自动叫号通知</td></tr>
-    <tr><td>数电发票</td><td>s_inv</td><td>¥1,088</td><td>¥1,088</td><td>扫码自助开票，普票/专票自动开具</td></tr>
-    <tr><td>门店进销存</td><td>s28</td><td>¥1,688</td><td>¥750</td><td>入库/出库/盘点，低库存预警，多仓管理</td></tr>
-    <tr><td>副收银系统</td><td>s02</td><td>¥1,288</td><td>¥660</td><td>多收银台扩展授权</td></tr>
-    <tr><td>门店代运维</td><td>s_maint</td><td>¥1,600</td><td>¥1,600</td><td>故障排查/系统维护/数据备份/远程支持/上门巡检</td></tr>
-    <tr><td>小程序装修包</td><td>s_design</td><td>¥4,000</td><td>¥4,000</td><td>首页视觉定制/菜单美化/品牌色系/活动页面</td></tr>
+    <table class="price-table"><thead><tr><th>产品名称</th><th>标准市场价</th><th>优惠价</th><th>说明</th></tr></thead><tbody>
+    <tr><td>门店管理系统（POS）</td><td>¥3,888</td><td>¥1,780</td><td>堂食/扫码/外卖全场景点餐，经营数据看板</td></tr>
+    <tr><td>商家小程序</td><td>¥1,888</td><td>¥600</td><td>堂食点餐/外带预点/桌位预约，营销玩法</td></tr>
+    <tr><td>会员管理</td><td>¥4,888</td><td>¥1,440</td><td>积分/储值/等级体系，智能储值营销</td></tr>
+    <tr><td>外卖接单-三方聚合平台</td><td>¥368</td><td>¥290</td><td>聚合美团/饿了么/京东到家等多平台</td></tr>
+    <tr><td>KDS智能厨房</td><td>¥1,688</td><td>¥750</td><td>厨房数字化：订单分区/优先级/制作计时</td></tr>
+    <tr><td>美团点评排队</td><td>¥1,588</td><td>¥520</td><td>美团App预约取号，叫号管理，数据分析</td></tr>
+    <tr><td>智能叫号</td><td>¥888</td><td>¥380</td><td>扫码/前台取号，自动叫号通知</td></tr>
+    <tr><td>数电发票</td><td>¥1,088</td><td>¥1,088</td><td>扫码自助开票，普票/专票自动开具</td></tr>
+    <tr><td>门店进销存</td><td>¥1,688</td><td>¥750</td><td>入库/出库/盘点，低库存预警，多仓管理</td></tr>
+    <tr><td>副收银系统</td><td>¥1,288</td><td>¥660</td><td>多收银台扩展授权</td></tr>
+    <tr><td>门店代运维</td><td>¥1,600</td><td>¥1,600</td><td>故障排查/系统维护/数据备份/远程支持/上门巡检</td></tr>
+    <tr><td>小程序装修包</td><td>¥4,000</td><td>¥4,000</td><td>首页视觉定制/菜单美化/品牌色系/活动页面</td></tr>
     </tbody></table>
     <h3 style="margin-bottom:16px;color:#1a1a2e;margin-top:30px;">硬件设备（元/台，一次性购买）</h3>
-    <table class="price-table"><thead><tr><th>产品名称</th><th>产品ID</th><th>单价</th><th>说明</th></tr></thead><tbody>
-    <tr><td>P2平板</td><td>hw00f</td><td>¥1,398</td><td>便携轻巧，适合小店/档口，支持外接配件</td></tr>
-    <tr><td>S4mini Pro一体机</td><td>hw00d</td><td>¥1,698</td><td>紧凑型，适合空间有限的小店</td></tr>
-    <tr><td>S5 Pro一体机</td><td>hw00b</td><td>¥1,398</td><td>主流机型，高性能处理器</td></tr>
-    <tr><td>S5S Pro一体机</td><td>hw00c</td><td>¥1,698</td><td>旗舰机型，高并发复杂场景</td></tr>
-    <tr><td>80N打印机</td><td>hw19</td><td>¥269</td><td>80mm热敏小票打印，高速自动切纸</td></tr>
-    <tr><td>LP2标签打印机</td><td>hw04</td><td>¥429</td><td>价格标签/外卖封口贴，自动剥离</td></tr>
-    <tr><td>后厨KDS显示终端-K2</td><td>hw_k2</td><td>¥1,198</td><td>15.6寸大屏，全金属密封，湿手触控</td></tr>
-    <tr><td>后厨KDS显示终端-K1</td><td>hw17</td><td>¥2,088</td><td>10.1寸触控屏，挂墙/支架安装</td></tr>
+    <table class="price-table"><thead><tr><th>产品名称</th><th>优惠价</th><th>说明</th></tr></thead><tbody>
+    <tr><td>P2平板</td><td>¥1,398</td><td>便携轻巧，适合小店/档口，支持外接配件</td></tr>
+    <tr><td>S4mini Pro一体机</td><td>¥1,698</td><td>紧凑型，适合空间有限的小店</td></tr>
+    <tr><td>S5 Pro一体机</td><td>¥1,398</td><td>主流机型，高性能处理器</td></tr>
+    <tr><td>S5S Pro一体机</td><td>¥1,698</td><td>旗舰机型，高并发复杂场景</td></tr>
+    <tr><td>80N打印机</td><td>¥269</td><td>80mm热敏小票打印，高速自动切纸</td></tr>
+    <tr><td>LP2标签打印机</td><td>¥429</td><td>价格标签/外卖封口贴，自动剥离</td></tr>
+    <tr><td>后厨KDS显示终端-K2</td><td>¥1,198</td><td>15.6寸大屏，全金属密封，湿手触控</td></tr>
+    <tr><td>后厨KDS显示终端-K1</td><td>¥2,088</td><td>10.1寸触控屏，挂墙/支架安装</td></tr>
     </tbody></table>
     <h3 style="margin-bottom:16px;color:#1a1a2e;margin-top:30px;">总部端软件（元/总部/年）</h3>
-    <table class="price-table"><thead><tr><th>产品名称</th><th>产品ID</th><th>标准市场价</th><th>建议成交价</th><th>说明</th></tr></thead><tbody>
-    <tr><td>供应链总部进销存</td><td>h02</td><td>¥20,000</td><td>¥10,000</td><td>仓储/配送/订货/财务/预警/档案/报表</td></tr>
-    <tr><td>连锁管理系统</td><td>s03</td><td>¥688</td><td>¥310</td><td>多组织架构，统一商品库下发，数据上报</td></tr>
-    <tr><td>分账管理</td><td>s04</td><td>¥300</td><td>¥140</td><td>多门店资金自动分账，管理费自动划扣</td></tr>
+    <table class="price-table"><thead><tr><th>产品名称</th><th>标准市场价</th><th>优惠价</th><th>说明</th></tr></thead><tbody>
+    <tr><td>连锁管理系统</td><td>¥688</td><td>¥310</td><td>多组织架构，统一商品库下发，数据上报</td></tr>
+    <tr><td>分账管理</td><td>¥300</td><td>¥140</td><td>多门店资金自动分账，管理费自动划扣</td></tr>
     </tbody></table>
 </div>
 
@@ -363,14 +363,7 @@
     <tr><td>活动页面</td><td>营销活动页面定制开发</td></tr>
     <tr><td>交付维护</td><td>一次性交付，年度免费小调优</td></tr>
     </tbody></table>
-    <h3 style="margin-bottom:16px;color:#1a1a2e;margin-top:24px;">供应链总部进销存</h3>
-    <table class="price-table feature-table"><tbody>
-    <tr><td>仓储管理</td><td>多仓库管理，库存实时查询</td></tr>
-    <tr><td>配送管理</td><td>配送路线优化，配送状态追踪</td></tr>
-    <tr><td>订货管理</td><td>门店订货汇总，采购计划制定</td></tr>
-    <tr><td>财务管理</td><td>总部与门店财务结算，对账管理</td></tr>
-    <tr><td>报表分析</td><td>供应链全流程数据分析与报表</td></tr>
-    </tbody></table>
+    
     <h3 style="margin-bottom:16px;color:#1a1a2e;margin-top:24px;">分账管理</h3>
     <table class="price-table feature-table"><tbody>
     <tr><td>自动分账</td><td>会员储值消费后自动分账至加盟商/品牌方</td></tr>
@@ -391,66 +384,14 @@
         <div class="service-card"><h4>📊 运营支持服务</h4><ul><li>系统使用培训（线上/线下）</li><li>新功能上线培训与指导</li><li>营销活动配置支持</li><li>数据报表解读与建议</li><li>最佳实践案例分享</li></ul></div>
         <div class="service-card"><h4>🔄 软件更新服务</h4><ul><li>版本自动更新升级</li><li>新功能优先体验</li><li>安全补丁及时推送</li><li>需求反馈与产品优化</li><li>系统兼容性保障</li></ul></div>
     </div>
-    <div style="background:#f8f9fa;border-radius:12px;padding:24px;margin-top:24px;">
-        <h4 style="margin-bottom:12px;color:#1a1a2e;">服务响应时效</h4>
-        <table class="price-table"><tbody>
-        <tr><td>一般问题</td><td style="font-weight:600;">2小时内响应，4小时内解决</td></tr>
-        <tr><td>紧急问题</td><td style="font-weight:600;">30分钟内响应，2小时内解决</td></tr>
-        <tr><td>严重故障</td><td style="font-weight:600;">15分钟内响应，1小时内解决</td></tr>
-        <tr><td>上门服务</td><td style="font-weight:600;">预约后48小时内到达（限已购买代运维服务客户）</td></tr>
-        </tbody></table>
-    </div>
-</div>
-
-<div class="page-break"></div>
-
-<!-- HARDWARE -->
-<div class="page">
-    <h2 class="section-title">五、硬件宣传册</h2>
-    <div class="k2-highlight">
-        <h3>美团厨房显示终端 K2</h3>
-        <p style="opacity:0.8;margin-bottom:20px;">后厨高效运转中枢 · 专为后厨环境设计</p>
-        <div class="k2-specs">
-            <div class="k2-spec"><div class="label">屏幕</div><div class="value">15.6英寸</div></div>
-            <div class="k2-spec"><div class="label">分辨率</div><div class="value">1366×768</div></div>
-            <div class="k2-spec"><div class="label">系统</div><div class="value">Meituan OS</div></div>
-            <div class="k2-spec"><div class="label">内存/存储</div><div class="value">4GB+32GB</div></div>
-            <div class="k2-spec"><div class="label">网络</div><div class="value">Wi-Fi 6</div></div>
-            <div class="k2-spec"><div class="label">蓝牙</div><div class="value">5.4</div></div>
-        </div>
-        <div style="margin-top:20px;display:flex;gap:30px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:200px;">
-                <h4 style="color:#ffcd00;margin-bottom:8px;">六大核心优势</h4>
-                <ul style="font-size:14px;opacity:0.9;padding-left:20px;">
-                    <li>全金属密封机身，抵御高温油烟</li>
-                    <li>后厨专用触控屏，湿手/戴手套可操作</li>
-                    <li>支持通电自启和定时开关机</li>
-                    <li>3W大功率音量提醒，嘈杂环境防漏单</li>
-                    <li>15.6寸大屏，订单信息一目了然</li>
-                    <li>VESA 100mm壁挂，灵活适配厨房空间</li>
-                </ul>
-            </div>
-            <div style="flex:1;min-width:200px;text-align:center;background:rgba(255,255,255,0.1);border-radius:12px;padding:20px;">
-                <div style="font-size:14px;opacity:0.7;">参考价格</div>
-                <div style="font-size:36px;font-weight:700;color:#ffcd00;margin:8px 0;">¥1,198</div>
-                <div style="font-size:13px;opacity:0.7;">元/台</div>
-            </div>
-        </div>
-    </div>
-    <h3 style="margin-bottom:16px;color:#1a1a2e;margin-top:30px;">其他硬件设备</h3>
-    <div class="hw-grid">
-        <div class="hw-card"><h4>P2平板</h4><div class="hw-model">hw00f</div><div class="hw-price">¥1,398</div><div class="hw-desc">便携轻巧，适合小店/档口/夜市摊位。支持扫码/NFC/刷卡支付，可外接打印机、扫码枪等配件。</div></div>
-        <div class="hw-card"><h4>S4mini Pro一体机</h4><div class="hw-model">hw00d</div><div class="hw-price">¥1,698</div><div class="hw-desc">紧凑设计不占台面；功能全面满足小店需求；总价低性价比高。</div></div>
-        <div class="hw-card"><h4>S5 Pro一体机</h4><div class="hw-model">hw00b</div><div class="hw-price">¥1,398</div><div class="hw-desc">性能与价格最佳平衡；大屏操作体验好；适配绝大多数餐饮场景。</div></div>
-        <div class="hw-card"><h4>S5S Pro一体机</h4><div class="hw-model">hw00c</div><div class="hw-price">¥1,698</div><div class="hw-desc">旗舰性能应对高并发；复杂业务场景（酒水分区/多支付/会员营销）游刃有余。</div></div>
-    </div>
+    
 </div>
 
 <div class="page-break"></div>
 
 <!-- SUMMARY -->
 <div class="page">
-    <h2 class="section-title">六、费用汇总</h2>
+    <h2 class="section-title">五、费用汇总</h2>
     <table class="summary-table">
         <thead><tr><th>品牌 · 브랜드</th><th>品类 · 업종</th><th>基础产品 · 기초</th><th>推荐产品 · 추천</th><th>硬件 · 하드웨어</th><th style="text-align:right;">总价</th></tr></thead>
         <tbody>
