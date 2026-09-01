@@ -87,10 +87,13 @@
         .summary-table td { padding: 10px 14px; border-bottom: 1px solid #eee; }
         .summary-table td:last-child { text-align: right; font-weight: 700; color: #e74c3c; }
         .summary-table tfoot td { border-top: 3px solid #1a1a2e; border-bottom: none; font-size: 16px; font-weight: 700; padding-top: 16px; }
+        @page { size: A4; margin: 10mm; }
         @media print {
+            .no-print { display: none !important; }
+            .pdf-btn { display: none !important; }
             .page-break { page-break-after: always; }
             body { font-size: 12px; }
-            .cover { min-height: auto; padding: 80px 40px; }
+            .cover { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 40px; page-break-after: always; }
             .brand-img-wrap img { max-height: 310px; }
             .brand-section { padding: 20px; margin-bottom: 16px; }
         }

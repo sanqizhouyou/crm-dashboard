@@ -190,7 +190,10 @@
             font-size: 14px;
             color: #666;
         }
+        @page { size: A4; margin: 10mm; }
         @media print {
+            .no-print { display: none !important; }
+            .pdf-btn { display: none !important; }
             body { background: white; }
             .section { box-shadow: none; border: 1px solid #eee; }
         }
