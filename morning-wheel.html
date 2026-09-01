@@ -656,6 +656,15 @@
   // 随机初始角度
   state.rotation = Math.random() * 360;
   draw();
+
+  // ═══════════ 暴露到全局（供内联 onclick 调用）═══════════
+  window.toggleFullscreen = toggleFullscreen;
+  window.setMode = setMode;
+  window.togglePanel = togglePanel;
+  window.applyLists = applyLists;
+  window.startSpin = startSpin;
+  window.stopSpin = stopSpin;
+  window.closeResult = closeResult;
 })();
 </script>
 </body>
