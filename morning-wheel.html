@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>早启动 · 惩罚大转盘</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0d0d1a 60%, #08080f 100%);
+    color: #e8e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+  /* ─── 顶部 ─── */
+  .header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px 10px;
+    max-width: 1100px;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 20px; color: #0d0d1a;
+    box-shadow: 0 4px 18px rgba(255, 215, 0, .35);
+  }
+  .logo-text { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+  .logo-text em { font-style: normal; color: #ffd700; }
+  .logo-sub { font-size: 11px; color: #7a7a8f; letter-spacing: 2px; margin-top: 2px; }
+  .hbtns { display: flex; gap: 10px; }
+  .icon-btn {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    color: #e8e8f0; border-radius: 8px; padding: 8px 14px; font-size: 13px;
+    cursor: pointer; transition: all .2s;
+  }
+  .icon-btn:hover { background: rgba(255,215,0,.12); border-color: rgba(255,215,0,.4); color: #ffd700; }
+
+  /* ─── 模式切换 ─── */
+  .mode-tabs {
+    display: flex; gap: 0; margin: 14px 0 6px;
+    background: rgba(255,255,255,.05); border-radius: 12px; padding: 4px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .mode-tab {
+    padding: 10px 34px; border-radius: 9px; font-size: 16px; font-weight: 700;
+    cursor: pointer; color: #8a8a9f; transition: all .25s; letter-spacing: 1px;
+    user-select: none;
+  }
+  .mode-tab.active {
+    background: linear-gradient(135deg, #ffd700, #ffb300);
+    color: #0d0d1a;
+    box-shadow: 0 4px 16px rgba(255, 215, 0, .35);
+  }
+  .mode-tab .sub { display: block; font-size: 10px; font-weight: 500; opacity: .75; letter-spacing: 2px; margin-top: 2px; }
+
+  /* ─── 主区域 ─── */
+  .stage {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 18px 16px 8px;
+  }
+  .wheel-wrap { position: relative; width: min(540px, 92vw); }
+  #wheel { width: 100%; height: auto; display: block; }
+  .pointer {
+    position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; z-index: 5;
+    border-left: 17px solid transparent; border-right: 17px solid transparent;
+    border-top: 34px solid #ffd700;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,.6));
+  }
+  .pointer::after {
+    content: ''; position: absolute; top: -30px; left: -7px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #ffd700; border: 3px solid #0d0d1a;
+  }
+  .hub {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 84px; height: 84px; border-radius: 50%; z-index: 4;
+    background: radial-gradient(circle at 35% 30%, #2a2a44, #101020);
+    border: 4px solid #ffd700;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 0 24px rgba(255,215,0,.3), inset 0 2px 8px rgba(255,255,255,.15);
+    pointer-events: none;
+  }
+
+  /* ─── 控制按钮 ─── */
+  .controls { display: flex; gap: 22px; margin: 26px 0 8px; }
+  .ctl-btn {
+    min-width: 170px; padding: 16px 34px; border-radius: 14px;
+    font-size: 22px; font-weight: 900; letter-spacing: 6px;
+    cursor: pointer; border: none; transition: all .15s;
+    font-family: inherit;
+  }
+  .ctl-btn:active:not(:disabled) { transform: scale(.96); }
+  .btn-start {
+    background: linear-gradient(135deg, #ffd700, #ff9500);
+    color: #0d0d1a;
+    box-shadow: 0 6px 24px rgba(255,180,0,.4);
+  }
+  .btn-start:hover:not(:disabled) { box-shadow: 0 8px 30px rgba(255,180,0,.6); }
+  .btn-stop {
+    background: linear-gradient(135deg, #ff4757, #c0392b);
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(255,71,87,.35);
+  }
+  .btn-stop:hover:not(:disabled) { box-shadow: 0 8px 30px rgba(255,71,87,.55); }
+  .ctl-btn:disabled { opacity: .25; cursor: not-allowed; box-shadow: none; }
+  .hint { font-size: 12px; color: #5a5a70; margin-top: 6px; letter-spacing: 1px; }
+
+  /* ─── 设置面板 ─── */
+  .panel {
+    width: min(540px, 92vw);
+    margin: 14px 0 20px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px; cursor: pointer; user-select: none;
+  }
+  .panel-head:hover { background: rgba(255,255,255,.03); }
+  .panel-title { font-size: 14px; font-weight: 700; color: #b8b8cc; letter-spacing: 1px; }
+  .panel-arrow { transition: transform .25s; color: #7a7a8f; font-size: 12px; }
+  .panel.open .panel-arrow { transform: rotate(180deg); }
+  .panel-body { display: none; padding: 4px 18px 18px; }
+  .panel.open .panel-body { display: block; }
+  .panel label { font-size: 12px; color: #8a8a9f; display: block; margin: 12px 0 6px; letter-spacing: 1px; }
+  .panel textarea {
+    width: 100%; min-height: 110px; resize: vertical;
+    background: #0d0d1a; border: 1px solid rgba(255,255,255,.15);
+    color: #e8e8f0; border-radius: 8px; padding: 10px 12px;
+    font-size: 14px; line-height: 1.9; font-family: inherit;
+  }
+  .panel textarea:focus { outline: none; border-color: rgba(255,215,0,.5); }
+  .check-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; cursor: pointer; }
+  .check-row input { width: 16px; height: 16px; accent-color: #ffd700; cursor: pointer; }
+  .check-row span { font-size: 13px; color: #b8b8cc; }
+  .apply-btn {
+    margin-top: 14px; width: 100%; padding: 11px;
+    background: rgba(255,215,0,.14); border: 1px solid rgba(255,215,0,.45);
+    color: #ffd700; border-radius: 8px; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all .2s; letter-spacing: 2px;
+  }
+  .apply-btn:hover { background: rgba(255,215,0,.25); }
+
+  /* ─── 抽取记录 ─── */
+  .history {
+    width: min(540px, 92vw); margin-bottom: 30px;
+  }
+  .history-title { font-size: 12px; color: #6a6a80; letter-spacing: 2px; margin-bottom: 10px; }
+  .history-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+    color: #c8c8dd;
+  }
+  .chip b { color: #ffd700; font-weight: 700; }
+  .chip.punish { border-color: rgba(255,71,87,.35); }
+  .chip.punish b { color: #ff6b7a; }
+
+  /* ─── 结果弹窗 ─── */
+  .overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(5,5,12,.88); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+  .overlay.show { display: flex; animation: fadeIn .25s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .result-label { font-size: 16px; color: #8a8a9f; letter-spacing: 8px; margin-bottom: 18px; }
+  .result-text {
+    font-size: clamp(44px, 10vw, 88px); font-weight: 900;
+    background: linear-gradient(135deg, #ffd700, #ff9500);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 60px rgba(255,180,0,.25);
+    animation: popIn .5s cubic-bezier(.2,1.6,.4,1);
+    text-align: center; padding: 0 20px; max-width: 90vw; line-height: 1.3;
+  }
+  @keyframes popIn { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .result-sub { font-size: 14px; color: #5a5a70; margin-top: 14px; letter-spacing: 1px; }
+  .result-btn {
+    margin-top: 38px; padding: 14px 56px; border-radius: 12px;
+    background: linear-gradient(135deg, #ffd700, #ff9500);
+    color: #0d0d1a; font-size: 18px; font-weight: 800; letter-spacing: 4px;
+    border: none; cursor: pointer; box-shadow: 0 6px 24px rgba(255,180,0,.4);
+  }
+  .result-btn:active { transform: scale(.96); }
+
+  /* ─── 彩带 ─── */
+  .confetti {
+    position: fixed; top: -20px; z-index: 101; pointer-events: none;
+    width: 10px; height: 16px; opacity: 0;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: .6; }
+  }
+
+  .footer-note { font-size: 11px; color: #4a4a5e; padding: 14px 0 24px; letter-spacing: 1px; }
+
+  @media (max-width: 600px) {
+    .ctl-btn { min-width: 130px; font-size: 18px; padding: 14px 24px; }
+    .mode-tab { padding: 9px 20px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">🎯</div>
+    <div>
+      <div class="logo-text">早启动<em>惩罚大转盘</em></div>
+      <div class="logo-sub">MORNING MEETING PUNISHMENT WHEEL</div>
+    </div>
+  </div>
+  <div class="hbtns">
+    <button class="icon-btn" onclick="toggleFullscreen()">⛶ 全屏投屏</button>
+  </div>
+</div>
+
+<div class="mode-tabs">
+  <div class="mode-tab active" id="tabPeople" onclick="setMode('people')">🎯 抽倒霉蛋<span class="sub">WHO</span></div>
+  <div class="mode-tab" id="tabPunish" onclick="setMode('punish')">🎲 抽惩罚<span class="sub">WHAT</span></div>
+</div>
+
+<div class="stage">
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="540" height="540"></canvas>
+    <div class="hub" id="hubEmoji">🎯</div>
+  </div>
+
+  <div class="controls">
+    <button class="ctl-btn btn-start" id="btnStart" onclick="startSpin()">开 始</button>
+    <button class="ctl-btn btn-stop" id="btnStop" onclick="stopSpin()" disabled>停</button>
+  </div>
+  <div class="hint">提示：按空格键也可以 开始 / 停止 · 建议「先抽倒霉蛋，再抽惩罚」</div>
+</div>
+
+<div class="panel" id="panel">
+  <div class="panel-head" onclick="togglePanel()">
+    <span class="panel-title">⚙️ 名单设置</span>
+    <span class="panel-arrow">▼</span>
+  </div>
+  <div class="panel-body">
+    <label id="labelPeople">团队成员名单（每行一个名字）</label>
+    <textarea id="taPeople" spellcheck="false"></textarea>
+    <label id="labelPunish" style="display:none">惩罚项目（每行一条）</label>
+    <textarea id="taPunish" spellcheck="false" style="display:none"></textarea>
+    <label class="check-row" id="removeRow" style="display:none">
+      <input type="checkbox" id="chkRemove">
+      <span>抽中后自动移出名单（不重复受罚，适合人少时）</span>
+    </label>
+    <button class="apply-btn" onclick="applyLists()">应 用</button>
+  </div>
+</div>
+
+<div class="history" id="historyBox" style="display:none">
+  <div class="history-title">📋 本场抽取记录</div>
+  <div class="history-chips" id="historyChips"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeResult()">
+  <div class="result-label" id="resultLabel">恭喜中奖</div>
+  <div class="result-text" id="resultText"></div>
+  <div class="result-sub" id="resultSub"></div>
+  <button class="result-btn" onclick="closeResult()">知 道 了</button>
+</div>
+
+<div class="footer-note">仅供团队娱乐 · 惩罚有度，快乐加倍 · 上海一区早启动</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ═══════════ 默认数据 ═══════════
+  var DEFAULT_PEOPLE = ['习嘉辰','王种卿','刘青','姜骏毅','李毅','周巍','李强','周晶静','王梦奇','王野','李卓艺'];
+  var DEFAULT_PUNISH = [
+    '俯卧撑 10 个','深蹲 20 个','唱一首歌（30秒起）','讲个笑话，没人笑就再来一个',
+    '模仿三种动物叫声','用屁股写自己的名字','真诚夸赞右边同事 30 秒','背诵一首古诗',
+    '表演 15 秒广场舞','下次早会带早餐','金鸡独立 60 秒','学新闻主播播报昨日战绩'
+  ];
+
+  var LS_KEY = 'morning_wheel_v1';
+
+  var state = {
+    mode: 'people',
+    people: DEFAULT_PEOPLE.slice(),
+    punish: DEFAULT_PUNISH.slice(),
+    rotation: 0,
+    spinning: false,
+    decel: null,          // 减速动画参数
+    speed: 0,
+    maxSpeed: 620,        // deg/s
+    lastTickIdx: -1,
+    history: [],
+    raf: null,
+    audioCtx: null
+  };
+
+  // ═══════════ 持久化 ═══════════
+  function save() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        people: state.people, punish: state.punish
+      }));
+    } catch(e) {}
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        var d = JSON.parse(raw);
+        if (Array.isArray(d.people) && d.people.length >= 2) state.people = d.people;
+        if (Array.isArray(d.punish) && d.punish.length >= 2) state.punish = d.punish;
+      }
+    } catch(e) {}
+  }
+
+  // ═══════════ 音效 ═══════════
+  function getCtx() {
+    if (!state.audioCtx) {
+      try { state.audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+    return state.audioCtx;
+  }
+  function tickSound() {
+    var ctx = getCtx(); if (!ctx) return;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'square'; o.frequency.value = 1200;
+    g.gain.setValueAtTime(.06, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .04);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + .04);
+  }
+  function fanfare() {
+    var ctx = getCtx(); if (!ctx) return;
+    var notes = [523, 659, 784, 1047];
+    notes.forEach(function(f, i) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      var t = ctx.currentTime + i * .12;
+      g.gain.setValueAtTime(.18, t);
+      g.gain.exponentialRampToValueAtTime(.001, t + .35);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + .35);
+    });
+  }
+
+  // ═══════════ 转盘绘制 ═══════════
+  var canvas = document.getElementById('wheel');
+  var ctx2d = canvas.getContext('2d');
+  var COLORS = ['#16213e', '#0f3460', '#1a1a2e', '#203a5e'];
+
+  function currentList() { return state.mode === 'people' ? state.people : state.punish; }
+
+  function draw(highlightIdx) {
+    var list = currentList();
+    var n = list.length;
+    var W = canvas.width, H = canvas.height;
+    var cx = W/2, cy = H/2, R = W/2 - 14;
+    ctx2d.clearRect(0, 0, W, H);
+
+    if (n < 2) {
+      ctx2d.beginPath(); ctx2d.arc(cx, cy, R, 0, Math.PI*2);
+      ctx2d.fillStyle = '#16213e'; ctx2d.fill();
+      ctx2d.fillStyle = '#8a8a9f'; ctx2d.font = '16px sans-serif';
+      ctx2d.textAlign = 'center'; ctx2d.textBaseline = 'middle';
+      ctx2d.fillText('请先在设置中添加名单（至少2项）', cx, cy);
+      return;
+    }
+
+    var seg = Math.PI * 2 / n;
+    var fontSize = n > 14 ? 13 : n > 10 ? 15 : 17;
+
+    for (var i = 0; i < n; i++) {
+      var a0 = i * seg + state.rotation * Math.PI / 180 - Math.PI/2;
+      var a1 = a0 + seg;
+
+      ctx2d.beginPath();
+      ctx2d.moveTo(cx, cy);
+      ctx2d.arc(cx, cy, R, a0, a1);
+      ctx2d.closePath();
+
+      if (highlightIdx === i) {
+        ctx2d.fillStyle = '#ffd700';
+        ctx2d.shadowColor = 'rgba(255,215,0,.8)'; ctx2d.shadowBlur = 24;
+      } else {
+        ctx2d.fillStyle = COLORS[i % COLORS.length];
+        ctx2d.shadowBlur = 0;
+      }
+      ctx2d.fill();
+      ctx2d.shadowBlur = 0;
+      ctx2d.strokeStyle = 'rgba(255,215,0,.25)';
+      ctx2d.lineWidth = 1.5;
+      ctx2d.stroke();
+
+      // 文字
+      var mid = a0 + seg/2;
+      ctx2d.save();
+      ctx2d.translate(cx, cy);
+      ctx2d.rotate(mid);
+      ctx2d.textAlign = 'right';
+      ctx2d.textBaseline = 'middle';
+      ctx2d.fillStyle = highlightIdx === i ? '#0d0d1a' : '#f0f0f8';
+      ctx2d.font = 'bold ' + fontSize + 'px "PingFang SC","Microsoft YaHei",sans-serif';
+      var name = list[i];
+      var maxChars = 10;
+      if (name.length > maxChars) name = name.slice(0, maxChars) + '…';
+      ctx2d.fillText(name, R - 22, 0);
+      ctx2d.restore();
+    }
+
+    // 外圈
+    ctx2d.beginPath();
+    ctx2d.arc(cx, cy, R + 6, 0, Math.PI*2);
+    ctx2d.strokeStyle = '#ffd700';
+    ctx2d.lineWidth = 4;
+    ctx2d.stroke();
+    // 外圈灯珠
+    var bulbs = Math.max(12, n * 2);
+    for (var b = 0; b < bulbs; b++) {
+      var ba = b / bulbs * Math.PI * 2;
+      ctx2d.beginPath();
+      ctx2d.arc(cx + Math.cos(ba) * (R + 6), cy + Math.sin(ba) * (R + 6), 3, 0, Math.PI*2);
+      ctx2d.fillStyle = b % 2 === 0 ? '#ffd700' : '#ff8c00';
+      ctx2d.fill();
+    }
+  }
+
+  // ═══════════ 旋转控制 ═══════════
+  var btnStart = document.getElementById('btnStart');
+  var btnStop = document.getElementById('btnStop');
+
+  function startSpin() {
+    if (state.spinning) return;
+    var list = currentList();
+    if (list.length < 2) { alert('名单至少需要 2 项，请先在「名单设置」中添加'); return; }
+    var actx = getCtx(); if (actx && actx.state === 'suspended') actx.resume();
+    state.spinning = true;
+    state.speed = 0;
+    state.decel = null;
+    btnStart.disabled = true;
+    btnStop.disabled = false;
+    var t0 = performance.now();
+    var last = t0;
+    state.raf = requestAnimationFrame(function loop(now) {
+      var dt = Math.min(.05, (now - last) / 1000);
+      last = now;
+      if (state.decel) {
+        // 减速阶段：easeOutCubic 到目标角度
+        var d = state.decel;
+        var t = Math.min(1, (now - d.t0) / d.dur);
+        var e = 1 - Math.pow(1 - t, 3);
+        var newRot = d.from + (d.to - d.from) * e;
+        // tick 音效
+        var list2 = currentList();
+        var segDeg = 360 / list2.length;
+        var idx = Math.floor(((newRot % 360) + 360) % 360 / segDeg);
+        if (idx !== state.lastTickIdx) { state.lastTickIdx = idx; tickSound(); }
+        state.rotation = newRot;
+        if (t >= 1) {
+          state.rotation = d.to;
+          finish(d.winner);
+          return;
+        }
+      } else {
+        // 加速到匀速
+        state.speed = Math.min(state.maxSpeed, state.speed + state.maxSpeed * dt * 1.8);
+        state.rotation += state.speed * dt;
+        var list3 = currentList();
+        var segDeg3 = 360 / list3.length;
+        var idx3 = Math.floor(((state.rotation % 360) + 360) % 360 / segDeg3);
+        if (idx3 !== state.lastTickIdx) { state.lastTickIdx = idx3; tickSound(); }
+      }
+      draw();
+      state.raf = requestAnimationFrame(loop);
+    });
+  }
+
+  function stopSpin() {
+    if (!state.spinning || state.decel) return;
+    var list = currentList();
+    var n = list.length;
+    var seg = 360 / n;
+    var winner = Math.floor(Math.random() * n);
+    // 目标：让 winner 段中心对准顶部指针（顶部 = -90°）
+    // 段 i 绘制起始角 = i*seg + rotation - 90；中心 = (i+.5)*seg + rotation - 90
+    // 指针在 -90° → (w+.5)*seg + rotation ≡ 0 (mod 360)
+    var jitter = (Math.random() * .6 - .3) * seg;
+    var wantMod = ((-(winner + .5) * seg - jitter) % 360 + 360) % 360;
+    var base = state.rotation + 360 * (4.5 + Math.random() * 2.5);
+    var curMod = ((base % 360) + 360) % 360;
+    var adjust = ((wantMod - curMod) % 360 + 360) % 360;
+    state.decel = {
+      from: state.rotation,
+      to: base + adjust,
+      t0: performance.now(),
+      dur: 3400 + Math.random() * 800,
+      winner: winner
+    };
+  }
+
+  function finish(winnerIdx) {
+    state.spinning = false;
+    state.decel = null;
+    btnStart.disabled = false;
+    btnStop.disabled = true;
+    draw(winnerIdx);
+
+    var list = currentList();
+    var text = list[winnerIdx];
+    var isPeople = state.mode === 'people';
+
+    // 记录
+    state.history.unshift({ mode: state.mode, text: text, time: new Date() });
+    if (state.history.length > 12) state.history.pop();
+    renderHistory();
+
+    // 抽中后移除
+    var removed = false;
+    if (isPeople && document.getElementById('chkRemove').checked && state.people.length > 2) {
+      state.people.splice(winnerIdx, 1);
+      save();
+      syncTextareas();
+      removed = true;
+      setTimeout(function(){ draw(); }, 2600);
+    }
+
+    // 弹窗
+    var overlay = document.getElementById('overlay');
+    document.getElementById('resultLabel').textContent = isPeople ? '🏆 天选之子' : '⚡ 惩罚内容';
+    document.getElementById('resultText').textContent = text;
+    document.getElementById('resultSub').textContent = isPeople
+      ? (removed ? '已自动移出本轮名单' : '请切换到「抽惩罚」决定 TA 的命运')
+      : '执行完毕，下次加油！';
+    overlay.classList.add('show');
+    fanfare();
+    confetti();
+  }
+
+  function confetti() {
+    var colors = ['#ffd700','#ff8c00','#ff4757','#2ed573','#1e90ff','#e8e8f0'];
+    for (var i = 0; i < 60; i++) {
+      var c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
+      c.style.animationDelay = (Math.random() * .5) + 's';
+      c.style.width = (6 + Math.random() * 8) + 'px';
+      c.style.height = (10 + Math.random() * 8) + 'px';
+      if (Math.random() > .5) c.style.borderRadius = '50%';
+      document.body.appendChild(c);
+      (function(el){ setTimeout(function(){ el.remove(); }, 3800); })(c);
+    }
+  }
+
+  function closeResult() {
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  // ═══════════ UI ═══════════
+  function setMode(m) {
+    if (state.spinning) return;
+    state.mode = m;
+    document.getElementById('tabPeople').classList.toggle('active', m === 'people');
+    document.getElementById('tabPunish').classList.toggle('active', m === 'punish');
+    document.getElementById('hubEmoji').textContent = m === 'people' ? '🎯' : '🎲';
+    document.getElementById('taPeople').style.display = m === 'people' ? '' : 'none';
+    document.getElementById('taPunish').style.display = m === 'punish' ? '' : 'none';
+    document.getElementById('labelPeople').style.display = m === 'people' ? '' : 'none';
+    document.getElementById('labelPunish').style.display = m === 'punish' ? '' : 'none';
+    document.getElementById('removeRow').style.display = m === 'people' ? 'flex' : 'none';
+    draw();
+  }
+
+  function togglePanel() {
+    document.getElementById('panel').classList.toggle('open');
+  }
+
+  function syncTextareas() {
+    document.getElementById('taPeople').value = state.people.join('\n');
+    document.getElementById('taPunish').value = state.punish.join('\n');
+  }
+
+  function applyLists() {
+    var p = document.getElementById('taPeople').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+    var q = document.getElementById('taPunish').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+    if (p.length < 2) { alert('团队成员至少 2 人'); return; }
+    if (q.length < 2) { alert('惩罚项目至少 2 条'); return; }
+    state.people = p;
+    state.punish = q;
+    save();
+    draw();
+    alert('已应用：成员 ' + p.length + ' 人 · 惩罚 ' + q.length + ' 项');
+  }
+
+  function renderHistory() {
+    var box = document.getElementById('historyBox');
+    var chips = document.getElementById('historyChips');
+    if (!state.history.length) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    chips.innerHTML = '';
+    state.history.forEach(function(h) {
+      var el = document.createElement('span');
+      el.className = 'chip' + (h.mode === 'punish' ? ' punish' : '');
+      var t = h.time.getHours() + ':' + ('0' + h.time.getMinutes()).slice(-2);
+      el.innerHTML = (h.mode === 'people' ? '👤 ' : '⚡ ') + '<b>' + escapeHtml(h.text) + '</b> <span style="opacity:.5;font-size:11px">' + t + '</span>';
+      chips.appendChild(el);
+    });
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function(){});
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  // 空格键
+  document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
+      e.preventDefault();
+      if (state.spinning && !state.decel) stopSpin();
+      else if (!state.spinning) startSpin();
+    }
+  });
+
+  // ═══════════ 初始化 ═══════════
+  load();
+  syncTextareas();
+  renderHistory();
+  draw();
+  // 随机初始角度
+  state.rotation = Math.random() * 360;
+  draw();
+})();
+</script>
+</body>
+</html>
