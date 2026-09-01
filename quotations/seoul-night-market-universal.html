@@ -198,6 +198,38 @@
             .section { box-shadow: none; border: 1px solid #eee; }
         }
     
+
+        /* 品牌分页 */
+        .brand-page { margin-top: 36px; page-break-before: always; break-before: page; }
+        .brand-hero { text-align: center; margin: 4px 0 10px; }
+        .brand-hero img { max-width: 100%; max-height: 190px; object-fit: contain; border-radius: 10px; }
+        .brand-head { text-align: center; margin-bottom: 14px; }
+        .brand-head-name { font-size: 24px; font-weight: 800; color: #1a2a4a; }
+        .brand-head-tag { font-size: 13px; color: #888; margin-top: 4px; }
+        .cfg-table td { padding: 8px 14px; }
+        .cfg-group td { background: #f7f7f9; font-size: 13px; font-weight: 700; color: #444; padding: 6px 14px; border-bottom: 1px solid #e8e8ee; }
+        .brand-total { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; justify-content: flex-end; margin-top: 14px; font-size: 14px; color: #666; }
+        .brand-total b { color: #e74c3c; font-size: 16px; margin-left: 4px; }
+        .brand-total .grand { border-left: 2px solid #ffcd00; padding-left: 18px; color: #222; }
+        .brand-total .grand b { font-size: 20px; }
+        @media print {
+            .brand-page { margin-top: 0; padding: 16px 20px; }
+            .brand-page .section-title { font-size: 17px; margin-bottom: 8px; }
+            .brand-hero { margin: 2px 0 6px; }
+            .brand-hero img { max-height: 96px; }
+            .brand-head { margin-bottom: 8px; }
+            .brand-head-name { font-size: 19px; }
+            .brand-head-tag { font-size: 12px; margin-top: 2px; }
+            .cfg-table td { padding: 4px 12px; }
+            .cfg-group td { padding: 3px 12px; font-size: 12px; }
+            .cfg-table .name-kr { font-size: 10px; }
+            .cfg-table .product-price { font-size: 14px; }
+            .brand-total { margin-top: 8px; font-size: 13px; }
+            .brand-total b { font-size: 14px; }
+            .brand-total .grand b { font-size: 18px; }
+            .footer { padding: 10px 0 0; margin-top: 6px; page-break-inside: avoid; }
+        }
+
 .name-kr{font-size:11px;color:#7a7a7a;margin-top:2px;font-weight:400;line-height:1.4;}
 .desc-kr{font-size:11px;color:#9a9a9a;margin-top:3px;font-weight:400;line-height:1.6;}
 </style>
@@ -527,6 +559,175 @@
         </div>
 
         <div style="text-align:right;margin-top:10px;font-size:12px;color:#999;">注：推荐产品统一9折优惠 · 추천 제품 10% 할인，折后价已计入小计与总价</div>
+        
+        <!-- Brand Index -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">📖</div>各品牌定制方案 · 브랜드별 맞춤 견적（每品牌一页 · 브랜드당 1페이지）</div>
+            <table class="product-table" style="margin-bottom:0;">
+                <thead><tr><th style="width:34%">品牌 · 브랜드</th><th style="width:42%">品牌定位 · 포지셔닝</th><th style="width:24%;text-align:right;">折后总价 · 총 금액</th></tr></thead>
+                <tbody><tr><td><div class="product-name">1. Standard Bread</div></td><td><div class="product-desc">英伦复古风高端手工生吐司工坊</div></td><td style="text-align:right;"><div class="product-price">¥9,809</div></td></tr><tr><td><div class="product-name">2. 小夏盐田</div></td><td><div class="product-desc">现象级先锋美学烘焙品牌</div></td><td style="text-align:right;"><div class="product-price">¥10,151</div></td></tr><tr><td><div class="product-name">3. La brick</div></td><td><div class="product-desc">全时段复式Brunch与微醺酒馆</div></td><td style="text-align:right;"><div class="product-price">¥10,094</div></td></tr><tr><td><div class="product-name">4. 酒神堂</div></td><td><div class="product-desc">首尔年轻人必打卡的主题酒吧</div></td><td style="text-align:right;"><div class="product-price">¥10,094</div></td></tr><tr><td><div class="product-name">5. 火花불티</div></td><td><div class="product-desc">朝鲜时代原班团队专属打造</div></td><td style="text-align:right;"><div class="product-price">¥10,481</div></td></tr><tr><td><div class="product-name">6. 孝道炸鸡 효도치킨</div></td><td><div class="product-desc">米其林星级主厨跨界研发</div></td><td style="text-align:right;"><div class="product-price">¥8,528</div></td></tr><tr><td><div class="product-name">7. Twozzim 두천</div></td><td><div class="product-desc">全韩销量第一韩式炖鸡</div></td><td style="text-align:right;"><div class="product-price">¥9,212</div></td></tr><tr><td><div class="product-name">8. Farm Market</div></td><td><div class="product-desc">国产高端和牛的韩式顶流表达</div></td><td style="text-align:right;"><div class="product-price">¥9,506</div></td></tr><tr><td colspan="3" style="text-align:right;font-size:14px;color:#666;padding-top:12px;">8店合计 · 8개 매장 합계：<span style="font-weight:700;color:#e74c3c;font-size:18px;">¥77,875</span></td></tr></tbody></table>
+            <div style="margin-top:10px;font-size:12px;color:#999;">以下为各品牌单店定制方案明细，每品牌独立一页，可直接抽取对应页面发给品牌方 · 아래는 브랜드별 단일 매장 맞춤 견적 상세이며 브랜드당 독립 페이지로 구성됩니다</div>
+        </div>
+
+        <!-- Brand Page: Standard Bread -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🏪</div>Standard Bread · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">1 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/standard-bread.jpg" alt="Standard Bread">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">Standard Bread</div>
+                <div class="brand-head-tag">英伦复古风高端手工生吐司工坊</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">外卖接单-三方聚合平台</div><div class="name-kr">배달 주문 통합 접수 플랫폼</div></td><td style="text-align:right;"><div class="product-price">¥261<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">KDS智能厨房（备餐管理）</div><div class="name-kr">KDS 스마트 주방(조리 관리)</div></td><td style="text-align:right;"><div class="product-price">¥675<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">数电发票</div><div class="name-kr">전자세금계산서(QR 발행)</div></td><td style="text-align:right;"><div class="product-price">¥979<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">P2平板</div><div class="name-kr">P2 태블릿</div></td><td style="text-align:right;"><div class="product-price">¥1,398</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥807</div></td></tr><tr><td><div class="product-name">美团标签打印机（LP2）</div><div class="name-kr">메이퇀 라벨 프린터(LP2)</div></td><td style="text-align:right;"><div class="product-price">¥429</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥3,355</b></span><span>硬件 <b>¥2,634</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥9,809</b></span>
+            </div>
+        </div>
+
+        <!-- Brand Page: 小夏盐田 -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🏪</div>小夏盐田 · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">2 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/xiaoxia-yantian.jpg" alt="小夏盐田">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">小夏盐田</div>
+                <div class="brand-head-tag">现象级先锋美学烘焙品牌</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">外卖接单-三方聚合平台</div><div class="name-kr">배달 주문 통합 접수 플랫폼</div></td><td style="text-align:right;"><div class="product-price">¥261<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">KDS智能厨房（备餐管理）</div><div class="name-kr">KDS 스마트 주방(조리 관리)</div></td><td style="text-align:right;"><div class="product-price">¥675<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">数电发票</div><div class="name-kr">전자세금계산서(QR 발행)</div></td><td style="text-align:right;"><div class="product-price">¥979<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">智能叫号</div><div class="name-kr">스마트 콜넘버</div></td><td style="text-align:right;"><div class="product-price">¥342<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">P2平板</div><div class="name-kr">P2 태블릿</div></td><td style="text-align:right;"><div class="product-price">¥1,398</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥807</div></td></tr><tr><td><div class="product-name">美团标签打印机（LP2）</div><div class="name-kr">메이퇀 라벨 프린터(LP2)</div></td><td style="text-align:right;"><div class="product-price">¥429</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥3,697</b></span><span>硬件 <b>¥2,634</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥10,151</b></span>
+            </div>
+        </div>
+
+        <!-- Brand Page: La brick -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🍽️</div>La brick · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">3 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/la-brick.jpg" alt="La brick">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">La brick</div>
+                <div class="brand-head-tag">全时段复式Brunch与微醺酒馆</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">KDS智能厨房（备餐管理）</div><div class="name-kr">KDS 스마트 주방(조리 관리)</div></td><td style="text-align:right;"><div class="product-price">¥675<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">数电发票</div><div class="name-kr">전자세금계산서(QR 발행)</div></td><td style="text-align:right;"><div class="product-price">¥979<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">供应链门店库存（进销存）</div><div class="name-kr">공급망 점포 재고관리(구매·판매·재고)</div></td><td style="text-align:right;"><div class="product-price">¥675<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">S5S Pro一体机</div><div class="name-kr">S5S Pro 올인원 단말기</div></td><td style="text-align:right;"><div class="product-price">¥1,698</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥807</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥3,769</b></span><span>硬件 <b>¥2,505</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥10,094</b></span>
+            </div>
+        </div>
+
+        <!-- Brand Page: 酒神堂 -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🍹</div>酒神堂 · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">4 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/jiushentang.jpg" alt="酒神堂">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">酒神堂</div>
+                <div class="brand-head-tag">首尔年轻人必打卡的主题酒吧</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">KDS智能厨房（备餐管理）</div><div class="name-kr">KDS 스마트 주방(조리 관리)</div></td><td style="text-align:right;"><div class="product-price">¥675<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">数电发票</div><div class="name-kr">전자세금계산서(QR 발행)</div></td><td style="text-align:right;"><div class="product-price">¥979<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">供应链门店库存（进销存）</div><div class="name-kr">공급망 점포 재고관리(구매·판매·재고)</div></td><td style="text-align:right;"><div class="product-price">¥675<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">S5S Pro一体机</div><div class="name-kr">S5S Pro 올인원 단말기</div></td><td style="text-align:right;"><div class="product-price">¥1,698</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥807</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥3,769</b></span><span>硬件 <b>¥2,505</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥10,094</b></span>
+            </div>
+        </div>
+
+        <!-- Brand Page: 火花불티 -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🍻</div>火花불티 · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">5 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/hwahwa-bulti.jpg" alt="火花불티">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">火花불티</div>
+                <div class="brand-head-tag">朝鲜时代原班团队专属打造</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">美团点评排队</div><div class="name-kr">메이퇀·디엔핑 온라인 웨이팅</div></td><td style="text-align:right;"><div class="product-price">¥468<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">副收银系统（收银点位）</div><div class="name-kr">서브 POS(결제 포인트 확장)</div></td><td style="text-align:right;"><div class="product-price">¥594<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">数电发票</div><div class="name-kr">전자세금계산서(QR 발행)</div></td><td style="text-align:right;"><div class="product-price">¥979<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">供应链门店库存（进销存）</div><div class="name-kr">공급망 점포 재고관리(구매·판매·재고)</div></td><td style="text-align:right;"><div class="product-price">¥675<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">S5S Pro一体机</div><div class="name-kr">S5S Pro 올인원 단말기</div></td><td style="text-align:right;"><div class="product-price">¥1,698</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥807</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥4,156</b></span><span>硬件 <b>¥2,505</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥10,481</b></span>
+            </div>
+        </div>
+
+        <!-- Brand Page: 孝道炸鸡 효도치킨 -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🍟</div>孝道炸鸡 효도치킨 · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">6 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/hyodo-chicken.jpg" alt="孝道炸鸡 효도치킨">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">孝道炸鸡 효도치킨</div>
+                <div class="brand-head-tag">米其林星级主厨跨界研发</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">外卖接单-三方聚合平台</div><div class="name-kr">배달 주문 통합 접수 플랫폼</div></td><td style="text-align:right;"><div class="product-price">¥261<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">智能叫号（取餐叫号）</div><div class="name-kr">스마트 콜넘버(픽업 호출)</div></td><td style="text-align:right;"><div class="product-price">¥342<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">S4mini Pro一体机</div><div class="name-kr">S4mini Pro 올인원 단말기</div></td><td style="text-align:right;"><div class="product-price">¥1,698</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥538</div></td></tr><tr><td><div class="product-name">美团标签打印机（LP2）</div><div class="name-kr">메이퇀 라벨 프린터(LP2)</div></td><td style="text-align:right;"><div class="product-price">¥429</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥2,043</b></span><span>硬件 <b>¥2,665</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥8,528</b></span>
+            </div>
+        </div>
+
+        <!-- Brand Page: Twozzim 두천 -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🍲</div>Twozzim 두천 · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">7 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/twozzim.jpg" alt="Twozzim 두천">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">Twozzim 두천</div>
+                <div class="brand-head-tag">全韩销量第一韩式炖鸡</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">美团点评排队</div><div class="name-kr">메이퇀·디엔핑 온라인 웨이팅</div></td><td style="text-align:right;"><div class="product-price">¥468<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">数电发票</div><div class="name-kr">전자세금계산서(QR 발행)</div></td><td style="text-align:right;"><div class="product-price">¥979<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">S5S Pro一体机</div><div class="name-kr">S5S Pro 올인원 단말기</div></td><td style="text-align:right;"><div class="product-price">¥1,698</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥807</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥2,887</b></span><span>硬件 <b>¥2,505</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥9,212</b></span>
+            </div>
+        </div>
+
+        <!-- Brand Page: Farm Market -->
+        <div class="section brand-page">
+            <div class="section-title"><div class="icon">🥩</div>Farm Market · 定制方案 <span style="font-size:13px;color:#999;font-weight:400;">8 / 8</span></div>
+            <div class="brand-hero">
+                <img src="assets/farm-market.jpg" alt="Farm Market">
+            </div>
+            <div class="brand-head">
+                <div class="brand-head-name">Farm Market</div>
+                <div class="brand-head-tag">国产高端和牛的韩式顶流表达</div>
+            </div>
+            <table class="product-table cfg-table">
+                <thead><tr><th style="width:70%">产品名称 · 제품명</th><th style="width:30%;text-align:right;">优惠价 · 할인가</th></tr></thead>
+                <tbody><tr class="cfg-group"><td colspan="2">基础产品 · 기초 제품</td></tr><tr><td><div class="product-name">门店管理系统（POS）</div><div class="name-kr">점포 관리 시스템(POS)</div></td><td style="text-align:right;"><div class="product-price">¥1,780<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">商家小程序</div><div class="name-kr">브랜드 전용 미니앱</div></td><td style="text-align:right;"><div class="product-price">¥600<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">会员管理</div><div class="name-kr">멤버십 관리</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">推荐产品 · 추천 제품 <span style="font-weight:400;font-size:11px;color:#e74c3c;">（9折优惠 · 10% 할인）</span></td></tr><tr><td><div class="product-name">美团点评排队</div><div class="name-kr">메이퇀·디엔핑 온라인 웨이팅</div></td><td style="text-align:right;"><div class="product-price">¥468<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">数电发票</div><div class="name-kr">전자세금계산서(QR 발행)</div></td><td style="text-align:right;"><div class="product-price">¥979<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">副收银系统（收银点位）</div><div class="name-kr">서브 POS(결제 포인트 확장)</div></td><td style="text-align:right;"><div class="product-price">¥594<span class="unit">/年</span></div></td></tr><tr><td><div class="product-name">门店代运维</div><div class="name-kr">점포 유지보수 대행</div></td><td style="text-align:right;"><div class="product-price">¥1,440<span class="unit">/年</span></div></td></tr><tr class="cfg-group"><td colspan="2">硬件配置 · 하드웨어 구성</td></tr><tr><td><div class="product-name">S5 Pro一体机</div><div class="name-kr">S5 Pro 올인원 단말기</div></td><td style="text-align:right;"><div class="product-price">¥1,398</div></td></tr><tr><td><div class="product-name">美团打印机-80N</div><div class="name-kr">메이퇀 프린터 80N</div></td><td style="text-align:right;"><div class="product-price">¥807</div></td></tr></tbody>
+            </table>
+            <div class="brand-total">
+                <span>基础 <b>¥3,820</b></span><span>推荐（9折）<b>¥3,481</b></span><span>硬件 <b>¥2,205</b></span>
+                <span class="grand">方案总价 · 총 금액 <b>¥9,506</b></span>
+            </div>
+        </div>
         <div class="footer">
             <p>美团餐饮SaaS · 메이퇀 외식 SaaS | 报价方案仅供参考，最终以合同为准 · 본 견적서는 참고용이며 최종 계약 조건에 따릅니다</p>
             <p style="margin-top: 8px;">联系人：周巍 | 联系方式：经由首尔夜市项目组转接</p>
