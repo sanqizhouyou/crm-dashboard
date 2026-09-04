@@ -714,9 +714,14 @@ body {
     <div class="changelog">
       <div class="changelog-header">
         <span class="changelog-title">📋 功能更新记录</span>
-        <span class="changelog-count">15 条</span>
+        <span class="changelog-count">16 条</span>
       </div>
       <div class="changelog-list">
+    <div class="changelog-item">
+      <span class="changelog-date">2026.09.04</span>
+      <span class="changelog-tag tag-fix">FIX</span>
+      <span class="changelog-text">修复进入报价单后顶部导航栏悬浮遮挡问题（进入时自动隐藏）</span>
+    </div>
     <div class="changelog-item">
       <span class="changelog-date">2026.09.04</span>
       <span class="changelog-tag tag-feat">FEAT</span>
@@ -929,6 +934,9 @@ function loadVersion(v) {
     document.getElementById('selector').style.display = 'none';
     document.getElementById('viewer').style.display = 'block';
     document.getElementById('backBtn').style.display = 'block';
+    // 进入报价单时隐藏顶部导航栏（避免悬浮在iframe上方）
+    var topNav = document.querySelector('.top-nav');
+    if (topNav) topNav.style.display = 'none';
     // iframe 加载完成后隐藏 loading
     frame.onload = function() {
       loader.style.opacity = '0';
@@ -953,6 +961,9 @@ function goBack() {
   document.getElementById('viewer').style.display = 'none';
   document.getElementById('backBtn').style.display = 'none';
   document.getElementById('selector').style.display = 'flex';
+  // 返回首页时恢复顶部导航栏
+  var topNav = document.querySelector('.top-nav');
+  if (topNav) topNav.style.display = 'flex';
 }
 </script>
 <script>
