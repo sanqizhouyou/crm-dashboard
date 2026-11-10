@@ -678,9 +678,9 @@ body {
           <span class="p-name">行业洞察-监测品牌补充包</span>
         </div>
         <div class="product-card-body">
-          <div class="p-desc">20个品牌监测点位/5个一组</div>
+          <div class="p-desc">20个品牌监测点位/每组5个</div>
           <div class="p-price">
-            <span class="std">标准价 <b>¥40,000</b>/个</span>
+            <span class="std">标准价 <b>¥40,000</b>/5个</span>
             <span class="eco" id="addonEcoPrice">首次赠送</span>
           </div>
         </div>
@@ -745,7 +745,7 @@ body {
               <th>产品说明</th>
               <th>单位</th>
               <th>标准报价</th>
-              <th>生态合作价格</th>
+              <th>生态合作价格（占位）</th>
               <th>备注</th>
             </tr>
           </thead>
@@ -874,6 +874,7 @@ function render() {
   if (getChecked('chk-ai')) selected.push('ai');
   if (getChecked('chk-ai-eco')) selected.push('aiEco');
   if (getChecked('chk-flagship')) selected.push('flagship');
+  if (getChecked('chk-flagship-eco')) selected.push('flagshipEco');
   if (getChecked('chk-addon')) selected.push('addon');
 
   const emptyEl = document.getElementById('qEmpty');
@@ -917,16 +918,20 @@ function render() {
       '<td class="p-desc">' + p.shortDesc + '</td>' +
       '<td class="p-unit">' + p.unit + '</td>' +
       '<td class="p-std">' + fmt(p.stdPrice) + '</td>' +
-      '<td class="p-eco">' + (discount < 1 ? fmt(discounted) + (discounted !== ecoPrice ? '<br><span style="font-size:10px;color:#999;font-weight:400;">原价' + ecoLabel + '</span>' : '') : ecoLabel) + '</td>' +
+      '<td class="p-eco" style="color:#999;font-size:11px;">占位填写</td>' +
       '<td class="p-remark">' + remark + '</td>';
     tbody.appendChild(tr);
 
     descHtml += '<div class="q-desc-item"><b>' + p.name + '：</b>' + p.fullDesc + '</div>';
   });
 
-  document.getElementById('qTotal').textContent = fmt(total);
+  // 生态价列留空，销售手动填写
   document.getElementById('qDescBody').innerHTML = descHtml;
   document.getElementById('qDescSection').style.display = 'block';
+
+  // 参考金额（非正式报价）
+  const refEl = document.getElementById('qRefTotal');
+  if (refEl) refEl.textContent = fmt(total);
 
   // 折页
   document.getElementById('qBrochure').style.display = getChecked('chkBrochure') ? 'block' : 'none';
@@ -935,6 +940,7 @@ function render() {
   document.getElementById('card-ai').classList.toggle('selected', getChecked('chk-ai'));
   document.getElementById('card-ai-eco').classList.toggle('selected', getChecked('chk-ai-eco'));
   document.getElementById('card-flagship').classList.toggle('selected', getChecked('chk-flagship'));
+  document.getElementById('card-flagship-eco').classList.toggle('selected', getChecked('chk-flagship-eco'));
   document.getElementById('card-addon').classList.toggle('selected', getChecked('chk-addon'));
 
   // 补充包控件禁用
@@ -997,7 +1003,7 @@ bindIds.forEach(function(id) {
   document.getElementById(id).addEventListener('input', render);
   document.getElementById(id).addEventListener('change', render);
 });
-['chk-ai', 'chk-ai-eco', 'chk-flagship', 'chk-addon', 'chkBrochure'].forEach(function(id) {
+['chk-ai', 'chk-ai-eco', 'chk-flagship', 'chk-flagship-eco', 'chk-addon', 'chkBrochure', 'chkCost'].forEach(function(id) {
   document.getElementById(id).addEventListener('change', render);
 });
 document.querySelectorAll('input[name="addonMode"]').forEach(function(r) {
