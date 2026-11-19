@@ -719,20 +719,65 @@ a .tool-card:hover {
     <!-- 左下：更新记录 -->
     <div class="changelog">
       <div class="changelog-header">
-        <span class="changelog-title">📋 功能更新记录</span>
-        <span class="changelog-count">23 条</span>
+        <span class="changelog-title">📋 产品更新明细</span>
+        <span class="changelog-count">30 条</span>
       </div>
-      <div class="changelog-list">
-            <div class="changelog-item">
+    <div class="changelog-list">
+        <div class="changelog-item">
+          <span class="changelog-date">2026.11.15</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">新增「生态版行业洞察报价」入口：AI行业洞察（餐饮客户版/生态客户版）、行业洞察生态客户旗舰版、监测品牌补充包，5个产品独立报价，生态合作价格列留空由销售手动填写</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.11.15</span>
+          <span class="changelog-tag tag-new">NEW</span>
+          <span class="changelog-text">新增「行业洞察客户报备」入口：品牌生态发现器（brand-ecology-finder.mynocode.host），高效筛选潜在客户</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.11.10</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">行业洞察生态客户旗舰版标价调整：¥250,000→¥188,888/总部/年（面向非餐饮商户，不带AI功能）</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.11.10</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">生态版报价工具：支持在线预览报价单（封面页黑底渐变+美团黄Logo，内容页白底商务风格表格），生态合作价格列手动输入，标准报价预填可编辑</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.09.21</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">成本分析新增「3阶梯对比」功能：弹窗内输入3个门店数档位一键对比，CSV导出15列格式（产品×3阶梯售价/成本/毛利）</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.09.16</span>
+          <span class="changelog-tag tag-fix">FIX</span>
+          <span class="changelog-text">修复成本分析阶梯价取数bug：revenue硬编码p.tiers.t1000导致无t1000阶梯的产品成本/毛利全错；统一改用getTierPrice(p, n)取售价</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.09.14</span>
+          <span class="changelog-tag tag-fix">FIX</span>
+          <span class="changelog-text">修复成本分析toggleCostView()调用不存在的generateAll()导致JS报错；补全正常模式成本计算代码</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.09.13</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">成本分析支持多方案模式：标注方案名并列出各方案产品明细，支持单独导出CSV（产品/分类/数量/售价/成本/毛利）</span>
+        </div>
+        <div class="changelog-item">
           <span class="changelog-date">2026.09.11</span>
           <span class="changelog-tag tag-feat">FEAT</span>
-          <span class="changelog-text">新增「成本视图」开关：一键计算总成本、毛利、毛利率，支持自定义成本率（总部/服务/硬件）</span>
+          <span class="changelog-text">新增「成本视图」开关：一键计算总成本、毛利、毛利率，支持自定义成本率（总部/服务/硬件）；Ctrl+Shift+C输入MIS号查看，成本数据不出现在面向客户的报价单中</span>
         </div>
-<div class="changelog-item">
-      <span class="changelog-date">2026.09.09</span>
-      <span class="changelog-tag tag-fix">FIX</span>
-      <span class="changelog-text">修复打包价模式明细行四舍五入尾差：明细行优惠价改为按最大余数法精确分摊，行加总恒等于打包总价（原约四成组合存在1-5元尾差）；同步修复阶梯对比模式总部产品数量&gt;1时特批价漏乘数量的问题</span>
-    </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.09.11</span>
+          <span class="changelog-tag tag-feat">FEAT</span>
+          <span class="changelog-text">行业洞察数据清单注入专业版报价单：无论普通模式还是阶梯对比模式均正确显示，数据来源为AI中枢售卖定价方案2026</span>
+        </div>
+        <div class="changelog-item">
+          <span class="changelog-date">2026.09.09</span>
+          <span class="changelog-tag tag-fix">FIX</span>
+          <span class="changelog-text">修复打包价模式明细行四舍五入尾差：明细行优惠价改为按最大余数法精确分摊，行加总恒等于打包总价（原约四成组合存在1-5元尾差）；同步修复阶梯对比模式总部产品数量&gt;1时特批价漏乘数量的问题</span>
+        </div>
     <div class="changelog-item">
       <span class="changelog-date">2026.09.09</span>
       <span class="changelog-tag tag-fix">FIX</span>
