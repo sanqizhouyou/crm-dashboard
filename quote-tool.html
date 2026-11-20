@@ -581,6 +581,9 @@ a .tool-card:hover {
       <input type="password" id="loginPassword" placeholder="请输入密码" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;transition:border-color 0.2s;">
     </div>
     <div id="loginError" style="display:none;color:#ef4444;font-size:12px;margin-bottom:14px;text-align:center;padding:8px;background:rgba(239,68,68,0.1);border-radius:6px;"></div>
+    <div style="text-align:center;margin-bottom:20px;">
+      <a href="#reset" style="color:#888;font-size:12px;text-decoration:none;" onclick="event.preventDefault();showForgotPassword();">忘记密码？</a>
+    </div>
     <button id="loginBtn" style="width:100%;padding:13px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:15px;font-weight:600;border:none;border-radius:8px;cursor:pointer;letter-spacing:1px;transition:opacity 0.2s;">登 录</button>
     <p style="color:#666;font-size:11px;text-align:center;margin:16px 0 0;">默认密码: mt2026</p>
   </div>
@@ -2567,7 +2570,7 @@ document.addEventListener('keydown', function(e) {
 
 <script>
 // ===== 登录验证系统 =====
-const USER_PASSWORDS = {
+const DEFAULT_PASSWORDS = {
   'zhouwei96': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
   'jiangjunyi03': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
   'liyi46': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
@@ -2581,6 +2584,32 @@ const USER_PASSWORDS = {
   'liuqing18': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
   'xiongzhiyang': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f'
 };
+function getUserPasswords() {
+  try {
+    const stored = localStorage.getItem('qt_user_passwords');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // 合并默认密码（新成员自动加入）
+      return { ...DEFAULT_PASSWORDS, ...parsed };
+    }
+  } catch(e) {}
+  return DEFAULT_PASSWORDS;
+}
+function setUserPassword(mis, hash) {
+  try {
+    let stored = {};
+    const existing = localStorage.getItem('qt_user_passwords');
+    if (existing) stored = JSON.parse(existing);
+    stored[mis] = hash;
+    localStorage.setItem('qt_user_passwords', JSON.stringify(stored));
+  } catch(e) {}
+}
+function resetUserPassword(mis, newPassword) {
+  return sha256(newPassword).then(hash => {
+    setUserPassword(mis, hash);
+    return true;
+  });
+}
 const AUTH_SECRET = 'quote-tool-2026-secret';
 
 async function sha256(text) {
@@ -2600,7 +2629,8 @@ function showLoginError(msg) {
 async function doLogin(mis, password) {
   if (!mis || !password) { showLoginError('请输入MIS账号和密码'); return; }
   const hash = await sha256(password);
-  if (USER_PASSWORDS[mis] === hash) {
+  const pwMap = getUserPasswords();
+    if (pwMap[mis] === hash) {
     window.__userMis = mis;
     sessionStorage.setItem('quote_tool_session', JSON.stringify({mis, ts: Date.now()}));
     document.getElementById('loginOverlay').style.display = 'none';
@@ -2622,7 +2652,8 @@ async function doLogin(mis, password) {
 function checkSession() {
   try {
     const session = JSON.parse(sessionStorage.getItem('quote_tool_session') || 'null');
-    if (session && session.mis && USER_PASSWORDS[session.mis]) {
+    const pwMap = getUserPasswords();
+    if (session && session.mis && pwMap[session.mis]) {
       window.__userMis = session.mis;
       document.getElementById('loginOverlay').style.display = 'none';
       const navAvatar = document.querySelector('.nav-avatar');
@@ -2676,11 +2707,133 @@ document.addEventListener('DOMContentLoaded', () => {
   // 检查自动登录
   checkAutoLogin();
   
+  // 检查重置页面
+  checkAutoReset();
+  
   // 检查会话
   checkSession();
 });
 
 // 退出登录
+
+
+// ===== 密码重置功能 ===== //
+const RESET_SECRET = 'quote-reset-secret-2026';
+
+function showForgotPassword() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('resetPage').style.display = 'flex';
+  document.getElementById('resetStep1').style.display = 'block';
+  document.getElementById('resetStep2').style.display = 'none';
+  document.getElementById('resetSuccess').style.display = 'none';
+  document.getElementById('resetError').style.display = 'none';
+  document.getElementById('resetMis').value = '';
+  document.getElementById('resetToken').value = '';
+}
+
+function showLogin() {
+  document.getElementById('resetPage').style.display = 'none';
+  document.getElementById('loginOverlay').style.display = 'flex';
+}
+
+function showResetError(msg) {
+  const el = document.getElementById('resetError');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+function generateResetToken(mis) {
+  // token = sha256(mis + RESET_SECRET + timestamp).slice(0, 12)
+  const ts = Math.floor(Date.now() / 60000); // 每分钟一次
+  return sha256(mis + RESET_SECRET + ts).then(h => h.slice(0, 12));
+}
+// URL参数直接打开重置页面
+function checkAutoReset() {
+  const params = new URLSearchParams(window.location.search);
+  const reset = params.get('reset');
+  if (reset) {
+    try {
+      const decoded = JSON.parse(atob(decodeURIComponent(reset)));
+      if (decoded.mis && decoded.token) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('resetPage').style.display = 'flex';
+        document.getElementById('resetStep1').style.display = 'block';
+        document.getElementById('resetStep2').style.display = 'none';
+        document.getElementById('resetSuccess').style.display = 'none';
+        document.getElementById('resetError').style.display = 'none';
+        document.getElementById('resetMis').value = decoded.mis;
+        document.getElementById('resetMis').readOnly = true;
+        document.getElementById('resetToken').value = decoded.token;
+        // 直接验证
+        verifyResetToken(decoded.mis, decoded.token).then(valid => {
+          if (valid) {
+            document.getElementById('resetStep1').style.display = 'none';
+            document.getElementById('resetStep2').style.display = 'block';
+            window.__resettingMis = decoded.mis;
+          } else {
+            showResetError('重置码已过期，请联系管理员重新发送');
+          }
+        });
+      }
+    } catch(e) {}
+  }
+}
+
+
+
+function verifyResetToken(mis, token) {
+  // 验证当前分钟和上一分钟
+  return Promise.all([
+    sha256(mis + RESET_SECRET + Math.floor(Date.now() / 60000)).then(h => h.slice(0, 12)),
+    sha256(mis + RESET_SECRET + (Math.floor(Date.now() / 60000) - 1)).then(h => h.slice(0, 12))
+  ]).then(([current, prev]) => token === current || token === prev);
+}
+
+// 在DOMContentLoaded中绑定重置码验证
+const resetVerifyBtn = document.getElementById('verifyTokenBtn');
+const resetMis = document.getElementById('resetMis');
+const resetToken = document.getElementById('resetToken');
+if (resetVerifyBtn) {
+  resetVerifyBtn.addEventListener('click', async () => {
+    const mis = resetMis.value.trim();
+    const token = resetToken.value.trim();
+    if (!mis || !token) { showResetError('请输入MIS和重置码'); return; }
+    const pwMap = getUserPasswords();
+    if (!pwMap[mis]) { showResetError('账号不存在'); return; }
+    const valid = await verifyResetToken(mis, token);
+    if (valid) {
+      document.getElementById('resetStep1').style.display = 'none';
+      document.getElementById('resetStep2').style.display = 'block';
+      window.__resettingMis = mis;
+      showResetError('');
+    } else {
+      showResetError('重置码无效或已过期');
+    }
+  });
+  resetToken.addEventListener('keydown', (e) => { if (e.key === 'Enter') resetVerifyBtn.click(); });
+}
+
+// 执行重置
+const doResetBtn = document.getElementById('doResetBtn');
+const newPwd1 = document.getElementById('newPassword1');
+const newPwd2 = document.getElementById('newPassword2');
+if (doResetBtn) {
+  doResetBtn.addEventListener('click', async () => {
+    const pw1 = newPwd1.value;
+    const pw2 = newPwd2.value;
+    if (!pw1 || pw1.length < 4) { showResetError('密码最少4位'); return; }
+    if (pw1 !== pw2) { showResetError('两次密码不一致'); return; }
+    const mis = window.__resettingMis;
+    if (!mis) { showResetError('请重新验证重置码'); return; }
+    await resetUserPassword(mis, pw1);
+    document.getElementById('resetStep2').style.display = 'none';
+    document.getElementById('resetSuccess').style.display = 'block';
+  });
+  newPwd2.addEventListener('keydown', (e) => { if (e.key === 'Enter') doResetBtn.click(); });
+}
+
+
 function logout() {
   sessionStorage.removeItem('quote_tool_session');
   window.__userMis = null;
@@ -2688,5 +2841,49 @@ function logout() {
 }
 </script>
 
+
+
+<!-- ===== 密码重置页 ===== -->
+<div id="resetPage" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);align-items:center;justify-content:center;">
+  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px 36px;width:360px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#ef4444,#dc2626);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;color:#fff;margin-bottom:14px;">!</div>
+      <h2 style="color:#f5f5f5;font-size:20px;font-weight:600;margin:0 0 6px;letter-spacing:1px;">密码重置</h2>
+      <p style="color:#888;font-size:13px;margin:0;">请输入新密码</p>
+    </div>
+    <div id="resetStep1" style="display:block;">
+      <div style="margin-bottom:14px;">
+        <label style="display:block;color:#aaa;font-size:12px;margin-bottom:6px;letter-spacing:0.5px;">MIS 账号</label>
+        <input type="text" id="resetMis" placeholder="如: zhouwei96" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;color:#aaa;font-size:12px;margin-bottom:6px;letter-spacing:0.5px;">重置码</label>
+        <input type="text" id="resetToken" placeholder="请输入收到的重置码" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <button id="verifyTokenBtn" style="width:100%;padding:13px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-size:15px;font-weight:600;border:none;border-radius:8px;cursor:pointer;letter-spacing:1px;">验证重置码</button>
+    </div>
+    <div id="resetStep2" style="display:none;">
+      <div style="margin-bottom:14px;">
+        <label style="display:block;color:#aaa;font-size:12px;margin-bottom:6px;letter-spacing:0.5px;">新密码</label>
+        <input type="password" id="newPassword1" placeholder="请输入新密码" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;color:#aaa;font-size:12px;margin-bottom:6px;letter-spacing:0.5px;">确认新密码</label>
+        <input type="password" id="newPassword2" placeholder="请再次输入" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <button id="doResetBtn" style="width:100%;padding:13px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-size:15px;font-weight:600;border:none;border-radius:8px;cursor:pointer;letter-spacing:1px;">重置密码</button>
+    </div>
+    <div id="resetSuccess" style="display:none;text-align:center;padding:20px;">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:14px;">✓</div>
+      <h3 style="color:#22c55e;">密码重置成功！</h3>
+      <p style="color:#888;font-size:13px;">请返回登录页面</p>
+      <button onclick="location.reload();" style="margin-top:16px;padding:10px 24px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:600;">返回登录</button>
+    </div>
+    <div id="resetError" style="display:none;color:#ef4444;font-size:12px;margin-top:14px;text-align:center;padding:8px;background:rgba(239,68,68,0.1);border-radius:6px;"></div>
+    <div style="text-align:center;margin-top:20px;">
+      <a href="#back" style="color:#888;font-size:12px;text-decoration:none;" onclick="event.preventDefault();showLogin();">← 返回登录</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>
