@@ -601,7 +601,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <div id="loginError" style="display:none;color:#ef4444;font-size:12px;margin-bottom:14px;text-align:center;padding:8px;background:rgba(239,68,68,0.1);border-radius:6px;"></div>
     <div style="text-align:center;margin-bottom:20px;">
-      <a href="#reset" style="color:#888;font-size:12px;text-decoration:none;" onclick="event.preventDefault();showForgotPassword();">忘记密码？</a>
+      <a href="#reset" style="color:#888;font-size:12px;text-decoration:none;margin-right:16px;" onclick="event.preventDefault();showForgotPassword();">忘记密码？</a><a href="#getToken" style="color:#f5c518;font-size:12px;text-decoration:none;" onclick="event.preventDefault();generateAndShowToken();">获取重置码</a>
     </div>
     <button id="loginBtn" style="width:100%;padding:13px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:15px;font-weight:600;border:none;border-radius:8px;cursor:pointer;letter-spacing:1px;transition:opacity 0.2s;">登 录</button>
     <p style="color:#666;font-size:11px;text-align:center;margin:16px 0 0;">默认密码: mt2026</p>
@@ -2875,6 +2875,64 @@ function showChangePwdError(msg) {
   setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
 
+
+
+// ===== 获取/发送重置码 ===== //
+function generateAndShowToken() {
+  if (window.__userMis) {
+    generateTokenForCurrentUser();
+    return;
+  }
+  showForgotPassword();
+}
+
+async function generateTokenForCurrentUser() {
+  const mis = window.__userMis;
+  const token = await generateResetToken(mis);
+  const params = new URLSearchParams({ mis, token });
+  const resetB64 = btoa(params.toString());
+  const resetUrl = window.location.origin + window.location.pathname + '?reset=' + encodeURIComponent(resetB64);
+  document.getElementById('tokenDisplay').textContent = token;
+  document.getElementById('tokenLink').textContent = resetUrl;
+  document.getElementById('tokenModal').style.display = 'flex';
+}
+
+function hideTokenModal() {
+  document.getElementById('tokenModal').style.display = 'none';
+}
+
+function copyToken() {
+  const token = document.getElementById('tokenDisplay').textContent;
+  const link = document.getElementById('tokenLink').textContent;
+  const text = '【报价工具密码重置】\n重置码: ' + token + '\n请点击下方链接直接进入重置页面：\n' + link;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('#tokenModal button:last-child');
+      const origText = btn.textContent;
+      btn.textContent = '✅ 已复制';
+      setTimeout(() => { btn.textContent = origText; }, 2000);
+    }).catch(() => { fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  const btn = document.querySelector('#tokenModal button:last-child');
+  const origText = btn.textContent;
+  btn.textContent = '✅ 已复制';
+  setTimeout(() => { btn.textContent = origText; }, 2000);
+}
+
+
 async function doChangePassword() {
   if (!window.__userMis) return;
   const curPwd = document.getElementById('curPwd').value;
@@ -2980,7 +3038,33 @@ function logout() {
       <button onclick="hideChangePassword()" style="flex:1;padding:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#aaa;font-size:14px;cursor:pointer;">取消</button>
       <button onclick="doChangePassword()" style="flex:1;padding:11px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">确认修改</button>
     </div>
+  
+
+<!-- ===== 获取重置码弹窗 ===== -->
+<div id="tokenModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
+  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;width:380px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <h3 style="color:#f5f5f5;font-size:16px;margin:0;">重置码</h3>
+      <button onclick="hideTokenModal()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;padding:4px;">&times;</button>
+    </div>
+    <div id="tokenContent" style="text-align:center;">
+      <div style="margin-bottom:16px;">
+        <div style="color:#f5c518;font-size:48px;font-weight:700;letter-spacing:8px;margin-bottom:12px;" id="tokenDisplay">----</div>
+        <div style="color:#888;font-size:12px;margin-bottom:16px;">有效期 2 分钟</div>
+      </div>
+      <div style="color:#aaa;font-size:12px;line-height:1.8;margin-bottom:20px;">
+        将此码和以下链接发给需要重置密码的同事<br>
+        对方点击链接 → 输入新密码即可重置
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;margin-bottom:16px;word-break:break-all;text-align:left;">
+        <div style="color:#888;font-size:11px;margin-bottom:4px;">重置链接：</div>
+        <div id="tokenLink" style="color:#555;font-size:12px;user-select:all;">生成中...</div>
+      </div>
+      <button onclick="copyToken()" style="width:100%;padding:11px;background:linear-gradient(135deg,#f5c518,#e0a800);border:none;border-radius:8px;color:#000;font-size:14px;font-weight:600;cursor:pointer;">📋 复制重置码 + 链接</button>
+    </div>
   </div>
+</div>
+</div>
 </div>
 </div>
 </div>
