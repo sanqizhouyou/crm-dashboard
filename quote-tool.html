@@ -606,6 +606,27 @@ if ('serviceWorker' in navigator) {
     <button id="loginBtn" style="width:100%;padding:13px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:15px;font-weight:600;border:none;border-radius:8px;cursor:pointer;letter-spacing:1px;transition:opacity 0.2s;">登 录</button>
     <p style="color:#666;font-size:11px;text-align:center;margin:16px 0 0;">默认密码: mt2026</p>
     <p style="color:#555;font-size:11px;text-align:center;margin:8px 0 0;">新成员请大象联系 <span style="color:#f5c518;">@周巍</span> 开通白名单</p>
+    <div style="text-align:center;margin:12px 0 0;">
+      <button id="applyBtn" style="background:none;border:1px dashed rgba(245,197,24,0.3);border-radius:6px;color:#f5c518;font-size:11px;padding:6px 16px;cursor:pointer;transition:all 0.2s;">📝 申请开通白名单</button>
+    </div>
+    <div id="applyModal" style="display:none;position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px 36px;width:340px;backdrop-filter:blur(20px);">
+        <h3 style="color:#f5f5f5;font-size:16px;margin:0 0 20px;text-align:center;">申请开通白名单</h3>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;color:#aaa;font-size:12px;margin-bottom:6px;">MIS 账号</label>
+          <input type="text" id="applyMis" placeholder="如: xuwanqian" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;color:#aaa;font-size:12px;margin-bottom:6px;">姓名</label>
+          <input type="text" id="applyName" placeholder="如: 徐万千" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;outline:none;box-sizing:border-box;">
+        </div>
+        <div id="applyError" style="display:none;color:#ef4444;font-size:12px;margin-bottom:14px;text-align:center;"></div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="document.getElementById('applyModal').style.display='none';document.getElementById('loginOverlay').style.filter='none';" style="flex:1;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#aaa;font-size:14px;cursor:pointer;">取消</button>
+          <button onclick="submitApply()" style="flex:1;padding:10px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:14px;font-weight:600;border:none;border-radius:8px;cursor:pointer;">提交申请</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2644,6 +2665,52 @@ function showLoginError(msg) {
   el.textContent = msg;
   el.style.display = 'block';
   setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+function showApplyError(msg) {
+  const el = document.getElementById('applyError');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+async function submitApply() {
+  const mis = document.getElementById('applyMis').value.trim();
+  const name = document.getElementById('applyName').value.trim();
+  if (!mis) { showApplyError('请输入MIS账号'); return; }
+  if (!name) { showApplyError('请输入姓名'); return; }
+  const pwMap = getUserPasswords();
+  if (pwMap[mis]) {
+    showApplyError('该账号已在白名单中，请直接登录'); return;
+  }
+  const text = `报价工具登录申请：\n• 姓名：${name}\n• MIS：${mis}\n• 时间：${new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'})}\n\n请审批开通白名单`;
+  const encoded = encodeURIComponent(text);
+  try {
+    const win = window.open(`https://x.sankuai.com/share?type=text&content=${encoded}&to=zhouwei96`, '_blank');
+    if (win) setTimeout(() => { win.close(); }, 3000);
+  } catch(e) {}
+  const modal = document.getElementById('applyModal');
+  modal.innerHTML = `<div style="text-align:center;padding:40px;color:#f5f5f5;"><div style="font-size:48px;margin-bottom:16px;">✅</div><h3 style="font-size:18px;margin:0 0 12px;">申请已提交</h3><p style="color:#aaa;font-size:13px;margin:0;">已通知周巍审批，请留意大象消息<br><span style="color:#666;font-size:11px;">正在跳回登录页…</span></p><div style="margin-top:16px;"><button onclick="location.reload()" style="padding:10px 24px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:14px;font-weight:600;border:none;border-radius:8px;cursor:pointer;">返回登录</button></div></div>`;
+}
+
+// 绑定申请按钮
+if (document.getElementById('applyBtn')) {
+  document.getElementById('applyBtn').addEventListener('click', () => {
+    const modal = document.getElementById('applyModal');
+    modal.style.display = 'flex';
+    loginOverlay.style.filter = 'blur(4px)';
+    document.getElementById('applyMis').value = loginMis.value.trim();
+    document.getElementById('applyMis').focus();
+  });
+}
+
+if (document.getElementById('applyModal')) {
+  document.getElementById('applyModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.style.display = 'none';
+      document.getElementById('loginOverlay').style.filter = 'none';
+    }
+  });
 }
 
 async function doLogin(mis, password) {
