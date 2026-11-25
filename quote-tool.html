@@ -585,7 +585,7 @@ if ('serviceWorker' in navigator) {
 
 <!-- ===== 登录验证层 ===== -->
 <div id="loginOverlay" style="display:flex;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);align-items:center;justify-content:center;">
-  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px 36px;width:360px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px 36px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <div style="text-align:center;margin-bottom:28px;">
       <div style="width:56px;height:56px;background:linear-gradient(135deg,#f5c518,#e0a800);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;color:#000;margin-bottom:14px;">M</div>
       <h2 style="color:#f5f5f5;font-size:20px;font-weight:600;margin:0 0 6px;letter-spacing:1px;">美团餐饮SaaS报价工具</h2>
@@ -652,6 +652,7 @@ if ('serviceWorker' in navigator) {
     <span class="nav-name">周巍</span>
     <div class="nav-status"><div class="nav-status-dot"></div>已登录</div>
     <button class="nav-btn" onclick="showChangePassword()" title="修改密码" style="margin-left:12px;padding:6px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#aaa;font-size:12px;cursor:pointer;transition:all 0.2s;">🔑</button>
+    <button class="nav-btn" onclick="logout()" title="退出登录" style="margin-left:8px;padding:6px 12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:6px;color:#f87171;font-size:12px;cursor:pointer;transition:all 0.2s;">🚪 退出</button>
   </div>
 </nav>
 
@@ -3044,7 +3045,7 @@ function logout() {
 
 <!-- ===== 密码重置页 ===== -->
 <div id="resetPage" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);align-items:center;justify-content:center;">
-  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px 36px;width:360px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px 36px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <div style="text-align:center;margin-bottom:28px;">
       <div style="width:56px;height:56px;background:linear-gradient(135deg,#ef4444,#dc2626);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;color:#fff;margin-bottom:14px;">!</div>
       <h2 style="color:#f5f5f5;font-size:20px;font-weight:600;margin:0 0 6px;letter-spacing:1px;">密码重置</h2>
@@ -3089,7 +3090,7 @@ function logout() {
 </div>
 </div>
 <div id="changePwdModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
-  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;width:340px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <h3 style="color:#f5f5f5;font-size:16px;margin:0;">修改密码</h3>
       <button onclick="hideChangePassword()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;padding:4px;">&times;</button>
@@ -3115,7 +3116,7 @@ function logout() {
 
 <!-- ===== 获取重置码弹窗 ===== -->
 <div id="tokenModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;">
-  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;width:380px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+  <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 32px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <h3 style="color:#f5f5f5;font-size:16px;margin:0;">重置码</h3>
       <button onclick="hideTokenModal()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;padding:4px;">&times;</button>
