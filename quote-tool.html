@@ -562,24 +562,7 @@ a .tool-card:hover {
 
 </style>
 <!-- v42 -->
-<script>
-// 强制SW更新检测
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg => {
-    reg.addEventListener('updatefound', () => {
-      const newWorker = reg.installing;
-      newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          // 新版本可用，提示刷新
-          if (confirm('新版本已发布，点击确定刷新页面')) {
-            window.location.reload();
-          }
-        }
-      });
-    });
-  });
-}
-</script>
+
 </head>
 <body>
 
