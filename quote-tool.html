@@ -2687,12 +2687,17 @@ async function submitApply() {
   }
   const text = `报价工具登录申请：\n• 姓名：${name}\n• MIS：${mis}\n• 时间：${new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'})}\n\n请审批开通白名单`;
   const encoded = encodeURIComponent(text);
-  try {
-    const win = window.open(`https://x.sankuai.com/share?type=text&content=${encoded}&to=zhouwei96`, '_blank');
-    if (win) setTimeout(() => { win.close(); }, 3000);
-  } catch(e) {}
+  const sendLink = `https://x.sankuai.com/share?type=text&content=${encoded}&to=zhouwei96`;
+  // Use <a> click instead of window.open to avoid popup blockers
+  const a = document.createElement('a');
+  a.href = sendLink;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // Show success modal
   const modal = document.getElementById('applyModal');
-  modal.innerHTML = `<div style="text-align:center;padding:40px;color:#f5f5f5;"><div style="font-size:48px;margin-bottom:16px;">✅</div><h3 style="font-size:18px;margin:0 0 12px;">申请已提交</h3><p style="color:#aaa;font-size:13px;margin:0;">已通知周巍审批，请留意大象消息<br><span style="color:#666;font-size:11px;">正在跳回登录页…</span></p><div style="margin-top:16px;"><button onclick="location.reload()" style="padding:10px 24px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:14px;font-weight:600;border:none;border-radius:8px;cursor:pointer;">返回登录</button></div></div>`;
+  modal.innerHTML = `<div style="text-align:center;padding:40px;color:#f5f5f5;"><div style="font-size:48px;margin-bottom:16px;">✅</div><h3 style="font-size:18px;margin:0 0 12px;">申请已提交</h3><p style="color:#aaa;font-size:13px;margin:0;">已打开大象私聊（@周巍），请在大象中发送消息完成申请<br><span style="color:#666;font-size:11px;">正在跳回登录页…</span></p><div style="margin-top:16px;"><button onclick="location.reload()" style="padding:10px 24px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:14px;font-weight:600;border:none;border-radius:8px;cursor:pointer;">返回登录</button></div></div>`;
 }
 
 // 绑定申请按钮
