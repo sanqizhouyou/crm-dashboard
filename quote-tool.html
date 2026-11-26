@@ -614,6 +614,102 @@ a .tool-card:hover {
 </div>
 
 
+
+<script>
+// Shell page login helpers - needed by applyBtn in loginOverlay
+const DEFAULT_PASSWORDS_ = {
+  'zhouwei96': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'jiangjunyi03': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'liyi46': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'liqiang93': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'zhoujingjing04': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'wangmengqi11': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'wangye59': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'lizhuoyi': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'xijiachen': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'wangchongqing': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'liuqing18': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'xiongzhiyang': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'xuwanqian': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f',
+  'xuweilong03': '63c2000c64209c32632695b281959e64800dc1d58bbba664b4b195cc9430620f'
+};
+function getUserPasswords() {
+  try {
+    const stored = localStorage.getItem('qt_user_passwords');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return { ...DEFAULT_PASSWORDS_, ...parsed };
+    }
+  } catch(e) {}
+  return DEFAULT_PASSWORDS_;
+}
+function showApplyError(msg) {
+  const el = document.getElementById('applyError');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+async function sha256(text) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function submitApply() {
+  const mis = document.getElementById('applyMis').value.trim();
+  const name = document.getElementById('applyName').value.trim();
+  if (!mis) { showApplyError('请输入MIS账号'); return; }
+  if (!name) { showApplyError('请输入姓名'); return; }
+  const pwMap = getUserPasswords();
+  if (pwMap[mis]) {
+    showApplyError('该账号已在白名单中，请直接登录'); return;
+  }
+  const text = '报价工具登录申请：
+• 姓名：' + name + '
+• MIS：' + mis + '
+• 时间：' + new Date().toLocaleString('zh-CN', {timeZone:'Asia/Shanghai'}) + '
+
+请审批开通白名单';
+  const encoded = encodeURIComponent(text);
+  const daxiangUrl = 'https://x.sankuai.com/share?type=text&content=' + encoded + '&to=zhouwei96';
+  const modal = document.getElementById('applyModal');
+  modal.innerHTML = '<div style="text-align:center;padding:40px;color:#f5f5f5;">' +
+    '<div style="font-size:48px;margin-bottom:16px;">✅</div>' +
+    '<h3 style="font-size:18px;margin:0 0 12px;">申请已提交</h3>' +
+    '<p style="color:#aaa;font-size:13px;margin:0 0 20px;">请点击下面按钮打开大象私聊（@周巍）<br>发送申请消息完成审批</p>' +
+    '<div style="margin:20px 0;">' +
+      '<a href="' + daxiangUrl + '" target="_blank" style="display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#f5c518,#e0a800);color:#000;font-size:15px;font-weight:600;border-radius:8px;text-decoration:none;box-shadow:0 2px 8px rgba(245,197,24,0.3);">' +
+      '✅ 在大象中发送申请' +
+      '</a>' +
+    '</div>' +
+    '<p style="color:#666;font-size:12px;margin:0;">点击打开大象私聊，在出现的私聊窗口中点击发送</p>' +
+    '<div style="margin-top:20px;">' +
+      '<button onclick="location.reload()" style="padding:10px 24px;background:rgba(255,255,255,0.1);color:#aaa;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,0.2);border-radius:8px;cursor:pointer;">返回登录</button>' +
+    '</div>' +
+  '</div>';
+}
+// 绑定申请按钮
+if (document.getElementById('applyBtn')) {
+  document.getElementById('applyBtn').addEventListener('click', () => {
+    const modal = document.getElementById('applyModal');
+    modal.style.display = 'flex';
+    const loginMis = document.getElementById('loginMis');
+    if (loginMis) {
+      document.getElementById('applyMis').value = loginMis.value.trim();
+      document.getElementById('applyMis').focus();
+    }
+  });
+}
+if (document.getElementById('applyModal')) {
+  document.getElementById('applyModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.style.display = 'none';
+    }
+  });
+}
+</script>
+
+
 <!-- Loading 动画 -->
 <div id="appLoading">
   <div class="loader-logo">M</div>
