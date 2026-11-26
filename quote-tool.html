@@ -2700,7 +2700,7 @@ if (document.getElementById('applyBtn')) {
   document.getElementById('applyBtn').addEventListener('click', () => {
     const modal = document.getElementById('applyModal');
     modal.style.display = 'flex';
-    loginOverlay.style.filter = 'blur(4px)';
+    
     document.getElementById('applyMis').value = loginMis.value.trim();
     document.getElementById('applyMis').focus();
   });
@@ -2710,7 +2710,7 @@ if (document.getElementById('applyModal')) {
   document.getElementById('applyModal').addEventListener('click', function(e) {
     if (e.target === this) {
       this.style.display = 'none';
-      document.getElementById('loginOverlay').style.filter = 'none';
+      ;
     }
   });
 }
